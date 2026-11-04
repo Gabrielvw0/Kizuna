@@ -107,12 +107,12 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
       }
       break;
 
-    case 2: // TELA 03: CHOQUE CULTURAL • CORREDOR DAS 4 PORTAS
+    case 2: // TELA 03: CHOQUE CULTURAL • CORREDOR ESCURO (portas identificadas na camada da tela)
       env.globeVisibility = 0.0;
       env.corridorVisibility = 1.0;
-      // Step controls active portal focus
-      pose.pos.set((sceneIdx - 1.5) * 0.45, 0.2, 2.6);
-      pose.target.set((sceneIdx - 1.5) * 0.3, 0.1, 0);
+      // Etapa 8: olhar fixo pelo corredor, com leve deriva lateral acompanhando a porta aberta
+      pose.pos.set((Math.min(3, sceneIdx) - 1.5) * 0.12, 0.05, 2.9);
+      pose.target.set((Math.min(3, sceneIdx) - 1.5) * 0.2, 0.0, -3);
       break;
 
     case 3: // TELA 04: GLOBAL × LOCAL • DUAS ESTRUTURAS SE FUNDINDO (KANJI 絆)

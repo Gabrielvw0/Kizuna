@@ -357,42 +357,84 @@ export const WorldStage: React.FC = () => {
     });
 
     // =========================================================================
-    // 03. CORRIDOR OF 4 DOORS GROUP (SCENE 03: CHOQUE CULTURAL)
+    // 03. CORREDOR ESCURO EM PERSPECTIVA (TELA 03, CENAS 1–4)
+    // Etapa 8: as quatro molduras coloridas saíram; as portas identificadas ficam na
+    // camada da tela. O 3D dá profundidade: corredor de pilares e uma luz que acompanha a porta aberta.
     // =========================================================================
     const corridorGroup = new THREE.Group();
     scene.add(corridorGroup);
 
-    const doors = [
-      { id: 0, x: -1.6, color: 0xef4444, kanji: '文化' },
-      { id: 1, x: -0.55, color: 0x38bdf8, kanji: '言語' },
-      { id: 2, x: 0.55, color: 0xf59e0b, kanji: '商習慣' },
-      { id: 3, x: 1.6, color: 0x10b981, kanji: '規制' }
-    ];
-
-    const doorMeshes: THREE.Group[] = [];
-    doors.forEach((d) => {
-      const doorRoot = new THREE.Group();
-      doorRoot.position.set(d.x, 0, 0);
-
-      // Frame
-      const frameMat = new THREE.MeshBasicMaterial({ color: d.color, transparent: true, opacity: 0.45 });
-      const leftP = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.8, 0.08), frameMat);
-      leftP.position.x = -0.42;
-      const rightP = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.8, 0.08), frameMat);
-      rightP.position.x = 0.42;
-      const topP = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.08, 0.08), frameMat);
-      topP.position.y = 0.9;
-      doorRoot.add(leftP, rightP, topP);
-
-      // Inner glowing pane
-      const paneGeo = new THREE.PlaneGeometry(0.78, 1.72);
-      const paneMat = new THREE.MeshBasicMaterial({ color: d.color, transparent: true, opacity: 0.15, side: THREE.DoubleSide });
-      const pane = new THREE.Mesh(paneGeo, paneMat);
-      doorRoot.add(pane);
-
-      corridorGroup.add(doorRoot);
-      doorMeshes.push(doorRoot);
+    // Sem névoa: a profundidade vem das próprias cores (claro na frente, escuro ao fundo)
+    const corridorLineMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9, fog: false });
+    const NEAR_C = new THREE.Color(0x323843);
+    const FAR_C = new THREE.Color(0x0b0b0d);
+    const depthColor = (z: number) => NEAR_C.clone().lerp(FAR_C, Math.min(1, Math.max(0, (1.5 - z) / 10.5)));
+    const addLine = (pts: THREE.Vector3[]) => {
+      const g = new THREE.BufferGeometry().setFromPoints(pts);
+      const cols: number[] = [];
+      pts.forEach((pt) => {
+        const c = depthColor(pt.z);
+        cols.push(c.r, c.g, c.b);
+      });
+      g.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+      corridorGroup.add(new THREE.Line(g, corridorLineMat));
+    };
+    const HALF_W = 2.3;
+    const FLOOR_Y = -1.05;
+    const CEIL_Y = 1.25;
+    // linhas longitudinais do piso e do teto (fogem para o fundo)
+    [-HALF_W, -1.15, 0, 1.15, HALF_W].forEach((x) => {
+      addLine([new THREE.Vector3(x, FLOOR_Y, 1.5), new THREE.Vector3(x, FLOOR_Y, -9)]);
+      addLine([new THREE.Vector3(x, CEIL_Y, 1.5), new THREE.Vector3(x, CEIL_Y, -9)]);
     });
+    // pilares e vigas (ritmo arquitetônico), cada vez mais distantes
+    for (let i = 0; i < 7; i++) {
+      const z = 0.8 - i * 1.45;
+      const shade = depthColor(z).multiplyScalar(0.42);
+      const pillarMat = new THREE.MeshBasicMaterial({ color: shade, fog: false });
+      const beamMat = new THREE.MeshBasicMaterial({ color: shade.clone().multiplyScalar(1.15), fog: false });
+      [-HALF_W, HALF_W].forEach((x) => {
+        const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.12, CEIL_Y - FLOOR_Y, 0.12), pillarMat);
+        pillar.position.set(x, (CEIL_Y + FLOOR_Y) / 2, z);
+        corridorGroup.add(pillar);
+      });
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(HALF_W * 2 + 0.12, 0.08, 0.12), beamMat);
+      beam.position.set(0, CEIL_Y, z);
+      corridorGroup.add(beam);
+      addLine([new THREE.Vector3(-HALF_W, FLOOR_Y, z), new THREE.Vector3(HALF_W, FLOOR_Y, z)]);
+    }
+
+    // luz suave (branco quente, sem vermelho) que segue a porta aberta
+    const beamShader = {
+      uniforms: { uOpacity: { value: 0.0 } },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+      `,
+      fragmentShader: `
+        uniform float uOpacity;
+        varying vec2 vUv;
+        void main() {
+          float h = smoothstep(0.0, 0.45, 1.0 - abs(vUv.x - 0.5) * 2.0);
+          float v = smoothstep(0.0, 0.9, vUv.y) * (1.0 - smoothstep(0.92, 1.0, vUv.y));
+          gl_FragColor = vec4(0.95, 0.92, 0.86, 1.0) * h * v * uOpacity;
+        }
+      `
+    };
+    const lightShaft = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.0, CEIL_Y - FLOOR_Y),
+      new THREE.ShaderMaterial({ ...beamShader, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })
+    );
+    lightShaft.position.set(0, (CEIL_Y + FLOOR_Y) / 2, -1.2);
+    corridorGroup.add(lightShaft);
+    const floorPool = new THREE.Mesh(
+      new THREE.CircleGeometry(0.75, 48),
+      new THREE.MeshBasicMaterial({ color: 0xf2eee6, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, fog: false })
+    );
+    floorPool.rotation.x = -Math.PI / 2;
+    floorPool.scale.set(1, 0.45, 1);
+    floorPool.position.set(0, FLOOR_Y + 0.005, -1.2);
+    corridorGroup.add(floorPool);
 
     // =========================================================================
     // 04. GLOBAL × LOCAL FUSION GROUP (SCENE 04)
@@ -854,14 +896,18 @@ export const WorldStage: React.FC = () => {
       }
 
       // -----------------------------------------------------------------------
-      // 3. Corridor 4 Doors (Scene 03)
+      // 3. Corredor escuro (tela 03, cenas 1–4)
       // -----------------------------------------------------------------------
       corridorGroup.visible = sIdx === 2;
       if (sIdx === 2) {
-        doorMeshes.forEach((dm, i) => {
-          const isActive = i === scIdx;
-          dm.scale.lerp(new THREE.Vector3(isActive ? 1.08 : 0.94, isActive ? 1.08 : 0.94, 1), 0.08);
-        });
+        // a luz desliza até a posição da porta aberta (mesma ordem das portas da tela)
+        const targetX = (Math.min(3, scIdx) - 1.5) * 1.05;
+        lightShaft.position.x += (targetX - lightShaft.position.x) * Math.min(1, dt * 3);
+        floorPool.position.x = lightShaft.position.x;
+        const shaftMat = lightShaft.material as THREE.ShaderMaterial;
+        shaftMat.uniforms.uOpacity.value += (0.24 - shaftMat.uniforms.uOpacity.value) * Math.min(1, dt * 2);
+        const poolMat = floorPool.material as THREE.MeshBasicMaterial;
+        poolMat.opacity += (0.07 - poolMat.opacity) * Math.min(1, dt * 2);
       }
 
       // -----------------------------------------------------------------------
