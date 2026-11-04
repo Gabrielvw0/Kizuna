@@ -1,0 +1,404 @@
+{
+  "classificationLegend": {
+    "DADO": "Informação factual verificável sustentada por documentação pública ou institucional.",
+    "HIPÓTESE": "Premissa estratégica adotada pelo grupo para modelagem de entrada no mercado.",
+    "RECOMENDAÇÃO": "Decisão estratégica ou arquitetural proposta pelo grupo para o projeto Kizuna.",
+    "META": "Indicador (KPI) de mercado, produto ou negócio para acompanhamento da estratégia.",
+    "PREÇO SUGERIDO": "Hipótese comercial de precificação proposta pelo grupo (não oficial da Globant)."
+  },
+  "sections": {
+    "01": {
+      "id": "01",
+      "title": "TELA 01 | ABERTURA — KIZUNA (絆統合基幹業務システム)",
+      "banca": {
+        "speech": "Hoje vamos apresentar uma estratégia para levar uma solução de gestão de equipes ao mercado japonês. Mas existe um desafio que vai muito além da tecnologia: confiança. ... É desse desafio que nasce o Kizuna.",
+        "concept": "A dificuldade de uma empresa global entrar no mercado japonês não está apenas na tecnologia. Está em compreender o contexto local, construir confiança e adaptar a experiência empresarial. CAPACIDADE GLOBAL + ADAPTAÇÃO LOCAL + CONFIANÇA = KIZUNA.",
+        "evidence": "O fio vermelho (赤い糸) parte do Brasil/Globant, percorre o mundo e converge para o arquipélago japonês, desenhando 絆 sob o slogan oficial 'GLOBAL REACH. LOCAL TRUST.'",
+        "premise": "Apresentar o Kizuna inicialmente como um software de gestão de equipes que evolui gradualmente (Land & Expand) reduz a barreira de entrada.",
+        "risk": "Apresentar o sistema de imediato como um ERP gigantesco e afastar clientes que exigem construção prévia de confiança.",
+        "response": "Iniciamos pela gestão de equipes e conduzimos a narrativa pelo fio vermelho até a plataforma empresarial.",
+        "probableQuestion": "Qual é a tese central do projeto Kizuna?",
+        "suggestedAnswer": "A tese central é que a barreira para entrar no Japão não é tecnológica, mas contextual e relacional. O Kizuna combina Capacidade Global + Adaptação Local + Confiança sob o posicionamento 'GLOBAL REACH. LOCAL TRUST.'"
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Posicionamento Oficial: GLOBAL REACH. LOCAL TRUST.",
+          "source": "Arquitetura Estratégica Kizuna (絆統合基幹業務システム)",
+          "date": "2026",
+          "info": "Uso exclusivo do slogan oficial 'GLOBAL REACH. LOCAL TRUST.' e da metáfora permanente do fio vermelho (赤い糸) conectando Brasil → Globant → Mundo → Japão → Equipes → Empresas → Kizuna.",
+          "methodology": "Storytelling estratégico contínuo em 15 telas controladas pelo apresentador.",
+          "implication": "Garante unidade visual e conceitual do início ao encerramento."
+        }
+      ]
+    },
+    "02": {
+      "id": "02",
+      "title": "TELA 02 | POR QUE O JAPÃO? — Um mercado que exige contexto",
+      "banca": {
+        "speech": "O Japão é um mercado tecnologicamente avançado, mas possui características empresariais próprias. Para uma empresa estrangeira, isso significa que não basta possuir uma boa tecnologia. É necessário compreender como o mercado funciona.",
+        "concept": "Mercado tecnológico desenvolvido, alta exigência empresarial, grande presença de empresas estabelecidas e forte demanda por modernização digital (DX), somados à ponte histórica Brasil–Japão iniciada em 1908.",
+        "evidence": "Dados comprováveis de órgãos oficiais japoneses (METI, Statistics Bureau / MIC, JETRO) e FMI.",
+        "premise": "Números reais com fonte e ano sustentam a atratividade do mercado japonês sem recorrer a estimativas inventadas.",
+        "risk": "Exagerar o peso comercial da relação histórica Brasil–Japão.",
+        "response": "Apresentamos o marco de 1908 (Kasato Maru) de forma breve e elegante apenas como ponte de contexto cultural entre os dois países.",
+        "probableQuestion": "Quais dados comprovam a oportunidade para softwares de gestão no Japão?",
+        "suggestedAnswer": "Segundo o METI (White Paper on SMEs, 2023/2024), 99,7% das empresas japonesas são PMEs (~3,36 milhões de empresas). Além disso, o famoso DX Report do METI aponta um risco econômico de até ¥12 trilhões/ano caso sistemas legados não sejam modernizados, em uma das maiores economias do mundo (IMF, 2024)."
+      },
+      "evidences": [
+        {
+          "type": "DADO",
+          "title": "99,7% das Empresas no Japão são PMEs (~3,36 milhões)",
+          "source": "METI — Small and Medium Enterprise Agency (White Paper on SMEs in Japan)",
+          "date": "2023 / 2024",
+          "info": "As pequenas e médias empresas representam 99,7% de todas as empresas japonesas e cerca de 70% da força de trabalho do país.",
+          "methodology": "Censo Econômico Oficial do Governo Japonês (METI / MIC).",
+          "implication": "Comprova a amplitude do público-alvo para entrada via gestão de equipes e expansão modular."
+        },
+        {
+          "type": "DADO",
+          "title": "Alerta 'Digital Cliff' — ¥12 Trilhões/ano em Risco por Sistemas Legados",
+          "source": "METI (Ministry of Economy, Trade and Industry) — DX Report",
+          "date": "2018–2025",
+          "info": "O Ministério da Economia, Comércio e Indústria do Japão documentou a urgência de transformação digital (DX) diante da rigidez de sistemas legados.",
+          "methodology": "Relatório Governamental de Transformação Digital do Japão.",
+          "implication": "Demonstra que há necessidade real de modernização operacional nas empresas japonesas."
+        },
+        {
+          "type": "DADO",
+          "title": "Ponte Histórica Brasil ↔ Japão (1908 — Kasato Maru)",
+          "source": "MOFA Japan (Ministério dos Negócios Estrangeiros do Japão) / Museu da Imigração SP",
+          "date": "1908",
+          "info": "A imigração japonesa oficial para o Brasil começou em 18 de junho de 1908, com a chegada do navio Kasato Maru ao Porto de Santos.",
+          "methodology": "Registro histórico bilateral oficial Brasil–Japão.",
+          "implication": "Contextualiza a afinidade histórica e institucional entre Brasil e Japão."
+        }
+      ]
+    },
+    "03": {
+      "id": "03",
+      "title": "TELA 03 | R1 • CHOQUE CULTURAL — O Japão não é apenas outro mercado",
+      "banca": {
+        "speech": "O choque cultural não está em um único ponto. Ele aparece na forma de se comunicar, decidir, contratar, operar e construir confiança.",
+        "concept": "Quatro portas estruturais do choque cultural: Porta 01 Cultura (Hierarquia, Formalidade, Consenso, Relacionamento), Porta 02 Idioma, Porta 03 Hábitos Empresariais e Porta 04 Regulação (diferenciando Legislação de Padrões/Certificações).",
+        "evidence": "Cada porta explicita a relação direta Problema → Consequência para o produto.",
+        "premise": "Distinguir claramente leis japonesas (APPI, Electronic Books Preservation Act, Qualified Invoice System) de normas/certificações técnicas (ISO/IEC 27001 / JIS Q 27001).",
+        "risk": "Confundir normas ISO/JIS com legislação estatal ou reduzir o choque cultural apenas à tradução.",
+        "response": "Separamos visualmente LEGISLAÇÃO de PADRÕES / CERTIFICAÇÕES na Porta 04 e detalhamos o impacto de cada porta no produto.",
+        "probableQuestion": "Qual é a diferença entre APPI, Electronic Books Preservation Act, Qualified Invoice System e ISO/IEC 27001 / JIS Q 27001?",
+        "suggestedAnswer": "APPI (proteção de dados pessoais), Electronic Books Preservation Act (guarda digital de livros e documentos contábeis/fiscais) e Qualified Invoice System (sistema de faturas qualificadas / Tekikaku Seikyusho) são LEGISLAÇÕES japonesas obrigatórias. Já a ISO/IEC 27001 e sua equivalente japonesa JIS Q 27001 são PADRÕES / CERTIFICAÇÕES de segurança da informação exigidos pelo mercado corporativo."
+      },
+      "evidences": [
+        {
+          "type": "DADO",
+          "title": "Legislação Japonesa vs. Padrões e Certificações (R1)",
+          "source": "PPC Japan (APPI) • NTA Japan (Electronic Books & Qualified Invoice) • JIPDEC (JIS Q 27001)",
+          "date": "2022–2024",
+          "info": "Legislação: APPI, Electronic Books Preservation Act e Qualified Invoice System (vigente desde out/2023). Padrões/Certificações: ISO/IEC 27001 / JIS Q 27001.",
+          "methodology": "Mapeamento regulatório e técnico para software B2B no Japão.",
+          "implication": "Garante precisão acadêmica e jurídica diante da banca."
+        }
+      ]
+    },
+    "04": {
+      "id": "04",
+      "title": "TELA 04 | GLOBAL × LOCAL — Como conectar os dois?",
+      "banca": {
+        "speech": "Temos de um lado a capacidade global da empresa. Do outro, as particularidades do mercado japonês. O desafio estratégico é transformar uma capacidade global em uma experiência que faça sentido localmente. ... É aqui que entra o Kizuna.",
+        "concept": "Confronto entre GLOBAL (Tecnologia, Escala, Experiência, Inovação, Conhecimento internacional) e LOCAL (Contexto, Idioma, Relacionamento, Processos, Confiança), unidos pelo fio vermelho e selados pelo caractere 絆 e carimbo Hanko.",
+        "evidence": "Síntese visual da tese: Capacidade Global + Adaptação Local + Confiança = Kizuna.",
+        "premise": "Sem uma ponte de adaptação e confiança, a fenda entre a oferta global e a demanda local impede a adoção.",
+        "risk": "Tentar impor processos globais padronizados a equipes japonesas.",
+        "response": "O Kizuna fecha a fenda conectando a engenharia global aos processos e rituais locais.",
+        "probableQuestion": "O que o carimbo Hanko e o fio vermelho simbolizam nessa transição?",
+        "suggestedAnswer": "O fio vermelho (赤い糸) simboliza a conexão contínua entre capacidade global e realidade local, enquanto o carimbo Hanko (判子) representa a validação formal, o compromisso institucional e o selo de confiança na cultura empresarial japonesa."
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Ponte Estratégica Global × Local",
+          "source": "Modelagem Conceitual Kizuna",
+          "date": "2026",
+          "info": "União de 5 ativos globais (Tecnologia, Escala, Experiência, Inovação, Conhecimento internacional) com 5 pilares locais (Contexto, Idioma, Relacionamento, Processos, Confiança).",
+          "methodology": "Síntese estratégica de internacionalização.",
+          "implication": "Prepara a apresentação do produto a partir da Tela 05."
+        }
+      ]
+    },
+    "05": {
+      "id": "05",
+      "title": "TELA 05 | COMEÇAMOS PELA EQUIPE — Kizuna Start (¥980 税抜)",
+      "banca": {
+        "speech": "O Kizuna não tenta entrar no Japão oferecendo toda a estrutura de um ERP de uma vez. Começamos pelo problema mais próximo da equipe: organizar tarefas, projetos, comunicação e acompanhamento.",
+        "concept": "Posicionamento inicial como software de gestão de equipes (Kizuna Start — ¥980 / usuário/mês 税抜, preço sugerido), composto por 4 blocos que se encaixam no núcleo: Tarefas, Calendário, Projetos e Comunicação.",
+        "evidence": "Estratégia de entrada enxuta ('Gestão de equipes sem complexidade desnecessária') que reduz o atrito de adoção.",
+        "premise": "Empresas japonesas preferem validar um fornecedor novo em escopo departamental controlado antes de expandir para sistemas críticos.",
+        "risk": "Oferecer um ERP monolítico complexo logo no primeiro contato comercial.",
+        "response": "Entramos pela equipe com 4 módulos essenciais a ¥980/usuário/mês (税抜).",
+        "probableQuestion": "Por que apresentar o Kizuna primeiro como software de gestão de equipes e não como um ERP completo?",
+        "suggestedAnswer": "Porque substituir um ERP inteiro exige altíssima confiança prévia e longo ciclo decisório no Japão. Ao entrar como um software de gestão de equipes (Tarefas, Calendário, Projetos e Comunicação por ¥980 税抜), resolvemos uma dor imediata com baixo risco e criamos a base para a estratégia Land & Expand."
+      },
+      "evidences": [
+        {
+          "type": "PREÇO SUGERIDO",
+          "title": "Kizuna Start — ¥980 / usuário/mês (税抜)",
+          "source": "Hipótese Estratégica do Projeto Kizuna",
+          "date": "2026",
+          "info": "Plano inicial focado em Tarefas, Calendário, Projetos e Comunicação, com indicação fiscal japonesa 税抜 (preço antes de impostos sobre consumo).",
+          "methodology": "Estratégia Land & Expand orientada a adoção rápida por equipes.",
+          "implication": "Viabiliza pilotos rápidos e entrada em PMEs e departamentos."
+        }
+      ]
+    },
+    "06": {
+      "id": "06",
+      "title": "TELA 06 | UMA INFORMAÇÃO. UMA OPERAÇÃO. — Demonstração do Kizuna",
+      "banca": {
+        "speech": "Vamos mostrar na prática: criamos a tarefa 'Preparar proposta comercial para cliente japonês', vinculamos ao projeto 'Entrada Japão', acompanhamos a evolução de 'A fazer' para 'Em andamento' e 'Concluído', vemos o indicador subir de 68% para 75% e o gestor acompanha tudo em tempo real.",
+        "concept": "Fluxo ao vivo em 5 passos acompanhado pelo fio vermelho: 1. Criar Tarefa → 2. Vincular ao Projeto ('Entrada Japão') → 3. Acompanhar ('A fazer' → 'Em andamento' → 'Concluído') → 4. Indicador (68% → 75%) → 5. Gestão.",
+        "evidence": "Demonstração funcional interativa + Modo Vídeo de Reserva (tecla V) para contingência técnica.",
+        "premise": "A informação nasce na equipe e chega à gestão sem precisar atravessar sistemas desconectados.",
+        "risk": "Falha técnica durante a demonstração ao vivo diante da banca.",
+        "response": "A Tela 06 funciona em tempo real e conta também com o Vídeo de Reserva (tecla V) que executa toda a sequência automaticamente caso necessário.",
+        "probableQuestion": "O que essa demonstração comprova sobre a arquitetura do Kizuna?",
+        "suggestedAnswer": "Comprova que a atualização feita pelo colaborador na ponta (concluir a tarefa da proposta comercial) recalcula instantaneamente o progresso do projeto (de 68% para 75%) e atualiza o painel do gestor com responsáveis, prazos e prioridades sem planilhas paralelas."
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Demonstração Operacional em 5 Etapas + Vídeo de Reserva",
+          "source": "Protótipo Funcional Kizuna",
+          "date": "2026",
+          "info": "Encadeamento Tarefa → Projeto → Indicador (68% → 75%) → Gestor, com acesso também ao workspace empresarial completo.",
+          "methodology": "Demonstração ao vivo assistida por fio condutor visual.",
+          "implication": "Materializa o valor do produto diante da banca avaliadora."
+        }
+      ]
+    },
+    "07": {
+      "id": "07",
+      "title": "TELA 07 | EXPANSÃO — À medida que a confiança cresce, a plataforma cresce",
+      "banca": {
+        "speech": "A estratégia é Land & Expand. A empresa não precisa adotar tudo no primeiro momento. Ela começa com uma necessidade concreta e amplia a utilização conforme o valor percebido.",
+        "concept": "Três anéis progressivos atravessados pelo fio vermelho: Kizuna Start (¥980 — Gestão de equipes), Kizuna Business (¥1.980 — Gestão + inteligência) e Kizuna Enterprise (¥3.500 — Gestão + escala).",
+        "evidence": "Progressão clara de escopo: Equipe → Inteligência (IA, Relatórios, Automação, Integrações, Desempenho) → Escala (Segurança avançada, Suporte prioritário, Implantação personalizada, Integrações corporativas).",
+        "premise": "A expansão tecnológica acompanha a curva de maturidade e confiança do cliente japonês.",
+        "risk": "O cliente estagnar no plano básico se os níveis superiores não tiverem valor claro.",
+        "response": "Cada anel adiciona capacidades decisivas para o crescimento da empresa (IA e automação no Business; governança e escala no Enterprise).",
+        "probableQuestion": "Como funciona a transição do cliente entre Start, Business e Enterprise?",
+        "suggestedAnswer": "O cliente inicia no Start (¥980) organizando tarefas e projetos de uma equipe. Quando busca cruzar dados entre áreas e automatizar rotinas com IA, avança para o Business (¥1.980). Quando a operação atinge escala corporativa com requisitos estritos de segurança, suporte prioritário e integrações sob medida, evolui para o Enterprise (¥3.500)."
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Arquitetura em 3 Anéis (Land & Expand)",
+          "source": "Estratégia de Produto e Expansão Kizuna",
+          "date": "2026",
+          "info": "Evolução: Gestão de equipes (Start ¥980) → Gestão + inteligência (Business ¥1.980) → Gestão + escala (Enterprise ¥3.500).",
+          "methodology": "Modelagem de expansão modular B2B.",
+          "implication": "Maximiza o Lifetime Value (LTV) respeitando o ritmo de decisão japonês."
+        }
+      ]
+    },
+    "08": {
+      "id": "08",
+      "title": "TELA 08 | R2 • ADAPTAÇÃO DO PRODUTO — Não basta traduzir",
+      "banca": {
+        "speech": "A adaptação não é apenas linguística. Ela envolve a forma como o usuário interage, como as decisões são aprovadas, como os dados são tratados e como o sistema se integra à realidade existente.",
+        "concept": "Seis dimensões de adaptação ao Japão unidas por conexões Kintsugi: 01 Nome (絆 Kizuna), 02 Idioma, 03 UX (Hierarquia, Permissões, Aprovações, Formalidade), 04 Processos (Ringi e Nemawashi), 05 Integrações e 06 Compliance.",
+        "evidence": "Incorporação nativa dos rituais japoneses de alinhamento prévio (Nemawashi) e aprovação formal em etapas (Ringi).",
+        "premise": "Integrar o que já funciona e evoluir gradualmente evita rejeição operacional.",
+        "risk": "Limitar a localização à tradução literal de menus.",
+        "response": "Adaptamos fluxos decisórios (Ringi/Nemawashi), hierarquia de UX, suporte nativo e conformidade regulatória.",
+        "probableQuestion": "Como o Kizuna traduz os conceitos japoneses de Ringi e Nemawashi em funcionalidades de software?",
+        "suggestedAnswer": "Nemawashi é suportado por espaços de alinhamento prévio e comentários contextuais entre as partes interessadas antes de submeter uma proposta; já o Ringi é materializado em cadeias estruturadas de aprovação multinível com registro formal de consenso por alçada."
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Matriz de 6 Adaptações do Produto (R2)",
+          "source": "Especificação de Localização Profunda — Projeto Kizuna",
+          "date": "2026",
+          "info": "01 Nome (絆), 02 Idioma, 03 UX, 04 Processos (Ringi & Nemawashi), 05 Integrações ('Integrar o que já funciona. Evoluir gradualmente.') e 06 Compliance (APPI, Electronic Books, Qualified Invoice, ISO/IEC 27001 / JIS Q 27001).",
+          "methodology": "Design centrado na cultura organizacional japonesa.",
+          "implication": "Responde integralmente ao requisito R2 de adaptação do produto."
+        }
+      ]
+    },
+    "09": {
+      "id": "09",
+      "title": "TELA 09 | CONFIANÇA E GOVERNANÇA — A confiança precisa estar no produto",
+      "banca": {
+        "speech": "A inteligência artificial pode acelerar o trabalho, mas decisões relevantes precisam permanecer dentro de uma estrutura de governança. O Kizuna combina automação com validação humana e rastreabilidade.",
+        "concept": "Segurança (RBAC), Auditoria (Audit Trail), Governança (Aprovação, Permissões, Rastreabilidade) e IA sob a regra: 'A IA PROPÕE. O HUMANO VALIDA. O SISTEMA REGISTRA. IA NÃO DECIDE SOZINHA.'",
+        "evidence": "Fluxo interativo: IA → Recomendação → Validação humana (Portão Vermelho) → Execução → Auditoria.",
+        "premise": "Em ambientes corporativos japoneses, a automação só é aceita quando acompanhada de supervisão humana explícita e trilha de auditoria.",
+        "risk": "Decisões automatizadas em caixa-preta gerarem desconfiança ou erros operacionais.",
+        "response": "O portão vermelho bloqueia qualquer execução crítica até que o gestor responsável valide a recomendação.",
+        "probableQuestion": "Por que o lema 'IA não decide sozinha' é tão importante para o mercado japonês?",
+        "suggestedAnswer": "Porque a governança corporativa japonesa exige responsabilidade nominal clara e previsibilidade. No Kizuna, a IA acelera a análise e propõe recomendações, mas o gestor humano valida antes da execução e o Audit Trail registra todo o processo."
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Governança de IA: A IA propõe, o humano valida, o sistema registra",
+          "source": "Arquitetura de Segurança e Governança Kizuna",
+          "date": "2026",
+          "info": "Combinação de RBAC, Audit Trail e Portão de Validação Humana obrigatório.",
+          "methodology": "Human-in-the-Loop AI Governance.",
+          "implication": "Transforma segurança e controle em vantagem competitiva de confiança."
+        }
+      ]
+    },
+    "10": {
+      "id": "10",
+      "title": "TELA 10 | R3 • PRAÇA — Como chegamos ao cliente?",
+      "banca": {
+        "speech": "A entrada não deve começar pela construção de uma grande estrutura própria. Começamos reduzindo o risco: parceiros locais, pilotos, clientes de referência e aprendizado. Com validação, podemos ampliar nossa presença.",
+        "concept": "Cinco canais de distribuição (Venda Direta, Parceiros Locais, Eventos Empresariais, Canais Digitais e SaaS) combinados ao Modo de Entrada em 5 Fases: Fase 1 Parceiro local → Fase 2 Pilotos → Fase 3 Clientes de referência → Fase 4 Escala → Fase 5 Presença própria (possível evolução futura: 株式会社).",
+        "evidence": "Rota progressiva sobre o mapa do Japão acompanhada pelo fio vermelho.",
+        "premise": "Entrar via parceiros locais (consultorias e integradores japoneses) e pilotos reduz o custo fixo inicial e transfere credibilidade local ao Kizuna.",
+        "risk": "Abrir uma estrutura pesada antes de validar a aderência do produto no mercado.",
+        "response": "Evoluímos em 5 fases graduais até alcançar escala e eventual constituição de entidade local própria (Kabushiki Kaisha / 株式会社).",
+        "probableQuestion": "Por que o modo de entrada começa com parceiros locais e só prevê presença própria (株式会社) na Fase 5?",
+        "suggestedAnswer": "Para mitigar risco financeiro e acelerar a confiança inicial. Consultorias e integradores japoneses já possuem relacionamento com os clientes locais; à medida que conquistamos pilotos (Fase 2), clientes de referência (Fase 3) e escala (Fase 4), justificamos a expansão para uma estrutura própria (株式会社) na Fase 5."
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Arquitetura de Canais e Modo de Entrada em 5 Fases (R3)",
+          "source": "Estratégia de Go-To-Market e Internacionalização Kizuna",
+          "date": "2026",
+          "info": "Canais: Venda Direta, Parceiros Locais, Eventos Empresariais, Canais Digitais e SaaS. Entrada: Parceiro local → Pilotos → Clientes de referência → Escala → Presença própria (株式会社).",
+          "methodology": "Modelo sequencial de entrada internacional com mitigação de risco.",
+          "implication": "Atende integralmente ao requisito R3 de Praça e Modo de Entrada."
+        }
+      ]
+    },
+    "11": {
+      "id": "11",
+      "title": "TELA 11 | R4 • PROMOÇÃO — Como o Kizuna se torna conhecido?",
+      "banca": {
+        "speech": "A comunicação não deve começar tentando vender um software estrangeiro. Primeiro precisamos construir credibilidade, demonstrar valor e mostrar que entendemos o contexto empresarial japonês.",
+        "concept": "Mensagem central 'GLOBAL REACH. LOCAL TRUST.' direcionada a Gestores, Líderes de equipes, PMEs, Empresas em crescimento e Executivos de tecnologia, através de 7 canais (LinkedIn, X, YouTube, Mídia Especializada, Webinars, Eventos, SEO Local) e Prova Social (Pilotos, Cases, Clientes de referência, Parceiros locais).",
+        "evidence": "Ecossistema integrado de peças de comunicação em Tóquio conectadas pelo fio vermelho.",
+        "premise": "No B2B japonês, educação técnica, eventos presenciais, mídia especializada e prova social local geram muito mais conversão do que propaganda genérica.",
+        "risk": "Comunicar apenas em inglês ou sem referências locais verificáveis.",
+        "response": "Combinamos SEO local em japonês, presença no X (muito forte no Japão), LinkedIn B2B, YouTube, Webinars e feiras corporativas com cases de pilotos.",
+        "probableQuestion": "Por que incluir a rede X e Eventos Empresariais na estratégia de promoção B2B no Japão?",
+        "suggestedAnswer": "O Japão possui um dos maiores públicos ativos do mundo no X, inclusive para discussão profissional e tecnológica, enquanto eventos presenciais e webinars técnicos são fundamentais na cultura japonesa para estabelecer relacionamento pessoal e credibilidade institucional."
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Plano de Comunicação B2B & Prova Social no Japão (R4)",
+          "source": "Estratégia de Promoção Kizuna",
+          "date": "2026",
+          "info": "7 Canais (LinkedIn, X, YouTube, Mídia Especializada, Webinars, Eventos, SEO Local) + 4 Pilares de Prova Social (Pilotos, Cases, Clientes de referência, Parceiros locais).",
+          "methodology": "Comunicação integrada de construção de autoridade e geração de demanda.",
+          "implication": "Responde integralmente ao requisito R4 de Promoção."
+        }
+      ]
+    },
+    "12": {
+      "id": "12",
+      "title": "TELA 12 | POSICIONAMENTO — Por que escolher o Kizuna?",
+      "banca": {
+        "speech": "O Kizuna não pretende competir simplesmente por quantidade de funcionalidades. O posicionamento está na combinação entre capacidade global e adaptação local.",
+        "concept": "GLOBAL (Escala, Tecnologia, Experiência internacional) × LOCAL (Adaptação, Contexto, Relacionamento) = KIZUNA (GLOBAL CAPABILITY × LOCAL ADAPTATION).",
+        "evidence": "Mapa estratégico 2×2 (Capacidade Global × Adaptação Local) aliado aos 5 diferenciais propostos: Gestão de equipes + Integração + Adaptação local + Governança + IA com controle humano.",
+        "premise": "Não afirmamos superioridade absoluta sem dados; demonstramos o espaço estratégico onde o Kizuna entrega valor diferenciado.",
+        "risk": "Competir frontalmente com ERPs legados locais apenas em listas de recursos.",
+        "response": "Posicionamos o Kizuna na interseção entre engenharia global moderna e adaptação profunda ao trabalho em equipe japonês.",
+        "probableQuestion": "Se o Japão já possui softwares locais e globais, qual é o diferencial real do Kizuna?",
+        "suggestedAnswer": "Soluções globais genéricas têm tecnologia, mas baixa adaptação aos rituais japoneses; soluções locais tradicionais têm adaptação linguística, mas menor capacidade de integração moderna e IA. O Kizuna propõe unir Gestão de equipes + Integração + Adaptação local + Governança + IA com controle humano."
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Matriz 2×2: Global Capability × Local Adaptation",
+          "source": "Posicionamento Competitivo Proposto — Projeto Kizuna",
+          "date": "2026",
+          "info": "Posicionamento estratégico sem alegações absolutas improváveis, focado na combinação de 5 diferenciais integrados.",
+          "methodology": "Mapeamento estratégico de valor competitivo.",
+          "implication": "Sustenta uma defesa madura e equilibrada perante a banca."
+        }
+      ]
+    },
+    "13": {
+      "id": "13",
+      "title": "TELA 13 | PREÇO — Como o Kizuna gera valor?",
+      "banca": {
+        "speech": "O modelo é baseado em assinatura por usuário. A lógica não é cobrar apenas pelo software inicial, mas permitir expansão conforme a utilização cresce. Implantação e integrações complexas podem ser tratadas separadamente.",
+        "concept": "Três planos em ienes (税抜): Kizuna Start (¥980/usuário/mês), Kizuna Business (¥1.980/usuário/mês) e Kizuna Enterprise (¥3.500/usuário/mês), acompanhados de simulador interativo (10 → 40 → 100 usuários) e separação explícita entre Licenças + Implantação + Integrações.",
+        "evidence": "Aviso transparente: 'PREÇOS SUGERIDOS — HIPÓTESE ESTRATÉGICA PARA O PROJETO. Os valores não representam preços oficiais da Globant.'",
+        "premise": "Separar Licenças SaaS de Implantação e Integrações torna o modelo econômico realista e escalável.",
+        "risk": "A banca questionar se ¥3.500/usuário cobre implantações corporativas complexas.",
+        "response": "Mostramos visualmente no simulador que Licenças, Implantação e Integrações são componentes distintos de receita.",
+        "probableQuestion": "Como o modelo de preços equilibra entrada acessível e viabilidade em grandes empresas?",
+        "suggestedAnswer": "O Start (¥980 税抜) funciona como porta de entrada acessível para pequenas equipes; o Business (¥1.980 税抜) captura a expansão para IA, relatórios e automação; e o Enterprise (¥3.500 税抜) remunera a licença de governança corporativa em maior escala, enquanto projetos de Implantação e Integrações são cobrados separadamente."
+      },
+      "evidences": [
+        {
+          "type": "PREÇO SUGERIDO",
+          "title": " Planos em Ienes (税抜) + Simulador 10 → 40 → 100 Usuários",
+          "source": "Modelagem Financeira Proposta — Projeto Kizuna",
+          "date": "2026",
+          "info": "Start: ¥980 | Business: ¥1.980 | Enterprise: ¥3.500 por usuário/mês (税抜), mais componentes distintos de Implantação e Integrações.",
+          "methodology": "Precificação SaaS B2B Land & Expand com receitas de serviços desacopladas.",
+          "implication": "Garante clareza comercial e defensabilidade financeira."
+        }
+      ]
+    },
+    "14": {
+      "id": "14",
+      "title": "TELA 14 | RISCOS E INDICADORES — Uma estratégia precisa ser medida",
+      "banca": {
+        "speech": "O objetivo não é apenas entrar no mercado. Precisamos saber se estamos conseguindo conquistar, ativar, reter e expandir clientes.",
+        "concept": "Mapeamento direto de 4 Riscos → Respostas (01 Desconfiança de fornecedor estrangeiro; 02 Ciclo de venda longo; 03 Concorrência local consolidada; 04 Erro de idioma) e Painel de KPIs em 3 dimensões: MERCADO (Parceiros ativos, Clientes de referência), PRODUTO (Usuários ativos, Taxa de adoção) e NEGÓCIO (MRR, Cancelamentos).",
+        "evidence": "Conexão causa-efeito entre mitigação de risco e métricas de acompanhamento.",
+        "premise": "Toda estratégia executiva precisa demonstrar consciência dos riscos e indicadores claros de sucesso.",
+        "risk": "Medir apenas vendas brutas e ignorar adoção real ou churn (cancelamentos).",
+        "response": "Monitoramos simultaneamente Mercado, Produto e Negócio (MRR e Cancelamentos).",
+        "probableQuestion": "Como vocês mitigam o risco de ciclo de venda longo e desconfiança no Japão?",
+        "suggestedAnswer": "Mitigamos a desconfiança entrando com parceiro local, hospedagem adequada, certificações e pilotos; e reduzimos o ciclo de venda longo focando inicialmente em PMEs e startups com pilotos ágeis para construir casos de referência locais."
+      },
+      "evidences": [
+        {
+          "type": "META",
+          "title": "Matriz de 4 Riscos & Painel de KPIs (Mercado, Produto e Negócio)",
+          "source": "Framework de Governança Estratégica Kizuna",
+          "date": "2026",
+          "info": "4 Riscos mitigados + 6 KPIs essenciais: Parceiros ativos, Clientes de referência, Usuários ativos, Taxa de adoção, MRR e Cancelamentos.",
+          "methodology": "Gestão integrada de risco e telemetria SaaS B2B.",
+          "implication": "Demonstra maturidade de gestão perante a banca universitária."
+        }
+      ]
+    },
+    "15": {
+      "id": "15",
+      "title": "TELA 15 | ENCERRAMENTO — 絆 GLOBAL REACH. LOCAL TRUST.",
+      "banca": {
+        "speech": "O Kizuna não leva apenas tecnologia ao Japão. Constrói uma conexão que o mercado possa aceitar e uma relação que possa permanecer.",
+        "concept": "O fio vermelho (赤い糸) parte do Japão, recua pelo globo e reconecta Brasil → Mundo → Japão → Equipes → Empresas → Kizuna, fechando o círculo iniciado na Tela 01 em torno do símbolo 絆 e do slogan oficial 'GLOBAL REACH. LOCAL TRUST.'",
+        "evidence": "Síntese das 8 perguntas fundamentais da banca respondidas ao longo das 15 telas.",
+        "premise": "Terminar com uma única imagem forte na mente da banca: 絆 — GLOBAL REACH. LOCAL TRUST.",
+        "risk": "Dispersar a mensagem final com múltiplos slogans.",
+        "response": "Fechamos o círculo visualmente no globo com o fio vermelho e a assinatura única.",
+        "probableQuestion": "Em uma frase, qual é o legado da estratégia Kizuna?",
+        "suggestedAnswer": "O Kizuna não leva apenas tecnologia ao Japão: constrói uma conexão que o mercado possa aceitar e uma relação que possa permanecer — GLOBAL REACH. LOCAL TRUST."
+      },
+      "evidences": [
+        {
+          "type": "RECOMENDAÇÃO",
+          "title": "Fechamento do Círculo: Brasil → Mundo → Japão → Equipes → Empresas → Kizuna",
+          "source": "Síntese Executiva Kizuna",
+          "date": "2026",
+          "info": "Convergência final do fio vermelho (赤い糸) sob o caractere 絆 e o slogan 'GLOBAL REACH. LOCAL TRUST.'",
+          "methodology": "Storytelling circular de alto impacto.",
+          "implication": "Consolida os 8 objetivos estratégicos da apresentação."
+        }
+      ]
+    }
+  }
+}

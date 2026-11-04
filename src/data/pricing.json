@@ -1,0 +1,130 @@
+{
+  "badge": "PREÇOS SUGERIDOS — HIPÓTESE ESTRATÉGICA PARA O MODELO DE ENTRADA",
+  "title": "VALOR → PREÇO",
+  "subtitle": "Plataforma modular integrada, com expansão por usuário e complexidade.",
+  "currency": "¥",
+  "currencyCode": "JPY",
+  "presets": [10, 50, 100, 500, 1000],
+  "defaultUsers": 50,
+  "revenueStreams": [
+    {
+      "id": "saas",
+      "number": "01",
+      "title": "Licença SaaS",
+      "detail": "¥980 / ¥1.980 / ¥3.500 por usuário/mês (recorrência previsível)"
+    },
+    {
+      "id": "implantacao",
+      "number": "02",
+      "title": "Implantação",
+      "detail": "Projeto inicial estruturado sob proposta"
+    },
+    {
+      "id": "integracoes",
+      "number": "03",
+      "title": "Integrações",
+      "detail": "Conexão com sistemas legados e APIs corporativas sob proposta"
+    },
+    {
+      "id": "servicos",
+      "number": "04",
+      "title": "Serviços Profissionais",
+      "detail": "Consultoria, treinamento, migração e suporte especializado sob proposta"
+    }
+  ],
+  "plans": [
+    {
+      "id": "start",
+      "name": "KIZUNA START",
+      "badge": "PREÇO SUGERIDO",
+      "stageLabel": "Entrada",
+      "conceptWord": "ORGANIZAR",
+      "priceMonthly": 980,
+      "priceAnnual": 11760,
+      "audience": "Para pequenas equipes",
+      "positioning": "Porta de entrada operacional. O cliente não precisa substituir sua operação inteira no primeiro dia.",
+      "description": "Começa organizando uma área ou equipe em idioma e padrão japonês, preparando o terreno para expansão futura.",
+      "features": [
+        "Tarefas e fluxos operacionais",
+        "Calendário corporativo integrado",
+        "Comunicação contextual por equipe",
+        "Acompanhamento de projetos"
+      ],
+      "additionalScope": [],
+      "highlight": false,
+      "accent": "#94A3B8"
+    },
+    {
+      "id": "business",
+      "name": "KIZUNA BUSINESS",
+      "badge": "PREÇO SUGERIDO • MAIS ESTRATÉGICO",
+      "stageLabel": "Expansão",
+      "conceptWord": "INTELIGÊNCIA",
+      "priceMonthly": 1980,
+      "priceAnnual": 23760,
+      "audience": "Para empresas em crescimento",
+      "positioning": "Inteligência + IA supervisionada (2× Start).",
+      "description": "Conecta múltiplos departamentos com automação, relatórios executivos e recomendações da IA com Human Validation Gate.",
+      "features": [
+        "Tudo do Kizuna Start +",
+        "IA com Human Validation Gate",
+        "Relatórios analíticos e BI operacional",
+        "Automações entre áreas",
+        "Integrações padrão e gestão de indicadores"
+      ],
+      "additionalScope": [],
+      "highlight": true,
+      "accent": "#E11D48"
+    },
+    {
+      "id": "enterprise",
+      "name": "KIZUNA ENTERPRISE",
+      "badge": "PREÇO SUGERIDO + ESCOPO SOB PROPOSTA",
+      "stageLabel": "Governança",
+      "conceptWord": "ESCALA",
+      "priceMonthly": 3500,
+      "priceAnnual": 42000,
+      "audience": "Para grandes empresas",
+      "positioning": "Maior valor por usuário e potencial de expansão por volume de licenças.",
+      "description": "O software é licenciado por usuário; a complexidade de implantação, migração e integração com legados é contratada sob proposta.",
+      "features": [
+        "Tudo do Kizuna Business +",
+        "Governança corporativa e auditoria imutável",
+        "Segurança avançada e controle granular (Ringi/RBAC)",
+        "Suporte prioritário em japonês"
+      ],
+      "additionalScope": [
+        "Implantação personalizada — sob proposta",
+        "Integrações corporativas — sob proposta",
+        "Serviços profissionais — sob proposta"
+      ],
+      "highlight": false,
+      "accent": "#38BDF8"
+    }
+  ],
+  "expansionJourney": {
+    "badge": "ESTRATÉGIA COMERCIAL PROPOSTA — LAND & EXPAND",
+    "motto": "Comece pequeno. Comprove valor. Expanda com confiança.",
+    "disclaimer": "Os valores não representam preços oficiais da Globant nem uma pesquisa de preço de concorrentes. São uma hipótese de precificação construída para o exercício, estruturada em três níveis de adoção e expansão.",
+    "tiers": [
+      {
+        "plan": "START",
+        "price": "¥980",
+        "transitionLabel": "adoção",
+        "role": "ORGANIZAÇÃO — Porta de entrada operacional em uma equipe ou departamento inicial."
+      },
+      {
+        "plan": "BUSINESS",
+        "price": "¥1.980",
+        "transitionLabel": "expansão",
+        "role": "INTELIGÊNCIA + IA — Integração entre departamentos, automação e análise operacional."
+      },
+      {
+        "plan": "ENTERPRISE",
+        "price": "¥3.500",
+        "transitionLabel": "governança",
+        "role": "GOVERNANÇA + ESCALA — Licença corporativa + implantação, integrações e serviços sob proposta."
+      }
+    ]
+  }
+}

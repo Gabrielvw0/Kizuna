@@ -1,0 +1,85 @@
+{
+  "badge": "METAS PROPOSTAS — HORIZONTE DE 12 MESES",
+  "disclaimer": "Todos os indicadores abaixo representam metas estratégicas propostas para os primeiros 12 meses da operação Kizuna no Japão, e não resultados históricos já realizados.",
+  "phases": [
+    {
+      "id": "m0_3",
+      "period": "0–3 MESES",
+      "stage": "PESQUISA",
+      "targetNumber": "20–30",
+      "targetUnit": "entrevistas",
+      "targetLabel": "20–30 entrevistas qualitativas",
+      "badge": "META PROPOSTA",
+      "progressValue": 25,
+      "summary": "Imersão no contexto empresarial japonês para validar dores operacionais, vocabulário corporativo e requisitos de confiança.",
+      "deliverables": [
+        "Entrevistas estruturadas com gestores de PMEs e empresas em expansão",
+        "Mapeamento de objeções culturais e barreiras de adoção",
+        "Ajuste fino da terminologia, UX e fluxos de validação do Kizuna",
+        "Seleção de parceiros locais estratégicos para co-validação"
+      ],
+      "strategicRole": "Garantir que o produto não seja apenas traduzido, mas genuinamente adaptado antes de ir a campo."
+    },
+    {
+      "id": "m3_6",
+      "period": "3–6 MESES",
+      "stage": "PILOTOS",
+      "targetNumber": "3–5",
+      "targetUnit": "empresas",
+      "targetLabel": "3–5 empresas em piloto assistido",
+      "badge": "META PROPOSTA",
+      "progressValue": 50,
+      "summary": "Implantação assistida em ambiente controlado com acompanhamento próximo para gerar evidências práticas no mercado japonês.",
+      "deliverables": [
+        "Onboarding assistido em 3 a 5 empresas do segmento CORE",
+        "Configuração de fluxos de tarefas, comunicação e validação humana",
+        "Coleta semanal de indicadores de uso, engajamento e fricção",
+        "Documentação técnica de segurança e conformidade operacional"
+      ],
+      "strategicRole": "Construir as primeiras referências locais verificáveis e reduzir o risco percebido pelo mercado."
+    },
+    {
+      "id": "m6_9",
+      "period": "6–9 MESES",
+      "stage": "VALIDAÇÃO",
+      "targetNumber": "80%+",
+      "targetUnit": "de satisfação",
+      "targetLabel": "80%+ de índice de satisfação nos pilotos",
+      "badge": "META PROPOSTA",
+      "progressValue": 78,
+      "summary": "Consolidação da qualidade percebida, validação de valor operacional e formalização de casos de sucesso no Japão.",
+      "deliverables": [
+        "Atingimento de 80%+ de satisfação entre usuários e patrocinadores dos pilotos",
+        "Publicação de estudos de caso locais autorizados pelos clientes",
+        "Validação da arquitetura IA → Human Validation Gate → Execução",
+        "Preparação da estrutura comercial e canais para lançamento"
+      ],
+      "strategicRole": "Confirmar o Product-Market Fit local antes de acelerar investimentos em aquisição comercial."
+    },
+    {
+      "id": "m9_12",
+      "period": "9–12 MESES",
+      "stage": "CONVERSÃO",
+      "targetNumber": "5–10",
+      "targetUnit": "contratos/clientes recorrentes",
+      "targetLabel": "5–10 contratos/clientes recorrentes ativos",
+      "badge": "META PROPOSTA",
+      "progressValue": 100,
+      "summary": "Conversão de pilotos em contratos anuais recorrentes e conquista dos primeiros clientes comerciais via canais diretos e parceiros.",
+      "deliverables": [
+        "Conversão efetiva dos pilotos validados em contratos pagos",
+        "Aquisição de novos clientes até atingir a marca de 5 a 10 contratos recorrentes",
+        "Início da jornada de expansão interna (Start → Business → Enterprise)",
+        "Planejamento de escala para o Ano 2 com base em dados reais"
+      ],
+      "strategicRole": "Estabelecer base sólida de receita recorrente (ARR) ancorada em confiança e reputação local."
+    }
+  ],
+  "transversalIndicator": {
+    "value": "ZERO",
+    "label": "incidentes críticos de segurança",
+    "quote": "Crescimento pode aumentar. Tolerância a incidentes críticos não.",
+    "badge": "META INEGOCIÁVEL • 0–12 MESES",
+    "rationale": "No mercado corporativo japonês, um único incidente grave de segurança ou vazamento de dados no primeiro ano compromete irreversivelmente a confiança construída. Por isso, governança, controle de permissões, logs e validação humana permanecem inegociáveis do mês 1 ao mês 12."
+  }
+}

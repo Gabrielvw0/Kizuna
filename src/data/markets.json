@@ -1,0 +1,76 @@
+{
+  "badge": "AVALIAÇÃO ESTRATÉGICA CONCEITUAL",
+  "centerLabel": "MERCADO JAPONÊS",
+  "disclaimer": "As pontuações do radar representam uma escala conceitual (1 a 100) de avaliação estratégica elaborada pelo grupo para priorização de entrada, e não estatísticas quantitativas de mercado.",
+  "segments": [
+    {
+      "id": "core",
+      "tier": "CORE",
+      "ringIndex": 1,
+      "name": "Pequenas/Médias Empresas e Empresas em Expansão",
+      "subtitle": "Foco primário de entrada — necessidade imediata de organização e digitalização",
+      "tag": "PRIORIDADE ESTRATÉGICA #1",
+      "color": "#E11D48",
+      "profile": "Empresas japonesas de pequeno e médio porte (PMEs / Chūshō Kigyō) e empresas em fase de crescimento que operam com ferramentas fragmentadas (planilhas, e-mails, sistemas desconectados) e buscam modernização operacional.",
+      "need": "Organização centralizada de tarefas, projetos, comunicação interna e digitalização progressiva sem a complexidade e o custo proibitivo de ERPs legados tradicionais.",
+      "maturity": "Intermediária — reconhecem a urgência da transformação digital (DX), mas carecem de equipes internas extensas de TI para implantações longas.",
+      "potential": "Alto potencial de tração inicial e geração de casos de sucesso locais no horizonte de 12 meses.",
+      "barriers": "Exigência de interface 100% adaptada ao contexto japonês, necessidade de suporte confiável e aversão a riscos operacionais na troca de ferramentas.",
+      "salesCycle": "Médio (estimado como hipótese operacional de 2 a 4 meses via piloto assistido).",
+      "strategicJustification": "Combina dor operacional aguda com tomada de decisão mais ágil que grandes conglomerados, permitindo validar o produto localmente e construir referências japonesas reais antes de disputar contratos corporativos de grande porte.",
+      "conceptualScores": {
+        "strategicFit": 94,
+        "speedOfAdoption": 86,
+        "digitalUrgency": 90,
+        "accessibility": 85,
+        "expansionPotential": 88
+      }
+    },
+    {
+      "id": "secondary",
+      "tier": "SECONDARY",
+      "ringIndex": 2,
+      "name": "Grandes Corporações",
+      "subtitle": "Expansão de médio prazo — operações complexas, segurança avançada e escala",
+      "tag": "EXPANSÃO CORPORATIVA",
+      "color": "#38BDF8",
+      "profile": "Grandes empresas japonesas com múltiplos departamentos, operações distribuídas e requisitos estritos de governança, segurança da informação e conformidade.",
+      "need": "Integração entre sistemas corporativos, visibilidade executiva consolidada, automação com validação humana (Ringi/governança) e controle rigoroso de auditoria.",
+      "maturity": "Alta em infraestrutura, porém frequentemente sobrecarregada por sistemas legados rígidos e silos departamentais.",
+      "potential": "Maior valor por usuário e potencial de expansão por volume de licenças, somado a projetos de implantação, integrações e serviços profissionais sob proposta.",
+      "barriers": "Ciclo decisório longo baseado em consenso (Ringi-sho), exigência de histórico comprovado no Japão, rigor extremo em segurança e homologação técnica.",
+      "salesCycle": "Longo (hipótese estratégica de 6 a 12+ meses, exigindo pilotos prévios e casos locais consolidados).",
+      "strategicJustification": "Representa o vetor de escala financeira do Kizuna após a conquista das primeiras referências e validações práticas no segmento CORE, ou por meio de entrada departamental (Land & Expand).",
+      "conceptualScores": {
+        "strategicFit": 82,
+        "speedOfAdoption": 48,
+        "digitalUrgency": 78,
+        "accessibility": 52,
+        "expansionPotential": 96
+      }
+    },
+    {
+      "id": "exploratory",
+      "tier": "EXPLORATORY",
+      "ringIndex": 3,
+      "name": "Pequenas Empresas Tradicionais",
+      "subtitle": "Horizonte exploratório — negócios familiares e operações altamente tradicionais",
+      "tag": "MONITORAMENTO DE LONGO PRAZO",
+      "color": "#94A3B8",
+      "profile": "Micro e pequenas empresas tradicionais japonesas com processos fortemente analógicos ou baseados em rotinas manuais consolidadas há décadas.",
+      "need": "Simplificação extrema de tarefas básicas, calendário e comunicação inicial (porta de entrada operacional Kizuna Start).",
+      "maturity": "Baixa maturidade digital — forte apego a métodos presenciais e processos em papel/carimbo físico.",
+      "potential": "Volume numérico elevado no mercado japonês, porém menor valor por conta e maior custo proporcional de educação digital.",
+      "barriers": "Resistência cultural à mudança tecnológica, sensibilidade a preço e necessidade de acompanhamento intensivo para adoção básica.",
+      "salesCycle": "Variável — depende fortemente de canais indiretos, parceiros locais e simplificação máxima do onboarding.",
+      "strategicJustification": "Mantido no radar como camada exploratória via plano Kizuna Start (¥980/usuário/mês) e parceiros regionais, evitando drenar o foco consultivo principal durante os primeiros meses de entrada.",
+      "conceptualScores": {
+        "strategicFit": 58,
+        "speedOfAdoption": 42,
+        "digitalUrgency": 60,
+        "accessibility": 65,
+        "expansionPotential": 50
+      }
+    }
+  ]
+}
