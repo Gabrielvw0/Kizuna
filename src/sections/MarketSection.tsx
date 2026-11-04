@@ -22,7 +22,7 @@ const EXPANSION_RINGS: RingTier[] = [
     price: yen(getPlan('start').priceMonthly),
     tagline: 'Gestão de equipes',
     jp: 'チーム管理',
-    scopeItems: ['Tarefas & Calendário', 'Projetos da Equipe', 'Comunicação Contextual', 'Adoção imediata sem fricção'],
+    scopeItems: getPlan('start').features,
     icon: <Users className="w-5 h-5" />
   },
   {
@@ -32,7 +32,7 @@ const EXPANSION_RINGS: RingTier[] = [
     price: yen(getPlan('business').priceMonthly),
     tagline: 'Gestão + inteligência',
     jp: '知能と自動化',
-    scopeItems: ['Tudo do Start', 'Automação & IA Assistiva', 'Fluxos de Aprovação (Ringi)', 'Indicadores Multiequipe'],
+    scopeItems: getPlan('business').features,
     icon: <BrainCircuit className="w-5 h-5" />
   },
   {
@@ -42,7 +42,7 @@ const EXPANSION_RINGS: RingTier[] = [
     price: yen(getPlan('enterprise').priceMonthly),
     tagline: 'Gestão + escala',
     jp: '全社統合基盤',
-    scopeItems: ['Tudo do Business', 'Governança Avançada & Audit Trail', 'Integrações Corporativas & API', 'Operação Integrada em Escala'],
+    scopeItems: getPlan('enterprise').features,
     icon: <Building2 className="w-5 h-5" />
   }
 ];

@@ -171,7 +171,7 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 9: // TELA 10: ENTRADA NO MERCADO • LINHA FERROVIÁRIA METROVIÁRIA
       env.globeVisibility = 0.0;
       env.railwayVisibility = 1.0;
-      pose.pos.set(-0.2 + sceneIdx * 0.25, 0.2, 2.5);
+      pose.pos.set(-0.2 + (sceneIdx / 6) * 0.25, 0.2, 2.5);
       pose.target.set(0, 0, 0);
       break;
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Compass, CheckCircle2, ArrowRight, Sparkles, Orbit } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
 import { getPlan, yen } from '../data/pricing';
@@ -76,10 +76,19 @@ const COMPETITORS: CompetitorNode[] = [
 ];
 
 export const PositioningSection: React.FC = () => {
-  const { setSceneIndex, nextStep } = usePresentation();
-  const [selectedCompId, setSelectedCompId] = useState<string>('kizuna');
+  const { sceneIndex, setSceneIndex, nextStep } = usePresentation();
+  // Cena 1: as alternativas do mercado no mapa • Cena 2: a posição-alvo do Kizuna
+  const scene = Math.min(1, Math.max(0, sceneIndex));
+  const [selectedCompId, setSelectedCompId] = useState<string>(COMPETITORS[0].id);
 
-  const activeComp = COMPETITORS.find((c) => c.id === selectedCompId) || COMPETITORS[4];
+  // Mudar de cena (teclado ou botões) troca o item em análise
+  useEffect(() => {
+    const kizunaSelected = selectedCompId === 'kizuna';
+    if (scene === 1 && !kizunaSelected) setSelectedCompId('kizuna');
+    if (scene === 0 && kizunaSelected) setSelectedCompId(COMPETITORS[0].id);
+  }, [scene, selectedCompId]);
+
+  const activeComp = COMPETITORS.find((c) => c.id === selectedCompId) || COMPETITORS[0];
 
   return (
     <div className="relative w-full h-full flex flex-col justify-between px-6 md:px-14 pt-6 pb-6 overflow-y-auto select-none">
@@ -120,7 +129,7 @@ export const PositioningSection: React.FC = () => {
             <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-white/15" />
 
             {/* Glowing Golden Apex Quadrant */}
-            <div className="absolute right-0 top-0 w-1/2 h-1/2 bg-gradient-to-bl from-red-600/25 via-amber-500/10 to-transparent pointer-events-none" />
+            <div className={`absolute right-0 top-0 w-1/2 h-1/2 bg-gradient-to-bl from-red-600/25 via-amber-500/10 to-transparent pointer-events-none transition-opacity duration-500 ${scene === 1 ? 'opacity-100' : 'opacity-0'}`} />
 
             {/* Axis Labels */}
             <div className="absolute bottom-2 right-4 text-[9px] font-mono text-slate-400 uppercase">
@@ -146,6 +155,8 @@ export const PositioningSection: React.FC = () => {
                       ? 'bg-gradient-to-br from-red-600 via-rose-700 to-slate-950 border-2 border-amber-300 shadow-[0_0_35px_rgba(239,68,68,0.7)] z-20 scale-105'
                       : isSelected
                       ? 'bg-slate-800 border-white/60 z-10'
+                      : scene === 1
+                      ? 'bg-slate-950/90 border-white/10 opacity-60 hover:opacity-90'
                       : 'bg-slate-950/90 border-white/20 hover:border-white/40'
                   }`}
                 >
@@ -220,7 +231,7 @@ export const PositioningSection: React.FC = () => {
               onClick={nextStep}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer"
             >
-              <span>Avançar</span>
+              <span>{scene === 0 ? 'Ver a posição-alvo do Kizuna' : 'Avançar'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

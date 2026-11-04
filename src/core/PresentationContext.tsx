@@ -178,8 +178,16 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     metamorphosisFromTo: 'Parceiro Local → Pilotos → Referência → Escala → Presença Própria (株式会社)',
     narrativeNode: 'MERCADO',
     kanji: '道',
-    sceneCount: 2,
-    sceneLabels: ['Os 5 Canais de Acesso', 'As 5 Fases do Modo de Entrada']
+    sceneCount: 7,
+    sceneLabels: [
+      'Os 5 Canais de Acesso',
+      'Estação 01 • Brasil (origem)',
+      'Estação 02 • Parceiro local',
+      'Estação 03 • Pilotos',
+      'Estação 04 • Casos de referência',
+      'Estação 05 • Expansão comercial',
+      'Estação 06 • Subsidiária (hipótese)'
+    ]
   },
   {
     index: 10,

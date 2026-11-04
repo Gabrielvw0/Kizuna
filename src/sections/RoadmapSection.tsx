@@ -109,9 +109,11 @@ const METRO_STATIONS = [
 
 export const RoadmapSection: React.FC = () => {
   const { sceneIndex, setSceneIndex, nextStep } = usePresentation();
-  const [selectedStationIdx, setSelectedStationIdx] = useState<number>(1);
+  // Cena 1: os 5 canais • Cenas 2 a 7: estações 01 a 06 (origem + 5 fases), em sequência
+  const scene = Math.min(METRO_STATIONS.length, Math.max(0, sceneIndex));
+  const selectedStationIdx = Math.max(0, scene - 1);
 
-  const activeStation = METRO_STATIONS[selectedStationIdx] || METRO_STATIONS[1];
+  const activeStation = METRO_STATIONS[selectedStationIdx] || METRO_STATIONS[0];
 
   return (
     <div className="relative w-full h-full flex flex-col justify-between px-6 md:px-14 pt-6 pb-6 overflow-y-auto select-none">
@@ -135,7 +137,7 @@ export const RoadmapSection: React.FC = () => {
           <button
             onClick={() => setSceneIndex(0)}
             className={`px-3.5 py-2 rounded-xl border text-xs font-mono uppercase transition-all cursor-pointer ${
-              sceneIndex === 0
+              scene === 0
                 ? 'bg-red-600 border-red-400 text-white font-bold'
                 : 'bg-slate-900/80 border-white/15 text-slate-300'
             }`}
@@ -145,7 +147,7 @@ export const RoadmapSection: React.FC = () => {
           <button
             onClick={() => setSceneIndex(1)}
             className={`px-3.5 py-2 rounded-xl border text-xs font-mono uppercase transition-all cursor-pointer ${
-              sceneIndex === 1
+              scene >= 1
                 ? 'bg-red-600 border-red-400 text-white font-bold'
                 : 'bg-slate-900/80 border-white/15 text-slate-300'
             }`}
@@ -162,7 +164,7 @@ export const RoadmapSection: React.FC = () => {
             key={ch.code}
             onClick={() => setSceneIndex(0)}
             className={`p-3.5 rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 cursor-pointer ${
-              sceneIndex === 0
+              scene === 0
                 ? 'bg-slate-900/95 border-red-500/45 shadow-lg'
                 : 'bg-slate-900/75 border-white/10'
             }`}
@@ -188,7 +190,13 @@ export const RoadmapSection: React.FC = () => {
             </span>
           </div>
           <span className="text-xs font-mono text-amber-300">
-            Estação Ativa: <strong>{activeStation.name}</strong> ({activeStation.location})
+            {scene === 0 ? (
+              'Origem + 5 fases • avance para percorrer a linha'
+            ) : (
+              <>
+                Estação Ativa: <strong>{activeStation.name}</strong> ({activeStation.location})
+              </>
+            )}
           </span>
         </div>
         <p className="pt-2 text-[10px] font-mono text-slate-500 leading-snug">
@@ -207,15 +215,14 @@ export const RoadmapSection: React.FC = () => {
               return (
                 <button
                   key={st.station}
-                  onClick={() => {
-                    setSelectedStationIdx(idx);
-                    setSceneIndex(1);
-                  }}
+                  onClick={() => setSceneIndex(idx + 1)}
                   className={`flex flex-col items-center text-center p-3 rounded-2xl border transition-all cursor-pointer ${
                     isSelected
                       ? st.isFinal
                         ? 'bg-amber-950/70 border-amber-300 shadow-[0_0_30px_rgba(212,175,55,0.4)] scale-105'
                         : 'bg-red-950/70 border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.4)] scale-105'
+                      : scene >= 1 && idx < selectedStationIdx
+                      ? 'bg-slate-900/90 border-red-500/40 hover:border-red-400/60'
                       : 'bg-slate-900/90 border-white/15 hover:border-white/30'
                   }`}
                 >
@@ -268,7 +275,13 @@ export const RoadmapSection: React.FC = () => {
               onClick={nextStep}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer"
             >
-              <span>Avançar</span>
+              <span>
+                {scene === 0
+                  ? 'Percorrer a linha de entrada'
+                  : scene < METRO_STATIONS.length
+                  ? 'Próxima estação'
+                  : 'Avançar'}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

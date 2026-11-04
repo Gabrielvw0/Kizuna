@@ -29,7 +29,7 @@
       "id": "integracoes",
       "number": "03",
       "title": "Integrações",
-      "detail": "Conexão com sistemas legados e APIs corporativas sob proposta"
+      "detail": "Integrações padrão incluídas no Business; avançadas e personalizadas sob proposta; fora do escopo do Start"
     },
     {
       "id": "servicos",
@@ -50,10 +50,10 @@
       "positioning": "Porta de entrada operacional. O cliente não precisa substituir sua operação inteira no primeiro dia.",
       "description": "Começa organizando uma área ou equipe em idioma e padrão japonês, preparando o terreno para expansão futura.",
       "features": [
-        "Tarefas e fluxos operacionais",
-        "Calendário corporativo integrado",
-        "Comunicação contextual por equipe",
-        "Acompanhamento de projetos"
+        "Tarefas & Calendário",
+        "Projetos da Equipe",
+        "Comunicação Contextual",
+        "Adoção imediata sem fricção"
       ],
       "additionalScope": [],
       "highlight": false,
@@ -65,8 +65,9 @@
       },
       "estimates": {
         "implementation": 150000,
-        "integration": 0
-      }
+        "integration": null
+      },
+      "integrationPolicy": "Integrações fora do escopo do Start"
     },
     {
       "id": "business",
@@ -76,16 +77,18 @@
       "conceptWord": "INTELIGÊNCIA",
       "priceMonthly": 1980,
       "audience": "Para empresas em crescimento",
-      "positioning": "Inteligência + IA supervisionada (2× Start).",
+      "positioning": "Projetos, processos, indicadores e aprovações (2× Start).",
       "description": "Conecta múltiplos departamentos com automação, relatórios executivos e recomendações da IA com Human Validation Gate.",
       "features": [
-        "Tudo do Kizuna Start +",
-        "IA com Human Validation Gate",
-        "Relatórios analíticos e BI operacional",
-        "Automações entre áreas",
-        "Integrações padrão e gestão de indicadores"
+        "Tudo do Start",
+        "Projetos, processos e indicadores multiequipe",
+        "Fluxos de Aprovação (Ringi)",
+        "Automação & IA Assistiva",
+        "Integrações padrão incluídas"
       ],
-      "additionalScope": [],
+      "additionalScope": [
+        "Personalizações — sob proposta"
+      ],
       "highlight": true,
       "accent": "#E11D48",
       "users": {
@@ -96,7 +99,8 @@
       "estimates": {
         "implementation": 450000,
         "integration": 300000
-      }
+      },
+      "integrationPolicy": "Integrações padrão incluídas; personalizadas sob proposta"
     },
     {
       "id": "enterprise",
@@ -109,14 +113,15 @@
       "positioning": "Maior valor por usuário e potencial de expansão por volume de licenças.",
       "description": "O software é licenciado por usuário; a complexidade de implantação, migração e integração com legados é contratada sob proposta.",
       "features": [
-        "Tudo do Kizuna Business +",
-        "Governança corporativa e auditoria imutável",
-        "Segurança avançada e controle granular (Ringi/RBAC)",
-        "Suporte prioritário em japonês"
+        "Tudo do Business",
+        "Governança ampliada & Audit Trail",
+        "Personalização",
+        "Operação em múltiplas unidades",
+        "Integrações avançadas — sob proposta"
       ],
       "additionalScope": [
         "Implantação personalizada — sob proposta",
-        "Integrações corporativas — sob proposta",
+        "Integrações avançadas e personalizadas — sob proposta",
         "Serviços profissionais — sob proposta"
       ],
       "highlight": false,
@@ -129,7 +134,8 @@
       "estimates": {
         "implementation": 1200000,
         "integration": 800000
-      }
+      },
+      "integrationPolicy": "Integrações avançadas e personalizadas sob proposta"
     }
   ],
   "expansionJourney": {
@@ -156,5 +162,10 @@
   },
   "taxRate": 0.1,
   "annualRule": "anual = mensal × 12, sem desconto",
-  "estimateLabel": "Estimativa ilustrativa • sob proposta"
+  "estimateLabel": "Estimativa ilustrativa • sob proposta",
+  "trial": {
+    "label": "PROPOSTA COMERCIAL • SUJEITA A VALIDAÇÃO",
+    "text": "Teste gratuito de até 30 dias, associado aos pilotos assistidos. Ainda não é política aprovada: depende de validação comercial."
+  },
+  "scopeNote": "Escopo por plano: referência é a tela de expansão (tela 7)."
 }

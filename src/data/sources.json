@@ -183,7 +183,7 @@
       "banca": {
         "speech": "A estratégia é Land & Expand. A empresa não precisa adotar tudo no primeiro momento. Ela começa com uma necessidade concreta e amplia a utilização conforme o valor percebido.",
         "concept": "Três anéis progressivos atravessados pelo fio vermelho: Kizuna Start (¥980 — Gestão de equipes), Kizuna Business (¥1.980 — Gestão + inteligência) e Kizuna Enterprise (¥3.500 — Gestão + escala).",
-        "evidence": "Progressão clara de escopo: Equipe → Inteligência (IA, Relatórios, Automação, Integrações, Desempenho) → Escala (Segurança avançada, Suporte prioritário, Implantação personalizada, Integrações corporativas).",
+        "evidence": "Progressão de escopo: Start (gestão de equipes e atividades; integrações fora do escopo) → Business (projetos, processos, indicadores, fluxos de aprovação e IA assistiva; integrações padrão incluídas; personalizações sob proposta) → Enterprise (governança ampliada, personalização e operação em múltiplas unidades; integrações avançadas sob proposta).",
         "premise": "A expansão tecnológica acompanha a curva de maturidade e confiança do cliente japonês.",
         "risk": "O cliente estagnar no plano básico se os níveis superiores não tiverem valor claro.",
         "response": "Cada anel adiciona capacidades decisivas para o crescimento da empresa (IA e automação no Business; governança e escala no Enterprise).",

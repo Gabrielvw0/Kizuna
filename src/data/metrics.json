@@ -113,7 +113,7 @@
         "risk": "Ciclo de vendas excessivamente longo devido à lentidão nos processos de Nemawashi",
         "trigger": "Tempo Médio de Fechamento",
         "triggerValue": "> 6 meses",
-        "response": "Ativação do modelo “Land & Expand”: entrada gratuita pelo Kizuna Start por 30 dias na equipe",
+        "response": "Land & Expand: proposta de teste gratuito de até 30 dias no piloto do Kizuna Start, sujeita a validação comercial",
         "status": "WATCH"
       },
       {
@@ -125,6 +125,103 @@
         "triggerValue": "CAC > LTV / 3",
         "response": "Fortalecimento de parcerias com integradores locais (SIers) com comissão de receita recorrente",
         "status": "OPTIMAL"
+      }
+    ]
+  },
+  "kpis": {
+    "badge": "6 KPIs ACOMPANHADOS • METAS PROPOSTAS",
+    "note": "Nenhum resultado foi realizado: o projeto é acadêmico e não tem operação. Metas numéricas existem apenas onde o projeto já as definiu nas fases de 12 meses; nos seis KPIs a meta ainda será definida.",
+    "dimensions": [
+      {
+        "id": "MERCADO",
+        "label": "MERCADO",
+        "riskIds": [
+          "mercado"
+        ]
+      },
+      {
+        "id": "PRODUTO",
+        "label": "PRODUTO",
+        "riskIds": [
+          "produto"
+        ]
+      },
+      {
+        "id": "NEGOCIO",
+        "label": "NEGÓCIO",
+        "riskIds": [
+          "comercial",
+          "financeiro"
+        ]
+      }
+    ],
+    "items": [
+      {
+        "id": "parceiros",
+        "label": "Parceiros ativos",
+        "dimension": "MERCADO",
+        "phaseId": "m0_3",
+        "deliverableIndex": 3,
+        "target": null
+      },
+      {
+        "id": "referencias",
+        "label": "Clientes de referência",
+        "dimension": "MERCADO",
+        "phaseId": "m6_9",
+        "deliverableIndex": 1,
+        "base": {
+          "type": "phase",
+          "id": "m3_6"
+        },
+        "target": null
+      },
+      {
+        "id": "usuarios",
+        "label": "Usuários ativos",
+        "dimension": "PRODUTO",
+        "phaseId": "m3_6",
+        "deliverableIndex": 2,
+        "base": {
+          "type": "phase",
+          "id": "m3_6"
+        },
+        "target": null
+      },
+      {
+        "id": "adocao",
+        "label": "Taxa de adoção",
+        "dimension": "PRODUTO",
+        "phaseId": "m3_6",
+        "deliverableIndex": 2,
+        "base": {
+          "type": "phase",
+          "id": "m3_6"
+        },
+        "target": null
+      },
+      {
+        "id": "mrr",
+        "label": "MRR",
+        "dimension": "NEGOCIO",
+        "phaseId": "m9_12",
+        "deliverableIndex": 1,
+        "base": {
+          "type": "phase",
+          "id": "m9_12"
+        },
+        "target": null
+      },
+      {
+        "id": "cancelamentos",
+        "label": "Cancelamentos",
+        "dimension": "NEGOCIO",
+        "phaseId": "m9_12",
+        "base": {
+          "type": "risk",
+          "id": "mercado"
+        },
+        "target": null
       }
     ]
   }

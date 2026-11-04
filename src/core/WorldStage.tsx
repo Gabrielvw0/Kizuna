@@ -495,13 +495,13 @@ export const WorldStage: React.FC = () => {
     trainPod.rotation.z = -Math.PI / 6;
     railwayGroup.add(trainPod);
 
-    // 5 Station Nodes
-    for (let i = 0; i < 5; i++) {
+    // 6 Station Nodes (origem + 5 fases)
+    for (let i = 0; i < 6; i++) {
       const st = new THREE.Mesh(
         new THREE.SphereGeometry(0.06, 12, 12),
         new THREE.MeshBasicMaterial({ color: 0xd4af37 })
       );
-      const pt = railCurve.getPoint(i / 4);
+      const pt = railCurve.getPoint(i / 5);
       st.position.copy(pt);
       railwayGroup.add(st);
     }
@@ -803,7 +803,8 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       railwayGroup.visible = sIdx === 9;
       if (sIdx === 9) {
-        const trainTargetPt = railCurve.getPoint(Math.min(1.0, Math.max(0, scIdx / 4)));
+        // cena 0 = canais (trem na origem); cenas 1..6 = estações 01..06
+        const trainTargetPt = railCurve.getPoint(Math.min(1.0, Math.max(0, (scIdx - 1) / 5)));
         trainPod.position.lerp(trainTargetPt, 0.08);
       }
 

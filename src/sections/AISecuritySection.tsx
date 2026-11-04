@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Shield,
   FileSearch,
@@ -42,20 +42,34 @@ const TRUST_PILLARS = [
 
 export const AISecuritySection: React.FC = () => {
   const { sceneIndex, setSceneIndex, nextStep } = usePresentation();
-  const [gateApproved, setGateApproved] = useState<boolean>(false);
-  const [hankoStamped, setHankoStamped] = useState<boolean>(false);
+  // Cena 1: pilares de governança • Cena 2: portão bloqueado • Cena 3: execução e registro.
+  // O portão só aparece desbloqueado na cena 3 (o portão 3D também abre nessa cena).
+  const scene = Math.min(2, Math.max(0, sceneIndex));
+  const gateApproved = scene >= 2;
+  const [stampAnim, setStampAnim] = useState<boolean>(false);
+  const stampTimer = useRef<number | null>(null);
+  const hankoStamped = gateApproved || stampAnim;
+
+  useEffect(() => {
+    return () => {
+      if (stampTimer.current) window.clearTimeout(stampTimer.current);
+    };
+  }, []);
 
   const handleApproveWithHanko = () => {
-    setHankoStamped(true);
-    setTimeout(() => {
-      setGateApproved(true);
+    setStampAnim(true);
+    if (stampTimer.current) window.clearTimeout(stampTimer.current);
+    stampTimer.current = window.setTimeout(() => {
+      stampTimer.current = null;
+      setStampAnim(false);
       setSceneIndex(2);
     }, 450);
   };
 
   const handleResetGate = () => {
-    setGateApproved(false);
-    setHankoStamped(false);
+    if (stampTimer.current) window.clearTimeout(stampTimer.current);
+    stampTimer.current = null;
+    setStampAnim(false);
     setSceneIndex(1);
   };
 
@@ -88,7 +102,7 @@ export const AISecuritySection: React.FC = () => {
       </div>
 
       {/* Top 3 Strategic Trust Pillars */}
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
+      <div className={`relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 my-2 transition-opacity duration-500 ${scene === 0 ? 'opacity-100' : 'opacity-60'}`}>
         {TRUST_PILLARS.map((pillar) => (
           <div
             key={pillar.code}
@@ -140,7 +154,7 @@ export const AISecuritySection: React.FC = () => {
         </div>
 
         {/* 4 Interactive Flow Stations */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 my-auto py-3">
+        <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 my-auto py-3 transition-opacity duration-500 ${scene === 0 ? 'opacity-40' : 'opacity-100'}`}>
           {/* 1. Proposta da IA */}
           <div className="p-4 rounded-2xl bg-slate-900/85 border border-white/15 flex flex-col justify-between">
             <div>
@@ -258,16 +272,30 @@ export const AISecuritySection: React.FC = () => {
         {/* Footer info & proceed */}
         <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="text-xs font-mono text-slate-300">
-            Princípio Universal:{' '}
-            <strong className="text-white">
-              Tecnologia rápida com responsabilidade e controle de governança humana.
-            </strong>
+            {scene === 0 && (
+              <>
+                Governança primeiro:{' '}
+                <strong className="text-white">permissões, trilha de auditoria e rastreabilidade antes de qualquer automação.</strong>
+              </>
+            )}
+            {scene === 1 && (
+              <>
+                Portão fechado:{' '}
+                <strong className="text-white">nenhuma execução sem o aval formal de um responsável.</strong>
+              </>
+            )}
+            {scene === 2 && (
+              <>
+                Execução autorizada e registrada:{' '}
+                <strong className="text-white">tecnologia rápida com responsabilidade e controle de governança humana.</strong>
+              </>
+            )}
           </div>
           <button
             onClick={nextStep}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer self-end sm:self-auto"
           >
-            <span>Avançar</span>
+            <span>{scene === 0 ? 'Ver o portão de validação' : scene === 1 ? 'Simular aprovação humana' : 'Avançar'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

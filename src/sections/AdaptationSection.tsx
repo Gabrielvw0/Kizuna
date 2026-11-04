@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Sparkles,
   Languages,
@@ -131,9 +131,23 @@ const SEVEN_PILLARS: AdaptationPillar[] = [
   }
 ];
 
+// Cada cena percorre um grupo de pilares (os mesmos rótulos exibidos na navegação)
+const PILLAR_GROUPS: { title: string; ids: string[] }[] = [
+  { title: 'Idioma, Calendário & Moeda', ids: ['idioma', 'calendario', 'moeda'] },
+  { title: 'Hierarquia, Rituais & Notificações', ids: ['hierarquia', 'notificacoes'] },
+  { title: 'Relatórios, Selo & Conformidade', ids: ['relatorios', 'compliance'] }
+];
+const groupOf = (id: string) => Math.max(0, PILLAR_GROUPS.findIndex((g) => g.ids.includes(id)));
+
 export const AdaptationSection: React.FC = () => {
   const { sceneIndex, setSceneIndex, nextStep } = usePresentation();
-  const [selectedId, setSelectedId] = useState<string>('idioma');
+  const scene = Math.min(PILLAR_GROUPS.length - 1, Math.max(0, sceneIndex));
+  const [selectedId, setSelectedId] = useState<string>(PILLAR_GROUPS[0].ids[0]);
+
+  // Mudar de cena (teclado ou botões) seleciona o primeiro pilar do grupo
+  useEffect(() => {
+    if (groupOf(selectedId) !== scene) setSelectedId(PILLAR_GROUPS[scene].ids[0]);
+  }, [scene, selectedId]);
 
   const activePillar =
     SEVEN_PILLARS.find((p) => p.id === selectedId) || SEVEN_PILLARS[0];
@@ -183,12 +197,14 @@ export const AdaptationSection: React.FC = () => {
                   key={p.id}
                   onClick={() => {
                     setSelectedId(p.id);
-                    setSceneIndex(1);
+                    setSceneIndex(groupOf(p.id));
                   }}
                   className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                     active
                       ? 'bg-gradient-to-r from-red-950/70 to-slate-900 border-amber-400/80 shadow-[0_0_20px_rgba(212,175,55,0.25)] scale-[1.01]'
-                      : 'bg-slate-900/80 border-white/10 hover:border-white/25'
+                      : groupOf(p.id) === scene
+                      ? 'bg-slate-900/80 border-white/10 hover:border-white/25'
+                      : 'bg-slate-900/60 border-white/5 opacity-50 hover:opacity-80'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -217,7 +233,7 @@ export const AdaptationSection: React.FC = () => {
           </div>
 
           <div className="text-[11px] font-mono text-slate-400 border-t border-white/10 pt-2 flex items-center justify-between">
-            <span>Harmonia entre flexibilidade global e rigor local</span>
+            <span>Grupo {scene + 1}/{PILLAR_GROUPS.length} • {PILLAR_GROUPS[scene].title}</span>
             <span className="text-amber-300 font-bold">Localização Nativa</span>
           </div>
         </div>
@@ -260,7 +276,7 @@ export const AdaptationSection: React.FC = () => {
               onClick={nextStep}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer"
             >
-              <span>Avançar</span>
+              <span>{scene < PILLAR_GROUPS.length - 1 ? 'Próximo grupo de pilares' : 'Avançar'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

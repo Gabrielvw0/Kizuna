@@ -8,7 +8,7 @@ import { PRICING, PlanId, getPlan, planForUsers, scaleStory, yen } from '../data
 const PLAN_COPY: Record<PlanId, { jp: string; summary: string }> = {
   start: { jp: 'チーム管理', summary: 'Tarefas, calendário, projetos e comunicação contextual.' },
   business: { jp: '知能・稟議フロー', summary: 'Automação, IA assistiva e fluxos de aprovação (Ringi/Nemawashi).' },
-  enterprise: { jp: '全社統制・連携', summary: 'Governança corporativa, trilha de auditoria e integrações dedicadas.' }
+  enterprise: { jp: '全社統制・連携', summary: 'Governança ampliada, personalização e operação em múltiplas unidades.' }
 };
 
 const PLANS = PRICING.plans.map((p) => ({
@@ -22,11 +22,14 @@ const PLANS = PRICING.plans.map((p) => ({
 const USER_SCALE_OPTIONS = PRICING.presets;
 
 export const PricingSection: React.FC = () => {
-  const { setSceneIndex, nextStep } = usePresentation();
+  const { sceneIndex, setSceneIndex, nextStep } = usePresentation();
+  // Cena 1: os 3 planos e seu escopo • Cena 2: simulador e estrutura de receita
+  const scene = Math.min(1, Math.max(0, sceneIndex));
   const [selectedPlanId, setSelectedPlanId] = useState<PlanId>(planForUsers(PRICING.defaultUsers));
   const [userCount, setUserCount] = useState<number>(PRICING.defaultUsers);
 
   const activePlan = PLANS.find((p) => p.id === selectedPlanId) || PLANS[1];
+  const activePlanData = getPlan(selectedPlanId);
   const monthlyJpy = activePlan.priceNum * userCount;
   const annualJpy = monthlyJpy * 12; // regra em pricing.json (annualRule): mensal × 12, sem desconto
 
@@ -153,6 +156,51 @@ export const PricingSection: React.FC = () => {
         <div className="lg:col-span-7 flex flex-col justify-between gap-4">
           {/* Main Calculation Card */}
           <div className="p-6 rounded-3xl bg-slate-950/95 border border-red-500/40 shadow-2xl flex-1 flex flex-col justify-between animate-fadeIn">
+            {scene === 0 ? (
+              <div>
+                <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-red-400 font-bold block">
+                      ESCOPO DO PLANO
+                    </span>
+                    <h3 className="text-lg sm:text-xl font-black text-white">
+                      <span className="text-red-400">{activePlan.name}</span> • {activePlanData.audience}
+                    </h3>
+                  </div>
+                  <span className="text-xs font-serif text-amber-300">{activePlan.jp}</span>
+                </div>
+
+                <ul className="space-y-1.5 mb-4">
+                  {activePlanData.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-xs text-slate-200">
+                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 mb-3">
+                  <div className="flex items-center gap-1.5 text-sky-400 text-[10px] font-mono font-bold uppercase mb-1">
+                    <Plug className="w-3.5 h-3.5" /> Integrações
+                  </div>
+                  <p className="text-xs text-slate-200">{activePlanData.integrationPolicy}</p>
+                  {activePlanData.additionalScope.length > 0 && (
+                    <ul className="mt-1.5 space-y-0.5 text-[11px] text-slate-400">
+                      {activePlanData.additionalScope.map((a) => (
+                        <li key={a}>• {a}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-400/40">
+                  <div className="flex items-center gap-1.5 text-amber-300 text-[10px] font-mono font-bold uppercase mb-1">
+                    <ShieldAlert className="w-3.5 h-3.5" /> {PRICING.trial.label}
+                  </div>
+                  <p className="text-xs text-slate-200">{PRICING.trial.text}</p>
+                </div>
+              </div>
+            ) : (
             <div>
               <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
                 <div>
@@ -233,13 +281,16 @@ export const PricingSection: React.FC = () => {
                       <span>3. Integrações</span>
                     </div>
                     <div className="text-slate-200 font-mono font-bold">
-                      {integrationJpy > 0 ? `¥${integrationJpy.toLocaleString('ja-JP')}` : 'Inclusa'}
+                      {integrationJpy === null ? 'Fora do escopo' : `¥${integrationJpy.toLocaleString('ja-JP')}`}
                     </div>
-                    <div className="text-[9px] text-slate-400 mt-0.5">{PRICING.estimateLabel}</div>
+                    <div className="text-[9px] text-slate-400 mt-0.5">
+                      {integrationJpy === null ? activePlanData.integrationPolicy : PRICING.estimateLabel}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            )}
 
             <div className="pt-4 mt-3 border-t border-white/10 flex items-center justify-between">
               <span className="text-xs font-mono text-slate-400">
@@ -249,7 +300,7 @@ export const PricingSection: React.FC = () => {
                 onClick={nextStep}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer shadow-lg"
               >
-                <span>Avançar para Riscos</span>
+                <span>{scene === 0 ? 'Ver o simulador' : 'Avançar para Riscos'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
