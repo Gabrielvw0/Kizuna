@@ -35,6 +35,7 @@ import { InventoryModule } from './components/modules/InventoryModule';
 import { PartnersModule } from './components/modules/PartnersModule';
 import { DocumentsModule } from './components/modules/DocumentsModule';
 import { WorkflowModule } from './components/modules/WorkflowModule';
+import { AiIntelligenceModule } from './components/modules/AiIntelligenceModule';
 import { ComplianceAuditModule } from './components/modules/ComplianceAuditModule';
 import { HrProductionModule } from './components/modules/HrProductionModule';
 import { CommandCenterModal } from './components/shared/CommandCenterModal';
@@ -57,6 +58,9 @@ const LiveProductDemoWorkspace: React.FC<{ onClose: () => void }> = ({ onClose }
         return <ExecutiveDashboard />;
       case 'analytics':
         return <BiAnalytics />;
+      case 'ai':
+        // Antes caía no default e repetia o Dashboard Executivo (tela duplicada).
+        return <AiIntelligenceModule />;
       case 'accounting':
         return <AccountingModule />;
       case 'sales':

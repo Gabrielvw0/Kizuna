@@ -323,7 +323,7 @@ export const AiIntelligenceModule: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-xs text-blue-800 font-semibold">
             <Cpu className="w-3.5 h-3.5" />
-            <span>KIZUNA ENTERPRISE AI ENGINE • デモ用LLM基盤 (模擬)</span>
+            <span>KIZUNA AI ENGINE • デモ用LLM基盤 (模擬)</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mt-0.5 flex items-baseline gap-3">
             <span>Kizuna Intelligence (AI 経営参謀)</span>
