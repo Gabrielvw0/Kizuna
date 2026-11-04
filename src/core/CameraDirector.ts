@@ -31,8 +31,10 @@ export interface EnvironmentState {
 }
 
 /**
- * Maps each presentation section index (0-14) and internal sceneIndex
+ * Maps each TECHNICAL stage index (0-14) and internal stage step
  * to cinematic camera coordinates and specialized 3D world parameters.
+ * Os comentários "TELA NN" abaixo usam a numeração antiga dos cenários; a ordem narrativa
+ * de 12 telas fica em narrativeMap.ts (STAGE_MAP).
  * 
  * CORE GRAMMAR RULE:
  * Globe is visible ONLY on Section 0 (Abertura) and Section 14 (Encerramento).

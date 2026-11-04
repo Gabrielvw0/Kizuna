@@ -53,7 +53,7 @@ export const EvidenceAndBancaPanels: React.FC = () => {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono text-rose-300/80 px-1.5 py-0.5 rounded bg-rose-500/10 border border-rose-500/20">
-                Seção {currentSection.code} • Cena {sceneIndex + 1}/{currentSection.sceneCount}
+                Tela {currentSection.code} • Cena {sceneIndex + 1}/{currentSection.sceneCount}
               </span>
               <button
                 onClick={toggleBancaMode}
@@ -72,6 +72,9 @@ export const EvidenceAndBancaPanels: React.FC = () => {
                 <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-sky-300 font-bold mb-1">
                   <Mic className="w-3.5 h-3.5 text-sky-400" />
                   <span>FALA SUGERIDA (TELEPROMPTER)</span>
+                  {'duration' in currentSectionData.banca && (
+                    <span className="ml-auto text-sky-200/80 normal-case tracking-normal">{(currentSectionData.banca as any).duration}</span>
+                  )}
                 </div>
                 <p className="text-white text-xs sm:text-sm leading-relaxed font-light italic">
                   “{(currentSectionData.banca as any).speech}”
@@ -185,14 +188,14 @@ export const EvidenceAndBancaPanels: React.FC = () => {
             <div className="px-6 py-2.5 border-b border-white/10 flex items-center justify-between bg-[#0B101B]">
               <span className="text-xs font-mono text-slate-300">
                 {showAllEvidences
-                  ? 'Dossiê completo (15 telas)'
+                  ? `Dossiê completo (${PRESENTATION_SECTIONS.length} telas)`
                   : `Tela atual: ${currentSectionData.title}`}
               </span>
               <button
                 onClick={() => setShowAllEvidences((prev) => !prev)}
                 className="text-xs font-mono text-sky-400 hover:text-sky-300 underline"
               >
-                {showAllEvidences ? 'Filtrar apenas tela atual' : 'Ver todas as 15 telas'}
+                {showAllEvidences ? 'Filtrar apenas tela atual' : `Ver todas as ${PRESENTATION_SECTIONS.length} telas`}
               </button>
             </div>
 

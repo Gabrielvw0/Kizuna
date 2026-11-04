@@ -41,8 +41,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'MUNDO',
     kanji: '絆',
     sceneCount: 2,
-    sceneLabels: ['O fio vermelho', 'KIZUNA 絆'],
-    sourceKey: '01'
+    sceneLabels: ['O fio vermelho', 'KIZUNA 絆']
   },
   {
     index: 1,
@@ -56,8 +55,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'JAPÃO',
     kanji: '日',
     sceneCount: 2,
-    sceneLabels: ['A oportunidade em dois números', 'A ponte Brasil ↔ Japão (1908)'],
-    sourceKey: '02'
+    sceneLabels: ['A oportunidade em dois números', 'A ponte Brasil ↔ Japão (1908)']
   },
   {
     index: 2,
@@ -72,8 +70,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'PROBLEMA',
     kanji: '門',
     sceneCount: 5,
-    sceneLabels: ['Porta 1: Cultura', 'Porta 2: Idioma', 'Porta 3: Hábitos empresariais', 'Porta 4: Regulação', 'Global × Local'],
-    sourceKey: '03'
+    sceneLabels: ['Porta 1: Cultura', 'Porta 2: Idioma', 'Porta 3: Hábitos empresariais', 'Porta 4: Regulação', 'Global × Local']
   },
   {
     index: 3,
@@ -87,8 +84,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'KIZUNA',
     kanji: '始',
     sceneCount: 1,
-    sceneLabels: [`Kizuna Start (${PRICE.start} 税抜)`],
-    sourceKey: '05'
+    sceneLabels: [`Kizuna Start (${PRICE.start} 税抜)`]
   },
   {
     index: 4,
@@ -108,8 +104,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
       '3. Acompanhar a execução',
       '4. Relacionar ao projeto',
       '5. Visão da gestão'
-    ],
-    sourceKey: '06'
+    ]
   },
   {
     index: 5,
@@ -124,8 +119,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'ADAPTAÇÃO',
     kanji: '和',
     sceneCount: 2,
-    sceneLabels: ['Idioma, datas e moeda', 'Rituais de aprovação e conformidade'],
-    sourceKey: '08'
+    sceneLabels: ['Idioma, datas e moeda', 'Rituais de aprovação e conformidade']
   },
   {
     index: 6,
@@ -139,8 +133,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'CONFIANÇA',
     kanji: '守',
     sceneCount: 2,
-    sceneLabels: ['Portão fechado', 'Decisão humana (Hanko)'],
-    sourceKey: '09'
+    sceneLabels: ['Portão fechado', 'Decisão humana (Hanko)']
   },
   {
     index: 7,
@@ -154,8 +147,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'NEGÓCIO',
     kanji: '価',
     sceneCount: 2,
-    sceneLabels: ['Land & Expand: escopo de cada plano', `Simulador de receita (${scaleStory})`],
-    sourceKey: '13'
+    sceneLabels: ['Land & Expand: escopo de cada plano', `Simulador de receita (${scaleStory})`]
   },
   {
     index: 8,
@@ -175,8 +167,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
       'R3 • Referências e expansão',
       'R3 • Subsidiária (hipótese futura)',
       'R4 • Mensagem, canais e funil'
-    ],
-    sourceKey: '10'
+    ]
   },
   {
     index: 9,
@@ -190,8 +181,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'NEGÓCIO',
     kanji: '位',
     sceneCount: 2,
-    sceneLabels: ['As alternativas existentes', 'A posição-alvo do Kizuna'],
-    sourceKey: '12'
+    sceneLabels: ['As alternativas existentes', 'A posição-alvo do Kizuna']
   },
   {
     index: 10,
@@ -205,8 +195,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'NEGÓCIO',
     kanji: '標',
     sceneCount: 2,
-    sceneLabels: ['4 riscos e respostas', 'Marcos propostos de 12 meses'],
-    sourceKey: '14'
+    sceneLabels: ['4 riscos e respostas', 'Marcos propostos de 12 meses']
   },
   {
     index: 11,
@@ -220,8 +209,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'FUTURO',
     kanji: '絆',
     sceneCount: 1,
-    sceneLabels: ['絆 Global Reach. Local Trust.'],
-    sourceKey: '15'
+    sceneLabels: ['絆 Global Reach. Local Trust.']
   }
 ];
 

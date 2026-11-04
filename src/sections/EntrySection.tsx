@@ -12,31 +12,31 @@ const CONTRACTS = phase('m9_12');
 const STATIONS = [
   {
     icon: Handshake,
-    name: 'Parceiro local',
+    name: 'Parceiro local', tag: 'hipotese' as const,
     text: 'Aproximar integradores e consultorias japonesas (SIer). Nenhum parceiro confirmado.',
     group: 0
   },
   {
     icon: FlaskConical,
-    name: 'Pilotos assistidos',
+    name: 'Pilotos assistidos', tag: 'projecao' as const,
     text: `${PILOTS.targetLabel} (${PILOTS.period.toLowerCase()}), para validar a aderência.`,
     group: 0
   },
   {
     icon: Award,
-    name: 'Referências',
+    name: 'Referências', tag: 'hipotese' as const,
     text: 'Casos de uso publicados só se autorizados pelos clientes e com resultados medidos.',
     group: 1
   },
   {
     icon: TrendingUp,
-    name: 'Expansão',
+    name: 'Expansão', tag: 'proposta' as const,
     text: 'Do Start para Business e Enterprise dentro de cada cliente (Land & Expand).',
     group: 1
   },
   {
     icon: Building2,
-    name: 'Subsidiária?',
+    name: 'Subsidiária?', tag: 'hipotese' as const,
     text: 'Avaliar uma empresa japonesa (KK) só depois de pilotos, carteira e referências. Hoje não existe.',
     group: 2
   }
@@ -112,7 +112,7 @@ export const EntrySection: React.FC = () => {
               <div key={st.name} className="p-5 rounded-2xl bg-slate-950/85 border border-white/15">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-base font-black text-white">{st.name}</span>
-                  <InfoTag kind={st.group === 2 ? 'hipotese' : 'proposta'} />
+                  <InfoTag kind={st.tag} />
                 </div>
                 <p className="mt-2 text-sm text-slate-200 leading-snug">{st.text}</p>
               </div>
@@ -143,7 +143,7 @@ export const EntrySection: React.FC = () => {
           <div className="p-4 rounded-3xl bg-slate-950/85 border border-rose-500/30 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400">Funil do primeiro ano</span>
-              <InfoTag kind="proposta">METAS PROPOSTAS</InfoTag>
+              <InfoTag kind="projecao">PROJEÇÃO • METAS PROPOSTAS</InfoTag>
             </div>
             <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
               <div className="text-sm font-bold text-white">Interesse qualificado</div>

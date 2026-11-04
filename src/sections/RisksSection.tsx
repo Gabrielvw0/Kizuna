@@ -38,7 +38,7 @@ export const RisksSection: React.FC = () => {
             </>
           )
         }
-        aside={<InfoTag kind="proposta">{scene === 0 ? 'GATILHOS PROPOSTOS' : metricsData.badge}</InfoTag>}
+        aside={scene === 0 ? <InfoTag kind="proposta">GATILHOS PROPOSTOS</InfoTag> : <InfoTag kind="projecao">{metricsData.badge}</InfoTag>}
       />
 
       {scene === 0 ? (
