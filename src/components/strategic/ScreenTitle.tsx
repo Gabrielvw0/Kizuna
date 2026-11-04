@@ -9,12 +9,12 @@ export const ScreenTitle: React.FC<{
 }> = ({ kicker, title, aside, align = 'left' }) => (
   <div
     className={`relative z-10 flex flex-col gap-3 ${
-      align === 'center' ? 'items-center text-center' : 'lg:flex-row lg:items-end lg:justify-between'
+      align === 'center' ? 'items-center text-center' : 'md:flex-row md:items-end md:justify-between'
     }`}
   >
     <div>
       <div className="text-[11px] font-mono uppercase tracking-[0.28em] text-rose-400">{kicker}</div>
-      <h1 className="mt-1 text-2xl md:text-4xl font-black tracking-tight text-white leading-tight">{title}</h1>
+      <h1 className="mt-1 text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">{title}</h1>
     </div>
     {aside}
   </div>

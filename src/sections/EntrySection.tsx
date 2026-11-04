@@ -132,7 +132,7 @@ export const EntrySection: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {CHANNELS.map(({ icon: Icon, name }) => (
-                <div key={name} className="flex items-center gap-2 p-3 rounded-xl bg-slate-900/80 border border-white/10 text-sm text-white">
+                <div key={name} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900/80 border border-white/10 text-sm text-white">
                   <Icon className="w-4 h-4 text-rose-400 shrink-0" />
                   {name}
                 </div>
@@ -149,17 +149,17 @@ export const EntrySection: React.FC = () => {
               <div className="text-sm font-bold text-white">Interesse qualificado</div>
               <div className="text-xs text-slate-400">Parceiros, eventos e demonstrações • sem meta numérica definida</div>
             </div>
-            <div className="mx-6 p-3 rounded-xl bg-white/[0.05] border border-white/15">
+            <div className="mx-6 p-2.5 rounded-xl bg-white/[0.05] border border-white/15">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm font-bold text-white">Pilotos assistidos</span>
-                <span className="text-2xl font-black font-mono text-white">{PILOTS.targetNumber}</span>
+                <span className="text-xl font-black font-mono text-white whitespace-nowrap">{PILOTS.targetNumber}</span>
               </div>
               <div className="text-xs text-slate-400">{PILOTS.targetUnit} • {PILOTS.period.toLowerCase()}</div>
             </div>
-            <div className="mx-12 p-3 rounded-xl bg-rose-950/40 border border-rose-500/40">
+            <div className="mx-12 p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/40">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm font-bold text-white">Clientes recorrentes</span>
-                <span className="text-2xl font-black font-mono text-white">{CONTRACTS.targetNumber}</span>
+                <span className="text-xl font-black font-mono text-white whitespace-nowrap">{CONTRACTS.targetNumber}</span>
               </div>
               <div className="text-xs text-slate-400">contratos • {CONTRACTS.period.toLowerCase()}</div>
             </div>

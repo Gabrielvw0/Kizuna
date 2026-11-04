@@ -137,14 +137,14 @@ export const PlansSection: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 rounded-3xl bg-slate-950/90 border border-emerald-500/40">
+            <div className="p-5 rounded-3xl bg-slate-950 border border-emerald-500/40">
               <div className="text-[10px] font-mono uppercase text-slate-400">Receita mensal (MRR)</div>
               <div className="text-3xl md:text-4xl font-black font-mono text-emerald-300 mt-1">{yenJp(monthly)}</div>
               <div className="text-xs font-mono text-slate-400 mt-1">
                 {yen(simPlan.priceMonthly)} × {users} usuários
               </div>
             </div>
-            <div className="p-5 rounded-3xl bg-slate-950/90 border border-amber-500/40">
+            <div className="p-5 rounded-3xl bg-slate-950 border border-amber-500/40">
               <div className="text-[10px] font-mono uppercase text-slate-400">Receita anual (ARR)</div>
               <div className="text-3xl md:text-4xl font-black font-mono text-amber-300 mt-1">{yenJp(monthly * 12)}</div>
               <div className="text-xs font-mono text-slate-400 mt-1">{PRICING.annualRule}</div>
@@ -152,16 +152,16 @@ export const PlansSection: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+            <div className="p-4 rounded-2xl bg-slate-950 border border-white/10">
               <div className="flex items-center gap-1.5 text-rose-400 font-bold"><Layers className="w-4 h-4" /> Licenças</div>
               <div className="font-mono text-white mt-1">{yenJp(monthly)}/mês</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+            <div className="p-4 rounded-2xl bg-slate-950 border border-white/10">
               <div className="flex items-center gap-1.5 text-amber-400 font-bold"><Wrench className="w-4 h-4" /> Implantação</div>
               <div className="font-mono text-white mt-1">{yenJp(implementation)}</div>
               <div className="text-[10px] text-slate-400">{PRICING.estimateLabel}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+            <div className="p-4 rounded-2xl bg-slate-950 border border-white/10">
               <div className="flex items-center gap-1.5 text-sky-400 font-bold"><Plug className="w-4 h-4" /> Integrações</div>
               <div className="font-mono text-white mt-1">{integration === null ? 'Fora do escopo' : yenJp(integration)}</div>
               <div className="text-[10px] text-slate-400">{integration === null ? simPlan.integrationPolicy : PRICING.estimateLabel}</div>
