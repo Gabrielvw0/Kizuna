@@ -1,6 +1,5 @@
 import React from 'react';
 import { PresentationProvider, usePresentation } from './core/PresentationContext';
-import { InputBusProvider, useInputBus } from './core/InputBus';
 import { NavigationChrome } from './core/NavigationChrome';
 import { VisualBackgroundEngine } from './core/VisualBackgroundEngine';
 import { WorldStage } from './core/WorldStage';
@@ -127,25 +126,6 @@ const LiveProductDemoWorkspace: React.FC<{ onClose: () => void }> = ({ onClose }
   );
 };
 
-const GestureBridge: React.FC = () => {
-  const { onCommand } = useInputBus();
-  const { nextStep, prevStep } = usePresentation();
-
-  React.useEffect(() => {
-    return onCommand((cmd) => {
-      if (cmd === 'NEXT') {
-        nextStep();
-      } else if (cmd === 'PREV') {
-        prevStep();
-      } else if (cmd === 'INTERACT' || cmd === 'CONFIRM') {
-        nextStep();
-      }
-    });
-  }, [onCommand, nextStep, prevStep]);
-
-  return null;
-};
-
 const StrategicPresentationStage: React.FC = () => {
   const { currentIndex, erpDemoOpen, setErpDemoOpen, stageMode } = usePresentation();
 
@@ -188,9 +168,6 @@ const StrategicPresentationStage: React.FC = () => {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#05080D] text-slate-100 flex flex-col">
-      {/* Gesture Bridge Listener for Camera & WebSocket inputs */}
-      <GestureBridge />
-
       {/* Camada 1: Living 3D World Stage (Persistent Earth, Orbit, Red Thread, Tokyo Architecture & Validation Gate) */}
       <WorldStage />
 
@@ -225,11 +202,9 @@ const StrategicPresentationStage: React.FC = () => {
 
 export function App() {
   return (
-    <InputBusProvider>
-      <PresentationProvider>
-        <StrategicPresentationStage />
-      </PresentationProvider>
-    </InputBusProvider>
+    <PresentationProvider>
+      <StrategicPresentationStage />
+    </PresentationProvider>
   );
 }
 

@@ -64,7 +64,7 @@ export const IntroSection: React.FC = () => {
             </p>
             <div className="mt-4 flex items-center justify-center gap-2 text-xs font-mono text-slate-400">
               <Compass className="w-3.5 h-3.5 text-red-400 animate-spin" />
-              <span>Clique ou deslize a mão para aproximar do ponto de origem</span>
+              <span>Clique ou pressione → para aproximar do ponto de origem</span>
             </div>
           </div>
         )}

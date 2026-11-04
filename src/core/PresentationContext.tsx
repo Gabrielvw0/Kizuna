@@ -466,10 +466,10 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       if (erpDemoOpen) return;
 
-      if (e.key === 'ArrowRight') {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
         e.preventDefault();
         nextStep();
-      } else if (e.key === 'ArrowLeft') {
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
         e.preventDefault();
         prevStep();
       } else if (e.key === ' ' || e.key === 'Enter') {
