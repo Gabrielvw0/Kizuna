@@ -27,7 +27,7 @@ const TRUST_PILLARS = [
     code: '02 AUDITORIA',
     title: 'Histórico de Alterações (Audit Trail)',
     jp: '監査証跡',
-    desc: 'Registro imutável de quem alterou, quando e com qual justificativa.',
+    desc: 'Registro rastreável de quem alterou, quando e com qual justificativa.',
     icon: <FileSearch className="w-5 h-5" />
   },
   {
@@ -113,7 +113,8 @@ export const AISecuritySection: React.FC = () => {
               MÓDULO DE INTELIGÊNCIA ASSISTIVA COM COFRE / PORTÃO VERMELHO
             </span>
             <div className="text-sm font-mono text-slate-300 mt-0.5">
-              Caso em Análise: <span className="text-white font-bold">Proposta de Alocação de Recursos</span>
+              Caso em Análise: <span className="text-white font-bold">Proposta de Alocação de Recursos</span>{' '}
+              <span className="text-[10px] text-slate-500">(simulação com dados de demonstração)</span>
             </div>
           </div>
 
@@ -236,7 +237,7 @@ export const AISecuritySection: React.FC = () => {
                 <span className="text-[10px] font-mono font-bold text-emerald-400">04 • 監査ログ</span>
                 <Database className="w-4 h-4 text-emerald-400" />
               </div>
-              <div className="text-sm font-bold text-white mb-1">Audit Log Imutável</div>
+              <div className="text-sm font-bold text-white mb-1">Audit Log (demonstração)</div>
               <div className="p-2 rounded-lg bg-black/60 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 leading-snug">
                 ID: #KZ-2026-9941
                 <br />
@@ -244,11 +245,11 @@ export const AISecuritySection: React.FC = () => {
                 <br />
                 TIMESTAMP: 2026-10-27 15:42 JST
                 <br />
-                STATUS: COMPLIANT (APPI/JIS)
+                STATUS: REGISTRADO (DEMO)
               </div>
             </div>
             <div className="text-[10px] font-mono text-slate-400 mt-2">
-              Trilha inviolável para auditoria corporativa
+              Trilha rastreável para auditoria corporativa
             </div>
           </div>
         </div>

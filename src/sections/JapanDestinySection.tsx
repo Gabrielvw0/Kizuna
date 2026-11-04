@@ -19,7 +19,7 @@ const FOUR_DOORS: CulturalDoor[] = [
     kanji: '文化',
     title: 'CULTURA',
     items: ['Hierarquia explícita', 'Formalidade', 'Consenso coletivo', 'Relacionamento de longo prazo'],
-    problem: 'Sistemas ocidentais horizontais ignoram alçadas formais de aprovação e geram insegurança.',
+    problem: 'Sistemas de estrutura horizontal podem não refletir as alçadas formais de aprovação e gerar insegurança.',
     consequence: 'O produto precisa refletir papéis claros: 経営 (Direção) → 管理職 (Gerência) → チーム (Equipe) → 個人 (Indivíduo).'
   },
   {
@@ -28,7 +28,7 @@ const FOUR_DOORS: CulturalDoor[] = [
     kanji: '言語',
     title: 'IDIOMA',
     items: ['Japonês nativo', 'Etiqueta corporativa (Keigo)', 'Documentação precisa', 'Suporte local'],
-    problem: 'Tradução literal desrespeita a hierarquia comunicativa e destrói a percepção de seriedade.',
+    problem: 'Tradução literal pode desrespeitar a hierarquia comunicativa e reduzir a percepção de seriedade.',
     consequence: 'Interface, termos de status e notificações devem seguir Keigo corporativo sem jargões soltos.'
   },
   {
@@ -37,7 +37,7 @@ const FOUR_DOORS: CulturalDoor[] = [
     kanji: '商習慣',
     title: 'HÁBITOS EMPRESARIAIS',
     items: ['Alinhamento prévio (Nemawashi)', 'Aprovação formal (Ringi)', 'Carimbo digital (Hanko)', 'Previsibilidade'],
-    problem: 'Tentar fechar contratos ou impor adoção de software por decisão individual isolada gera rejeição.',
+    problem: 'Tentar fechar contratos ou impor adoção de software por decisão individual isolada tende a gerar rejeição.',
     consequence: 'O software precisa incorporar fluxos nativos de Nemawashi (根回し) e carimbos formais de Ringi (稟議).'
   },
   {
@@ -46,7 +46,7 @@ const FOUR_DOORS: CulturalDoor[] = [
     kanji: '規制',
     title: 'REGULAÇÃO',
     items: ['Proteção de dados', 'Documentos eletrônicos', 'Fiscalidade', 'Segurança da informação'],
-    problem: 'Confundir exigências fiscais/legais do Japão com normas técnicas impede homologação corporativa.',
+    problem: 'Confundir exigências fiscais/legais do Japão com normas técnicas pode dificultar a homologação corporativa.',
     consequence: 'Separação estrita entre Legislação obrigatória e Certificações internacionais de segurança.'
   }
 ];

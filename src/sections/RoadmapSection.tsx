@@ -54,35 +54,35 @@ const CHANNELS = [
 const METRO_STATIONS = [
   {
     station: 'ESTAÇÃO 01',
-    name: 'Brasil',
-    jp: 'ブラジル（開発・検証）',
-    location: 'São Paulo R&D Hub',
-    detail: 'Origem, engenharia avançada Globant e validação prévia de arquitetura.',
-    milestone: 'Base sólida de engenharia'
+    name: 'Brasil (origem do projeto)',
+    jp: 'ブラジル（プロジェクトの起点）',
+    location: 'Origem conceitual do projeto',
+    detail: 'Origem acadêmica e conceitual do Kizuna, com a Globant como referência empresarial; validação prévia da arquitetura.',
+    milestone: 'Base conceitual do projeto'
   },
   {
     station: 'ESTAÇÃO 02',
     name: 'Parceiro Local (SIer)',
-    jp: '現地SIerパートナー提携',
-    location: 'Tóquio (Marunouchi)',
-    detail: 'Aliança estratégica com consultorias e integradores de sistemas japoneses.',
-    milestone: 'Endosso de confiança local'
+    jp: '現地SIerパートナー候補の探索',
+    location: 'Tóquio (alvo inicial)',
+    detail: 'Identificar e aproximar consultorias e integradores de sistemas japoneses como possíveis parceiros de entrada. Nenhum parceiro foi confirmado.',
+    milestone: 'Endosso de confiança local (objetivo)'
   },
   {
     station: 'ESTAÇÃO 03',
     name: 'Pilotos Controlados',
-    jp: '3社限定パイロット導入',
-    location: 'Tóquio & Yokohama',
-    detail: 'Implementação de Kizuna Start em 3 PMEs selecionadas para validação prática.',
-    milestone: 'Ajuste fino de rotina'
+    jp: '3〜5社限定パイロット導入',
+    location: 'Região metropolitana de Tóquio (alvo)',
+    detail: 'Pilotos do Kizuna Start em 3 a 5 PMEs selecionadas, para validar a aderência ao mercado japonês (meta proposta).',
+    milestone: 'Ajustes a partir dos pilotos'
   },
   {
     station: 'ESTAÇÃO 04',
     name: 'Casos de Referência',
     jp: '導入事例・社会的証明',
     location: 'Nagoya & Kanto',
-    detail: 'Publicação de estudos de caso comprovados com ganho de eficiência real.',
-    milestone: 'Prova social consolidada'
+    detail: 'Estudos de caso a partir dos pilotos, se autorizados pelos clientes e com resultados efetivamente medidos.',
+    milestone: 'Referências locais (objetivo)'
   },
   {
     station: 'ESTAÇÃO 05',
@@ -90,15 +90,15 @@ const METRO_STATIONS = [
     jp: '全国展開・多拠点拡大',
     location: 'Osaka & Kansai',
     detail: 'Crescimento via modelo Land & Expand do Start para Business e Enterprise.',
-    milestone: 'Escala nacional'
+    milestone: 'Escala nacional (projeção)'
   },
   {
     station: 'ESTAÇÃO 06',
-    name: 'Entidade Japonesa (株式会社)',
-    jp: '株式会社 Globant Kizuna Japan',
-    location: 'Sede Própria em Tóquio',
-    detail: 'Estabelecimento da sociedade anônima japonesa (Kabushiki Kaisha) com governança definitiva.',
-    milestone: 'Presença permanente no Japão',
+    name: 'Avaliar subsidiária própria (hipótese futura)',
+    jp: '現地法人（株式会社）設立の検討 — 将来の仮説',
+    location: 'Decisão futura, condicionada à validação',
+    detail: 'Avaliar a viabilidade de uma subsidiária japonesa (Kabushiki Kaisha) somente depois de pilotos validados, carteira de clientes e referências locais. Não existe entidade japonesa constituída.',
+    milestone: 'Decisão sobre presença permanente (hipótese)',
     isFinal: true
   }
 ];
@@ -187,6 +187,9 @@ export const RoadmapSection: React.FC = () => {
             Estação Ativa: <strong>{activeStation.name}</strong> ({activeStation.location})
           </span>
         </div>
+        <p className="pt-2 text-[10px] font-mono text-slate-500 leading-snug">
+          Roteiro de entrada = hipótese estratégica do projeto acadêmico. Parcerias, pilotos e subsidiária ainda não existem.
+        </p>
 
         {/* Metro Track Visual Bar */}
         <div className="relative my-6 px-2">

@@ -36,7 +36,7 @@ const SEVEN_PILLARS: AdaptationPillar[] = [
     bullets: [
       'Tratamento formal e polido adequado à hierarquia corporativa japonesa',
       'Termos de status específicos do vocabulário empresarial (承諾, 差戻し, 決裁)',
-      'Documentação técnica, manuais e suporte 100% em japonês'
+      'Proposta: documentação técnica, manuais e suporte em japonês'
     ]
   },
   {
@@ -64,7 +64,7 @@ const SEVEN_PILLARS: AdaptationPillar[] = [
     bullets: [
       'Sistema de Fatura Qualificada (Qualified Invoice System / インボイス制度)',
       'Exibição obrigatória e transparente dos valores antes e pós-imposto',
-      'Arredondamento contábil estritamente conforme regras fiscais japonesas'
+      'Arredondamento conforme as regras fiscais japonesas (a validar com a regra vigente)'
     ]
   },
   {
@@ -90,7 +90,7 @@ const SEVEN_PILLARS: AdaptationPillar[] = [
     shortDesc: 'Supressão inteligente de alertas fora do horário comercial japonês.',
     previewSnippet: 'Modo Silencioso Noturno Ativo: Notificações retidas até 09:00 JST.',
     bullets: [
-      'Políticas de conformidade com as leis de reforma do estilo de trabalho (働き方改革)',
+      'Alinhado à reforma do estilo de trabalho (働き方改革), como diretriz de produto',
       'Alertas urgentes apenas mediante autorização gerencial explícita',
       'Preservação do bem-estar e redução de estresse comunicativo'
     ]
@@ -106,21 +106,21 @@ const SEVEN_PILLARS: AdaptationPillar[] = [
     bullets: [
       'Geração de relatórios com alta densidade informacional tradicional',
       'Carimbo circular digital com data e identificador do signatário',
-      'Exportação em PDF/A compatível com o Arquivo Eletrônico Governamental'
+      'Exportação em PDF/A (formato de arquivamento de longo prazo)'
     ]
   },
   {
     id: 'compliance',
     code: '07 CONFORMIDADE LEGAL',
     title: 'APPI & JIS Q 15001 / 27001',
-    jp: '個人情報保護法 (APPI) 準拠',
+    jp: '個人情報保護法 (APPI) への対応方針',
     icon: <ShieldCheck className="w-4 h-4" />,
-    shortDesc: 'Adesão total à Lei de Proteção de Informações Pessoais do Japão.',
-    previewSnippet: 'APPI Compliance: Dados criptografados em repouso no datacenter Tokyo Kanto.',
+    shortDesc: 'Requisito do projeto: aderência à Lei de Proteção de Informações Pessoais do Japão (APPI), a validar com assessoria jurídica.',
+    previewSnippet: 'Requisito do projeto (proposta): dados criptografados em repouso e hospedagem no Japão — sem certificação obtida.',
     bullets: [
-      'Separado estrito entre exigências legais e certificações técnicas',
-      'Conformidade com a Electronic Books Preservation Act (電子帳簿保存法)',
-      'Residência de dados e suporte com operadoras locais em território japonês'
+      'Separação estrita entre exigências legais e certificações técnicas',
+      'Requisito: atender à Electronic Books Preservation Act (電子帳簿保存法), a validar',
+      'Proposta: residência de dados e suporte local em território japonês'
     ]
   }
 ];
@@ -249,7 +249,7 @@ export const AdaptationSection: React.FC = () => {
           </div>
 
           <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400">R2 Validado</span>
+            <span className="text-xs font-mono text-slate-400">R2 • Requisitos propostos pelo projeto (sem certificação obtida)</span>
             <button
               onClick={nextStep}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer"

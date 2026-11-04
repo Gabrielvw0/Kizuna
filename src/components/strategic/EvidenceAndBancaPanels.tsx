@@ -16,10 +16,12 @@ import {
 } from 'lucide-react';
 
 const TYPE_BADGE_STYLES: Record<string, string> = {
-  DADO: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
+  'FATO INSTITUCIONAL': 'bg-teal-500/15 text-teal-300 border-teal-500/40',
+  'DADO EXTERNO COM FONTE': 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
   HIPÓTESE: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
-  RECOMENDAÇÃO: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
-  META: 'bg-purple-500/15 text-purple-300 border-purple-500/40',
+  'PROPOSTA DO PROJETO': 'bg-sky-500/15 text-sky-300 border-sky-500/40',
+  PROJEÇÃO: 'bg-purple-500/15 text-purple-300 border-purple-500/40',
+  'DADO DE DEMONSTRAÇÃO': 'bg-slate-500/20 text-slate-200 border-slate-400/40',
   'PREÇO SUGERIDO': 'bg-rose-500/15 text-rose-300 border-rose-500/40'
 };
 
@@ -148,7 +150,7 @@ export const EvidenceAndBancaPanels: React.FC = () => {
                     CAMADA DE EVIDÊNCIAS & RIGOR ACADÊMICO
                   </h2>
                   <p className="text-xs text-slate-400">
-                    Distinção estrita entre Dado, Hipótese, Recomendação, Meta e Preço Sugerido
+                    Distinção entre fato institucional, dado externo com fonte, proposta do projeto, hipótese, projeção, dado de demonstração e preço sugerido
                   </p>
                 </div>
               </div>

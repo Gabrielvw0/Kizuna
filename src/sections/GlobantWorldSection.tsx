@@ -13,30 +13,30 @@ interface VerifiedJapanDatum {
 const VERIFIED_JAPAN_DATA: VerifiedJapanDatum[] = [
   {
     number: '99,7%',
-    description: 'Das empresas no Japão são PMEs (~3,36 milhões de empresas ativas)',
-    source: 'METI — White Paper on Small and Medium Enterprises',
-    year: '2023 / 2024',
+    description: 'Das empresas no Japão são PMEs (cerca de 3,365 milhões de empresas em 2021)',
+    source: 'METI — Agência de PMEs (Censo Econômico 2021)',
+    year: '2021 (pub. 2023)',
     cityTag: 'TOKYO • KANTO'
   },
   {
     number: '¥12 Tri / ano',
-    description: 'Risco estimado de perda anual (“Digital Cliff”) por sistemas legados obsoletos',
-    source: 'METI — DX Report (Digital Cliff Warning)',
-    year: '2018–2025',
+    description: 'Perda econômica potencial máxima estimada pelo METI (“Digital Cliff”) a partir de 2025 se sistemas legados não forem modernizados',
+    source: 'METI — DX Report (2018) • estimativa de risco',
+    year: '2018 (projeção)',
     cityTag: 'OSAKA • KANSAI'
   },
   {
-    number: '86%',
-    description: 'Das empresas japonesas relatam escassez crítica de engenheiros e talentos de TI',
-    source: 'MIC / METI IT Talent Supply Survey',
-    year: '2024',
+    number: 'Escassez',
+    description: 'Empresas japonesas relatam falta de profissionais de TI e de transformação digital (índice a citar com a edição do levantamento)',
+    source: 'IPA — DX白書 (série anual)',
+    year: 'a confirmar',
     cityTag: 'NAGOYA • CHUBU'
   },
   {
-    number: 'US$ 4,2 Tri',
-    description: '4ª maior economia mundial com alta densidade tecnológica e demanda por governança',
-    source: 'IMF World Economic Outlook / Cabinet Office',
-    year: '2024',
+    number: 'Top 5',
+    description: 'Entre as cinco maiores economias do mundo em PIB nominal (a posição exata varia por ano)',
+    source: 'IMF — World Economic Outlook (abr/2025)',
+    year: '2025 (projeção)',
     cityTag: 'GLOBAL VALUE HUB'
   }
 ];
@@ -45,7 +45,7 @@ const OPPORTUNITY_PILLARS = [
   'Mercado tecnológico maduro e altamente estruturado',
   'Alta exigência corporativa por confiabilidade e governança',
   'Pressão governamental urgente por modernização (DX)',
-  'Abertura a parceiros globais com respeito cultural comprovado'
+  'Espaço para parceiros globais que demonstrem respeito ao contexto cultural'
 ];
 
 export const GlobantWorldSection: React.FC = () => {
@@ -72,7 +72,7 @@ export const GlobantWorldSection: React.FC = () => {
         {!stageMode && (
           <div className="flex items-center gap-1.5 flex-wrap">
             {[
-              { idx: 0, label: '01 DADOS COMPROVADOS' },
+              { idx: 0, label: '01 DADOS DE MERCADO' },
               { idx: 1, label: '02 OPORTUNIDADE DX' },
               { idx: 2, label: '03 PONTE BRASIL–JAPÃO (1908)' }
             ].map((s) => (
@@ -107,9 +107,9 @@ export const GlobantWorldSection: React.FC = () => {
           <div className="space-y-3 my-2">
             <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-red-500/40 flex items-center justify-between">
               <div>
-                <div className="text-xs font-mono font-bold text-red-400">TOKYO (東京) • SEDE CORPORATIVA</div>
+                <div className="text-xs font-mono font-bold text-red-400">TOKYO (東京) • CENTRO CORPORATIVO</div>
                 <div className="text-sm font-black text-white mt-0.5">Centro Financeiro &amp; Marunouchi</div>
-                <div className="text-[11px] text-slate-300">Decisão estratégica e presença direta da Globant</div>
+                <div className="text-[11px] text-slate-300">Centro de decisão corporativa e financeira — destino-alvo da entrada</div>
               </div>
               <span className="text-lg font-serif text-red-300 font-bold">東</span>
             </div>
@@ -216,7 +216,7 @@ export const GlobantWorldSection: React.FC = () => {
               </span>
             </div>
             <p className="text-xs sm:text-sm text-white font-medium mt-1.5">
-              “O Brasil abriga a maior comunidade japonesa fora do Japão (2,0M+ descendentes). A história que começou no mar agora se consolida como ponte de confiança tecnológica.”
+              “O Brasil abriga a maior comunidade japonesa fora do Japão (cerca de 2 milhões de descendentes; as estimativas variam). A história que começou no mar agora se consolida como ponte de confiança tecnológica.”
             </p>
           </div>
         </div>

@@ -50,12 +50,12 @@ const PLANS: PlanConfig[] = [
     priceNum: 3500,
     priceFormatted: '¥3.500',
     jp: '全社統制・連携',
-    summary: 'Governança corporativa, auditoria imutável e integrações dedicadas.',
+    summary: 'Governança corporativa, trilha de auditoria e integrações dedicadas.',
     features: [
       'Tudo do Kizuna Business',
       'Controle de acesso granular (RBAC) & Audit Trail',
       'Integrações dedicadas com ERPs legados japoneses',
-      'Conformidade com APPI e ISO/IEC 27001 (JIS Q 27001)'
+      'Alinhamento a APPI e ISO/IEC 27001 (JIS Q 27001) como referência, sem certificação'
     ],
     recommendedScale: 100
   }
@@ -266,7 +266,7 @@ export const PricingSection: React.FC = () => {
                     <div className="text-slate-200 font-mono font-bold">
                       ¥{implementationJpy.toLocaleString('ja-JP')}
                     </div>
-                    <div className="text-[9px] text-slate-400 mt-0.5">Setup &amp; Ringi único</div>
+                    <div className="text-[9px] text-slate-400 mt-0.5">Estimativa ilustrativa • sob proposta</div>
                   </div>
 
                   <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
@@ -277,7 +277,7 @@ export const PricingSection: React.FC = () => {
                     <div className="text-slate-200 font-mono font-bold">
                       {integrationJpy > 0 ? `¥${integrationJpy.toLocaleString('ja-JP')}` : 'Inclusa'}
                     </div>
-                    <div className="text-[9px] text-slate-400 mt-0.5">APIs &amp; legado</div>
+                    <div className="text-[9px] text-slate-400 mt-0.5">Estimativa ilustrativa • sob proposta</div>
                   </div>
                 </div>
               </div>
@@ -285,7 +285,7 @@ export const PricingSection: React.FC = () => {
 
             <div className="pt-4 mt-3 border-t border-white/10 flex items-center justify-between">
               <span className="text-xs font-mono text-slate-400">
-                Transparência B2B: Preço por valor entregue sem custos ocultos
+                Proposta: licença por usuário; implantação e integrações apresentadas à parte (valores ilustrativos)
               </span>
               <button
                 onClick={nextStep}

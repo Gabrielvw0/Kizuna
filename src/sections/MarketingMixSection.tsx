@@ -24,18 +24,18 @@ const SLOGAN_WORDS = [
 
 const SEVEN_CHANNELS = [
   { id: 1, name: 'Eventos Executivos', jp: 'エグゼクティブ・フォーラム', tag: 'C-Level & Meishi' },
-  { id: 2, name: 'Casos Reais', jp: '国内導入事例・顧客の声', tag: 'Prova Social' },
-  { id: 3, name: 'Parcerias Estratégicas', jp: 'SIer・コンサル提携', tag: 'Distribuição Local' },
+  { id: 2, name: 'Casos de Referência', jp: '導入事例（パイロット後）', tag: 'Prova Social (pós-piloto)' },
+  { id: 3, name: 'Parcerias Estratégicas', jp: 'SIer・コンサルとの提携検討', tag: 'Distribuição Local' },
   { id: 4, name: 'Conteúdo Técnico', jp: '技術ホワイトペーパー', tag: 'Segurança & APPI' },
   { id: 5, name: 'Demonstrações Guiadas', jp: '対話型ライブデモ', tag: 'Experiência Kizuna' },
-  { id: 6, name: 'Prova de Conceito (PoC)', jp: '30日間実証導入', tag: 'Adoção sem Risco' },
-  { id: 7, name: 'Presença em Tóquio', jp: '丸の内・現地オフィス', tag: 'Proximidade & Confiança' }
+  { id: 6, name: 'Prova de Conceito (PoC)', jp: '30日間実証導入', tag: 'Adoção com risco reduzido' },
+  { id: 7, name: 'Presença Local (futura)', jp: '現地拠点（将来の選択肢）', tag: 'Hipótese futura' }
 ];
 
 const FUNNEL_STAGES = [
   { stage: 'LEAD', jp: '見込み客', metric: '100+', desc: 'Contatos qualificados em feiras, webinars e busca B2B.' },
   { stage: 'PILOT', jp: '実証パイロット', metric: '3~5', desc: 'Equipes testando o Kizuna Start por 30 dias em ambiente real.' },
-  { stage: 'CUSTOMER', jp: '正規顧客化', metric: '94%', desc: 'Conversão em planos Business/Enterprise com retenção de longo prazo.' }
+  { stage: 'CUSTOMER', jp: '正規顧客化', metric: 'A definir', desc: 'Conversão dos pilotos em contratos pagos (Business/Enterprise): meta a definir após os pilotos.' }
 ];
 
 export const MarketingMixSection: React.FC = () => {
@@ -134,7 +134,7 @@ export const MarketingMixSection: React.FC = () => {
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-amber-300 font-bold flex items-center gap-1.5">
               <Award className="w-3.5 h-3.5" /> FUNIL DE RECONHECIMENTO &amp; ADOÇÃO
             </span>
-            <span className="text-[10px] font-mono text-emerald-400">Taxa de Sucesso</span>
+            <span className="text-[10px] font-mono text-amber-300">Projeção ilustrativa</span>
           </div>
 
           <div className="space-y-3 my-auto py-2">

@@ -191,12 +191,12 @@ export const ValueSection: React.FC = () => {
                 絆
               </div>
               <span className="text-xs font-mono tracking-widest text-white font-bold">
-                KIZUNA WORKSPACE • TOKYO OPS
+                KIZUNA WORKSPACE • DEMONSTRAÇÃO
               </span>
             </div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-mono text-emerald-300">
-                ● LIVE SYNC
+                ● DADOS DE DEMONSTRAÇÃO
               </span>
               <span className="text-[10px] font-mono text-slate-400">
                 ETAPA {sceneIndex + 1}/5
@@ -311,7 +311,7 @@ export const ValueSection: React.FC = () => {
                 </div>
                 <div className="text-[11px] font-mono text-slate-300 mt-1.5">
                   {sceneIndex >= 4
-                    ? '✓ Proposta comercial auditada • SLA: 100% no prazo'
+                    ? '✓ Proposta registrada e rastreável • entrega no prazo (dado de demonstração)'
                     : 'Clique para inspecionar o painel executivo'}
                 </div>
               </div>
@@ -320,7 +320,7 @@ export const ValueSection: React.FC = () => {
 
           <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
             <span>赤い糸 • Fio de Dados Contínuo: Equipe → Projeto → Gestão</span>
-            <span className="text-red-400">Zero retrabalho entre sistemas</span>
+            <span className="text-red-400">Objetivo: menos retrabalho entre sistemas</span>
           </div>
         </div>
 

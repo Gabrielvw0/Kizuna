@@ -23,7 +23,7 @@ const COMPETITORS: CompetitorNode[] = [
     quadrant: 'Extremo Direito Inferior',
     scope: 'Altíssimo / Complexo',
     cultural: 'Baixa (Genérica / Global)',
-    limitation: 'Custo proibitivo para PMEs, implementação de múltiplos anos e fricção na UX tradicional japonesa.',
+    limitation: 'Hipótese do grupo (a validar): soluções amplas tendem a exigir custo e prazo de implantação elevados para PMEs.',
     xPercent: 78,
     yPercent: 75
   },
@@ -34,7 +34,7 @@ const COMPETITORS: CompetitorNode[] = [
     quadrant: 'Extremo Esquerdo Superior',
     scope: 'Fechado / Rígido',
     cultural: 'Alta (Nativa Tradicional)',
-    limitation: 'Sistemas legados locais, arquitetura fechada sem IA moderna ou capacidade de expansão global.',
+    limitation: 'Hipótese do grupo (a validar): forte aderência local, com possível menor abertura a integrações modernas e à expansão global.',
     xPercent: 24,
     yPercent: 28
   },
@@ -45,7 +45,7 @@ const COMPETITORS: CompetitorNode[] = [
     quadrant: 'Centro-Esquerda',
     scope: 'Focado em Fiscal / Contábil',
     cultural: 'Média-Alta',
-    limitation: 'Excelentes em contabilidade, mas não cobrem a gestão integrada de projetos, tarefas e governança operacional.',
+    limitation: 'Hipótese do grupo (a validar): foco em contabilidade e RH; a cobertura de projetos e tarefas deve ser conferida em fontes oficiais.',
     xPercent: 32,
     yPercent: 55
   },
@@ -56,7 +56,7 @@ const COMPETITORS: CompetitorNode[] = [
     quadrant: 'Esquerdo Inferior',
     scope: 'Produtividade de Equipe',
     cultural: 'Baixa (Sem Regras Locais)',
-    limitation: 'Modernos e ágeis, porém sem rituais japoneses (Ringi/Nemawashi), sem carimbo Hanko e sem conformidade fiscal.',
+    limitation: 'Hipótese do grupo (a validar): produtividade de equipe moderna; o suporte a rituais japoneses (Ringi/Hanko) e a requisitos fiscais locais deve ser conferido.',
     xPercent: 20,
     yPercent: 82
   },
@@ -67,7 +67,7 @@ const COMPETITORS: CompetitorNode[] = [
     quadrant: 'Quadrante Superior Direito ★',
     scope: 'Modular (Equipes → ERP)',
     cultural: 'Alta (Keigo, Ringi, APPI)',
-    limitation: 'Equilíbrio ideal: facilidade de entrada (¥980) com engenharia corporativa de classe mundial.',
+    limitation: 'Proposta: combinar facilidade de entrada (¥980, preço sugerido) com engenharia corporativa e adaptação local.',
     xPercent: 80,
     yPercent: 22,
     isKizuna: true
@@ -110,7 +110,7 @@ export const PositioningSection: React.FC = () => {
         <div className="lg:col-span-7 relative rounded-3xl bg-slate-950/95 border border-white/15 p-6 flex flex-col justify-between overflow-hidden min-h-[360px] shadow-2xl">
           <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-slate-400 z-10">
             <span>▲ EIXO VERTICAL: ADAPTAÇÃO CULTURAL (BAIXA → ALTA/NATIVA)</span>
-            <span className="text-amber-300 font-bold">KIZUNA NO ÁPICE ★</span>
+            <span className="text-amber-300 font-bold">POSIÇÃO-ALVO DO KIZUNA ★</span>
           </div>
 
           <div className="relative flex-1 my-3 rounded-2xl bg-slate-900/50 border border-white/10 overflow-hidden">
@@ -172,7 +172,7 @@ export const PositioningSection: React.FC = () => {
 
           <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-white/10 pt-2">
             <span>Clique nos concorrentes para comparar diferenciais</span>
-            <span className="text-amber-300 font-bold">Posição Estratégica Inédita</span>
+            <span className="text-amber-300 font-bold">Mapa conceitual: avaliação qualitativa do grupo, sem pesquisa de mercado</span>
           </div>
         </div>
 
@@ -190,7 +190,7 @@ export const PositioningSection: React.FC = () => {
               <h2 className="text-2xl font-black text-white">{activeComp.name}</h2>
               {activeComp.isKizuna && (
                 <span className="px-2 py-0.5 rounded bg-red-600/30 border border-red-400/50 text-[10px] font-mono text-red-200">
-                  LÍDER DO QUADRANTE
+                  POSIÇÃO-ALVO DO PROJETO
                 </span>
               )}
             </div>
@@ -207,14 +207,14 @@ export const PositioningSection: React.FC = () => {
               </div>
 
               <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10">
-                <div className="text-[10px] font-mono uppercase text-slate-400">Ponto Fraco no Japão / Razão de Escolha</div>
+                <div className="text-[10px] font-mono uppercase text-slate-400">Hipótese de limitação / Razão de escolha</div>
                 <p className="text-xs text-slate-300 leading-relaxed mt-0.5">{activeComp.limitation}</p>
               </div>
             </div>
           </div>
 
           <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400">Diferencial Único</span>
+            <span className="text-xs font-mono text-slate-400">Diferencial pretendido</span>
             <button
               onClick={nextStep}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer"

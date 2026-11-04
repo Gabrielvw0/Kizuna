@@ -81,7 +81,7 @@ export const IntroSection: React.FC = () => {
               O VÍNCULO HISTÓRICO.
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
-              O Brasil abriga a maior comunidade japonesa fora do Japão (2,0M+ descendentes). A história que começou em 1908 agora se transforma em conexão tecnológica e confiança empresarial.
+              O Brasil abriga a maior comunidade japonesa fora do Japão (cerca de 2 milhões de descendentes; as estimativas variam). A história que começou em 1908 agora se transforma em conexão tecnológica e confiança empresarial.
             </p>
             <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-amber-300 font-bold">
               <span>赤い糸 • O fio vermelho nasce no Brasil</span>
@@ -102,7 +102,7 @@ export const IntroSection: React.FC = () => {
               RUMO AO ARQUIPÉLAGO.
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
-              O fio orbital cruza as Américas, Europa e Ásia, alinhando a capacidade internacional da Globant ao destino de maior rigor e valor agregado do planeta: o mercado japonês.
+              O fio orbital cruza as Américas, Europa e Ásia, conectando a referência empresarial do projeto — a Globant, origem conceitual do Kizuna — a um mercado que exige rigor e confiança: o Japão.
             </p>
             <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-red-400 font-bold">
               <span>Convergência em Tóquio (東京)</span>

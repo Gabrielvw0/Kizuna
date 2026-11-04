@@ -270,6 +270,9 @@ export const TrustSection: React.FC = () => {
               <div className="p-3 rounded-lg bg-white/[0.03] border border-white/10 font-mono text-xs text-emerald-300">
                 ▸ {activeBlock.microView}
               </div>
+              <p className="mt-1.5 text-[10px] font-mono text-slate-500">
+                Exemplo com dados de demonstração (nomes, prazos e percentuais fictícios).
+              </p>
             </div>
 
             <div className="mt-4 pt-4 border-t border-white/10 space-y-2.5">

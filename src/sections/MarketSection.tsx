@@ -272,6 +272,11 @@ export const MarketSection: React.FC = () => {
             );
           })}
 
+          <p className="text-[10px] font-mono text-slate-500 leading-snug">
+            Planos e preços: propostas comerciais do projeto acadêmico (preços sugeridos, 税抜) — não são preços oficiais da Globant
+            nem preços de mercado comprovados.
+          </p>
+
           <div className="flex items-center justify-between pt-1">
             <span className="text-xs font-mono text-slate-400">
               Evolução ativa: <strong className="text-white">{activeRing.name}</strong> ({activeRing.tagline})

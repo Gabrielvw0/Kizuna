@@ -109,7 +109,7 @@ export const MetricsSection: React.FC = () => {
 
         <div className="px-4 py-2 rounded-xl bg-slate-900/90 border border-red-500/40 text-xs font-mono text-white flex items-center gap-2">
           <Radar className="w-4 h-4 text-red-400 animate-spin" />
-          <span>4 QUADRANTES TÁTICOS ATIVOS</span>
+          <span>4 QUADRANTES DE RISCO • GATILHOS PROPOSTOS</span>
         </div>
       </div>
 
@@ -161,13 +161,13 @@ export const MetricsSection: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-white/5 border border-white/10 ${activeQuad.colorClass}`}>
-              STATUS: {activeQuad.status}
+              STATUS ILUSTRATIVO: {activeQuad.status}
             </span>
-            <span className="text-sm font-bold text-white">Centro de Telemetria: {activeQuad.title}</span>
+            <span className="text-sm font-bold text-white">Centro de Controle (modelo): {activeQuad.title}</span>
             <span className="text-xs font-serif text-slate-400">({activeQuad.jp})</span>
           </div>
           <p className="text-xs text-slate-300 max-w-3xl leading-relaxed">
-            Monitoramento contínuo em tempo real via dashboard de governança, garantindo intervenções preventivas antes que qualquer barreira comprometa a reputação corporativa (絆).
+            Modelo proposto de acompanhamento: gatilhos e limiares são propostas do projeto, sem dados reais de operação. A intenção é intervir cedo, antes que uma barreira comprometa a reputação corporativa (絆).
           </p>
         </div>
 
