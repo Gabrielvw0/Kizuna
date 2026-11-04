@@ -246,6 +246,11 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
   }
 ];
 
+// Simulação de reserva: só pode ser ativada na tela 06 (índice 5, Demonstração),
+// com um passo a cada 2,4 s, e termina sozinha ao chegar no último passo.
+const BACKUP_SIM_SECTION_INDEX = 5;
+const BACKUP_SIM_STEP_MS = 2400;
+
 export interface CommandCue {
   id: number;
   label: string;
@@ -279,7 +284,7 @@ interface PresentationContextType {
   toggleEvidence: () => void;
   toggleNavMenu: () => void;
   setNavMenuOpen: (open: boolean) => void;
-  setBackupVideoMode: (open: boolean) => void;
+  toggleBackupSimulation: () => void;
   setEvidenceOpen: (open: boolean) => void;
   setErpDemoOpen: (open: boolean) => void;
   toggleFullscreen: () => void;
@@ -320,6 +325,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (index < 0 || index >= totalSections) return;
       const targetSec = PRESENTATION_SECTIONS[index];
       const clampedScene = Math.max(0, Math.min(targetSec.sceneCount - 1, initialScene));
+      setBackupVideoMode(false);
       setCurrentIndex(index);
       setSceneIndexState(clampedScene);
       setNavMenuOpen(false);
@@ -330,12 +336,14 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const setSceneIndex = useCallback(
     (sceneIdx: number) => {
       const clamped = Math.max(0, Math.min(currentSection.sceneCount - 1, sceneIdx));
+      setBackupVideoMode(false); // qualquer escolha manual de cena interrompe a simulação
       setSceneIndexState(clamped);
     },
     [currentSection.sceneCount]
   );
 
   const nextStep = useCallback(() => {
+    setBackupVideoMode(false);
     if (sceneIndex < currentSection.sceneCount - 1) {
       const nextSc = sceneIndex + 1;
       setSceneIndexState(nextSc);
@@ -349,6 +357,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [sceneIndex, currentSection, currentIndex, totalSections, triggerCue]);
 
   const prevStep = useCallback(() => {
+    setBackupVideoMode(false);
     if (sceneIndex > 0) {
       const prevSc = sceneIndex - 1;
       setSceneIndexState(prevSc);
@@ -363,6 +372,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [sceneIndex, currentIndex, currentSection, triggerCue]);
 
   const nextSection = useCallback(() => {
+    setBackupVideoMode(false);
     if (currentIndex < totalSections - 1) {
       const nextSec = PRESENTATION_SECTIONS[currentIndex + 1];
       setCurrentIndex((prev) => prev + 1);
@@ -372,6 +382,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [currentIndex, totalSections, triggerCue]);
 
   const prevSection = useCallback(() => {
+    setBackupVideoMode(false);
     if (currentIndex > 0) {
       const prevSec = PRESENTATION_SECTIONS[currentIndex - 1];
       setCurrentIndex((prev) => prev - 1);
@@ -381,9 +392,39 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [currentIndex, triggerCue]);
 
   const resetCurrentScene = useCallback(() => {
+    setBackupVideoMode(false);
     setSceneIndexState(0);
     triggerCue('RESET', `TELA ${currentSection.code} • CENA 1/${currentSection.sceneCount}`);
   }, [currentSection, triggerCue]);
+
+  // Único ponto que pode LIGAR a simulação de reserva: só vale na tela 06.
+  const toggleBackupSimulation = useCallback(() => {
+    if (currentIndex !== BACKUP_SIM_SECTION_INDEX || erpDemoOpen) return;
+    if (backupVideoMode) {
+      setBackupVideoMode(false);
+      triggerCue('SIMULAÇÃO INTERROMPIDA', 'Controle manual');
+      return;
+    }
+    if (sceneIndex >= currentSection.sceneCount - 1) setSceneIndexState(0);
+    setBackupVideoMode(true);
+    triggerCue('SIMULAÇÃO DE RESERVA', 'Automática • ESC ou ← → para assumir');
+  }, [currentIndex, erpDemoOpen, backupVideoMode, sceneIndex, currentSection, triggerCue]);
+
+  // Rede de segurança: fora da tela 06 (ou com o ERP aberto) a simulação nunca fica ligada.
+  useEffect(() => {
+    if (currentIndex !== BACKUP_SIM_SECTION_INDEX || erpDemoOpen) setBackupVideoMode(false);
+  }, [currentIndex, erpDemoOpen]);
+
+  // Único temporizador da simulação: um passo a cada 2,4 s; ao chegar ao último passo, encerra.
+  useEffect(() => {
+    if (!backupVideoMode || currentIndex !== BACKUP_SIM_SECTION_INDEX) return;
+    if (sceneIndex >= currentSection.sceneCount - 1) {
+      setBackupVideoMode(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setSceneIndexState(sceneIndex + 1), BACKUP_SIM_STEP_MS);
+    return () => window.clearTimeout(timer);
+  }, [backupVideoMode, currentIndex, sceneIndex, currentSection.sceneCount]);
 
   const toggleStageMode = useCallback(() => {
     setStageMode((prev) => {
@@ -485,8 +526,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         toggleSafeMode();
       } else if (e.key === 'v' || e.key === 'V') {
         e.preventDefault();
-        setBackupVideoMode((prev) => !prev);
-        triggerCue('VÍDEO DE RESERVA', 'Simulação Contínua de Emergência');
+        toggleBackupSimulation();
       } else if (e.key === 'r' || e.key === 'R') {
         e.preventDefault();
         resetCurrentScene();
@@ -514,6 +554,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     toggleEvidence,
     toggleFullscreen,
     triggerCue,
+    toggleBackupSimulation,
     backupVideoMode,
     evidenceOpen,
     bancaMode,
@@ -549,7 +590,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         toggleEvidence,
         toggleNavMenu,
         setNavMenuOpen,
-        setBackupVideoMode,
+        toggleBackupSimulation,
         setEvidenceOpen,
         setErpDemoOpen,
         toggleFullscreen,

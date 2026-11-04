@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   PlusCircle,
   Link2,
@@ -77,16 +77,8 @@ export const ValueSection: React.FC = () => {
     setSceneIndex,
     nextStep,
     backupVideoMode,
-    setBackupVideoMode
+    toggleBackupSimulation
   } = usePresentation();
-
-  useEffect(() => {
-    if (!backupVideoMode) return;
-    const timer = window.setInterval(() => {
-      setSceneIndex((sceneIndex + 1) % 5);
-    }, 2400);
-    return () => window.clearInterval(timer);
-  }, [backupVideoMode, sceneIndex, setSceneIndex]);
 
   const currentDemo = DEMO_STEPS[sceneIndex] || DEMO_STEPS[0];
   const progressValue = sceneIndex >= 3 ? 75 : 68;
@@ -117,17 +109,26 @@ export const ValueSection: React.FC = () => {
 
         {/* Backup Video Mode Controls */}
         <div className="flex items-center gap-2.5">
+          {backupVideoMode && (
+            <span
+              role="status"
+              className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-amber-300"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              Simulação automática • passo {sceneIndex + 1}/5 • ESC ou ← → para assumir
+            </span>
+          )}
           <button
-            onClick={() => setBackupVideoMode(!backupVideoMode)}
+            onClick={toggleBackupSimulation}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-mono uppercase tracking-wider transition-all cursor-pointer ${
               backupVideoMode
                 ? 'bg-amber-500/20 border-amber-400 text-amber-200 shadow-[0_0_20px_rgba(245,158,11,0.3)]'
                 : 'bg-slate-900/80 border-white/15 text-slate-300 hover:border-white/30'
             }`}
-            title="Atalho: Tecla V (Modo Vídeo de Reserva)"
+            title="Atalho: tecla V (somente nesta tela). Simulação de reserva: um passo a cada 2,4 s, só inicia por comando manual."
           >
             {backupVideoMode ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span>{backupVideoMode ? 'Vídeo Reserva Ativo (V)' : 'Simulação Reserva (V)'}</span>
+            <span>{backupVideoMode ? 'Interromper simulação (V)' : 'Simulação de reserva (V)'}</span>
           </button>
           <button
             onClick={() => setSceneIndex(0)}
