@@ -153,7 +153,9 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 8: // TELA 09: CONFIANÇA • COFRE / PORTÃO VERMELHO DE VALIDAÇÃO
       env.globeVisibility = 0.0;
       env.gateVisibility = 1.0;
-      pose.pos.set(0, 0.15, 2.4);
+      // Etapa 8: câmera afastada — os pilares caem nos vãos entre as três colunas da tela
+      // e o portão (deslocado para baixo em WorldStage) emoldura a decisão no centro
+      pose.pos.set(0, 0.05, 6.0);
       pose.target.set(0, 0, 0);
       break;
 
