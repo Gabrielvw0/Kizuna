@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users, BrainCircuit, Building2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
+import { PRICING, getPlan, yen } from '../data/pricing';
 
 interface RingTier {
   idx: number;
@@ -18,7 +19,7 @@ const EXPANSION_RINGS: RingTier[] = [
     idx: 0,
     ringLabel: 'ANEL 01 • ENTRADA',
     name: 'KIZUNA START',
-    price: '¥980',
+    price: yen(getPlan('start').priceMonthly),
     tagline: 'Gestão de equipes',
     jp: 'チーム管理',
     scopeItems: ['Tarefas & Calendário', 'Projetos da Equipe', 'Comunicação Contextual', 'Adoção imediata sem fricção'],
@@ -28,7 +29,7 @@ const EXPANSION_RINGS: RingTier[] = [
     idx: 1,
     ringLabel: 'ANEL 02 • EXPANSÃO',
     name: 'KIZUNA BUSINESS',
-    price: '¥1.980',
+    price: yen(getPlan('business').priceMonthly),
     tagline: 'Gestão + inteligência',
     jp: '知能と自動化',
     scopeItems: ['Tudo do Start', 'Automação & IA Assistiva', 'Fluxos de Aprovação (Ringi)', 'Indicadores Multiequipe'],
@@ -38,7 +39,7 @@ const EXPANSION_RINGS: RingTier[] = [
     idx: 2,
     ringLabel: 'ANEL 03 • PLATAFORMA',
     name: 'KIZUNA ENTERPRISE',
-    price: '¥3.500',
+    price: yen(getPlan('enterprise').priceMonthly),
     tagline: 'Gestão + escala',
     jp: '全社統合基盤',
     scopeItems: ['Tudo do Business', 'Governança Avançada & Audit Trail', 'Integrações Corporativas & API', 'Operação Integrada em Escala'],
@@ -178,7 +179,7 @@ export const MarketSection: React.FC = () => {
               textAnchor="middle"
               className="fill-red-300 font-mono text-[11px] font-bold pointer-events-none"
             >
-              ¥980
+              {yen(getPlan('start').priceMonthly)}
             </text>
 
             <text
@@ -187,7 +188,7 @@ export const MarketSection: React.FC = () => {
               textAnchor="middle"
               className="fill-slate-200 font-mono text-[10px] font-bold pointer-events-none"
             >
-              BUSINESS • ¥1.980
+              BUSINESS • {yen(getPlan('business').priceMonthly)}
             </text>
 
             <text
@@ -196,7 +197,7 @@ export const MarketSection: React.FC = () => {
               textAnchor="middle"
               className="fill-amber-300 font-mono text-[10px] font-bold pointer-events-none"
             >
-              ENTERPRISE • ¥3.500
+              ENTERPRISE • {yen(getPlan('enterprise').priceMonthly)}
             </text>
           </svg>
 
@@ -273,8 +274,7 @@ export const MarketSection: React.FC = () => {
           })}
 
           <p className="text-[10px] font-mono text-slate-500 leading-snug">
-            Planos e preços: propostas comerciais do projeto acadêmico (preços sugeridos, 税抜) — não são preços oficiais da Globant
-            nem preços de mercado comprovados.
+            Preços sugeridos (税抜). {PRICING.expansionJourney.disclaimer}
           </p>
 
           <div className="flex items-center justify-between pt-1">

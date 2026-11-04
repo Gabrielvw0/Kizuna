@@ -207,7 +207,7 @@
       "title": "TELA 08 | R2 • ADAPTAÇÃO DO PRODUTO — Não basta traduzir",
       "banca": {
         "speech": "A adaptação não é apenas linguística. Ela envolve a forma como o usuário interage, como as decisões são aprovadas, como os dados são tratados e como o sistema se integra à realidade existente.",
-        "concept": "Seis dimensões de adaptação ao Japão unidas por conexões Kintsugi: 01 Nome (絆 Kizuna), 02 Idioma, 03 UX (Hierarquia, Permissões, Aprovações, Formalidade), 04 Processos (Ringi e Nemawashi), 05 Integrações e 06 Compliance.",
+        "concept": "Sete pilares de localização japonesa, os mesmos exibidos na tela: 01 Idioma (Keigo corporativo), 02 Calendário (datas e eras), 03 Moeda e Impostos (税抜/税込), 04 Hierarquia e Rituais (Nemawashi e Ringi), 05 Notificações (respeito ao horário de trabalho), 06 Relatórios e Selo (Hanko) e 07 Conformidade legal (requisitos APPI e Electronic Books Preservation Act; ISO/IEC 27001 como referência, sem certificação).",
         "evidence": "Incorporação nativa dos rituais japoneses de alinhamento prévio (Nemawashi) e aprovação formal em etapas (Ringi).",
         "premise": "Integrar o que já funciona e evoluir gradualmente evita rejeição operacional.",
         "risk": "Limitar a localização à tradução literal de menus.",
@@ -218,10 +218,10 @@
       "evidences": [
         {
           "type": "PROPOSTA DO PROJETO",
-          "title": "Matriz de 6 Adaptações do Produto (R2)",
+          "title": "Matriz de 7 Pilares de Adaptação do Produto (R2)",
           "source": "Especificação de Localização Profunda — Projeto Kizuna",
           "date": "2026",
-          "info": "01 Nome (絆), 02 Idioma, 03 UX, 04 Processos (Ringi & Nemawashi), 05 Integrações ('Integrar o que já funciona. Evoluir gradualmente.') e 06 Compliance (APPI, Electronic Books, Qualified Invoice, ISO/IEC 27001 / JIS Q 27001).",
+          "info": "01 Idioma, 02 Calendário, 03 Moeda e Impostos, 04 Hierarquia e Rituais (Ringi & Nemawashi), 05 Notificações, 06 Relatórios e Selo e 07 Conformidade legal (APPI, Electronic Books, Qualified Invoice; ISO/IEC 27001 / JIS Q 27001 como referência). Princípio: 'Integrar o que já funciona. Evoluir gradualmente.' Integrações com sistemas existentes fazem parte da estratégia de planos (Enterprise, sob proposta).",
           "methodology": "Design centrado na cultura organizacional japonesa.",
           "implication": "Responde integralmente ao requisito R2 de adaptação do produto."
         }

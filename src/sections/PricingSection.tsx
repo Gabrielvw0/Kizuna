@@ -1,94 +1,52 @@
 import React, { useState } from 'react';
 import { Check, Layers, Wrench, Plug, ArrowRight, TrendingUp, Users, ShieldAlert } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
+import { PRICING, PlanId, getPlan, planForUsers, scaleStory, yen } from '../data/pricing';
 
-interface PlanConfig {
-  id: 'start' | 'business' | 'enterprise';
-  name: string;
-  priceNum: number;
-  priceFormatted: string;
-  jp: string;
-  summary: string;
-  features: string[];
-  recommendedScale: number;
-}
+// Preços, faixas de usuários, estimativas e avisos vêm de src/data/pricing.json.
+// Aqui ficam apenas os textos de apresentação de cada plano.
+const PLAN_COPY: Record<PlanId, { jp: string; summary: string }> = {
+  start: { jp: 'チーム管理', summary: 'Tarefas, calendário, projetos e comunicação contextual.' },
+  business: { jp: '知能・稟議フロー', summary: 'Automação, IA assistiva e fluxos de aprovação (Ringi/Nemawashi).' },
+  enterprise: { jp: '全社統制・連携', summary: 'Governança corporativa, trilha de auditoria e integrações dedicadas.' }
+};
 
-const PLANS: PlanConfig[] = [
-  {
-    id: 'start',
-    name: 'KIZUNA START',
-    priceNum: 980,
-    priceFormatted: '¥980',
-    jp: 'チーム管理',
-    summary: 'Tarefas, calendário, projetos e comunicação contextual.',
-    features: [
-      'Gestão ágil de tarefas e prazos',
-      'Calendário compartilhado por equipe',
-      'Visão de entregas e progresso de projetos',
-      'Comunicação direta contextualizada'
-    ],
-    recommendedScale: 10
-  },
-  {
-    id: 'business',
-    name: 'KIZUNA BUSINESS',
-    priceNum: 1980,
-    priceFormatted: '¥1.980',
-    jp: '知能・稟議フロー',
-    summary: 'Automação, IA assistiva e fluxos de aprovação (Ringi/Nemawashi).',
-    features: [
-      'Tudo do Kizuna Start',
-      'Fluxos nativos de Nemawashi (根回し) e Ringi (稟議)',
-      'Inteligência assistiva com portão de validação humana',
-      'Indicadores multiequipe e visibilidade gerencial'
-    ],
-    recommendedScale: 40
-  },
-  {
-    id: 'enterprise',
-    name: 'KIZUNA ENTERPRISE',
-    priceNum: 3500,
-    priceFormatted: '¥3.500',
-    jp: '全社統制・連携',
-    summary: 'Governança corporativa, trilha de auditoria e integrações dedicadas.',
-    features: [
-      'Tudo do Kizuna Business',
-      'Controle de acesso granular (RBAC) & Audit Trail',
-      'Integrações dedicadas com ERPs legados japoneses',
-      'Alinhamento a APPI e ISO/IEC 27001 (JIS Q 27001) como referência, sem certificação'
-    ],
-    recommendedScale: 100
-  }
-];
+const PLANS = PRICING.plans.map((p) => ({
+  id: p.id as PlanId,
+  name: p.name,
+  priceNum: p.priceMonthly,
+  priceFormatted: yen(p.priceMonthly),
+  ...PLAN_COPY[p.id as PlanId]
+}));
 
-const USER_SCALE_OPTIONS = [10, 25, 40, 75, 100] as const;
+const USER_SCALE_OPTIONS = PRICING.presets;
 
 export const PricingSection: React.FC = () => {
   const { setSceneIndex, nextStep } = usePresentation();
-  const [selectedPlanId, setSelectedPlanId] = useState<'start' | 'business' | 'enterprise'>('business');
-  const [userCount, setUserCount] = useState<number>(40);
+  const [selectedPlanId, setSelectedPlanId] = useState<PlanId>(planForUsers(PRICING.defaultUsers));
+  const [userCount, setUserCount] = useState<number>(PRICING.defaultUsers);
 
   const activePlan = PLANS.find((p) => p.id === selectedPlanId) || PLANS[1];
   const monthlyJpy = activePlan.priceNum * userCount;
-  const annualJpy = monthlyJpy * 12;
+  const annualJpy = monthlyJpy * 12; // regra em pricing.json (annualRule): mensal × 12, sem desconto
 
-  // Implementation and integration estimates
-  const implementationJpy = selectedPlanId === 'start' ? 150000 : selectedPlanId === 'business' ? 450000 : 1200000;
-  const integrationJpy = selectedPlanId === 'start' ? 0 : selectedPlanId === 'business' ? 300000 : 800000;
+  // Estimativas ilustrativas de implantação e integração (sob proposta), de pricing.json
+  const { implementation: implementationJpy, integration: integrationJpy } = getPlan(selectedPlanId).estimates;
 
-  const handleSelectPlan = (planId: 'start' | 'business' | 'enterprise') => {
+  // Escolher um plano ajusta a escala se ela estiver fora da faixa do plano:
+  // Start aceita até users.max; Business e Enterprise exigem pelo menos users.min.
+  const handleSelectPlan = (planId: PlanId) => {
     setSelectedPlanId(planId);
-    if (planId === 'start' && userCount > 25) setUserCount(10);
-    if (planId === 'business' && userCount < 25) setUserCount(40);
-    if (planId === 'enterprise' && userCount < 50) setUserCount(100);
+    const { users } = getPlan(planId);
+    const outOfRange = planId === 'start' ? userCount > (users.max ?? Infinity) : userCount < users.min;
+    if (outOfRange) setUserCount(users.default);
     setSceneIndex(0);
   };
 
+  // Escolher uma escala seleciona o plano da faixa correspondente
   const handleUserScale = (count: number) => {
     setUserCount(count);
-    if (count <= 20) setSelectedPlanId('start');
-    else if (count <= 60) setSelectedPlanId('business');
-    else setSelectedPlanId('enterprise');
+    setSelectedPlanId(planForUsers(count));
     setSceneIndex(1);
   };
 
@@ -113,7 +71,7 @@ export const PricingSection: React.FC = () => {
         {/* Mandatory Visible Notice */}
         <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 border border-amber-400/50 text-[11px] font-mono font-bold tracking-wider text-amber-200">
           <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>PREÇOS SUGERIDOS — HIPÓTESE ESTRATÉGICA PARA O PROJETO</span>
+          <span>{PRICING.badge}</span>
         </div>
       </div>
 
@@ -123,7 +81,7 @@ export const PricingSection: React.FC = () => {
         <div className="lg:col-span-5 flex flex-col justify-between gap-3">
           <div className="flex items-center justify-between text-xs font-mono text-slate-400 px-1">
             <span>SELECIONE O PLANO OPERACIONAL</span>
-            <span className="text-red-400">¥ (税抜 • sem imposto de 10%)</span>
+            <span className="text-red-400">¥ (税抜 • sem imposto de {Math.round(PRICING.taxRate * 100)}%)</span>
           </div>
 
           <div className="space-y-2.5 flex-1 flex flex-col justify-between">
@@ -170,7 +128,7 @@ export const PricingSection: React.FC = () => {
               <span className="text-[10px] font-mono uppercase tracking-widest text-slate-300 font-bold flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5 text-red-400" /> ESCALA DA EMPRESA: {userCount} USUÁRIOS
               </span>
-              <span className="text-[10px] font-mono text-amber-300">10 → 40 → 100</span>
+              <span className="text-[10px] font-mono text-amber-300">{scaleStory}</span>
             </div>
 
             <div className="grid grid-cols-5 gap-1.5">
@@ -266,7 +224,7 @@ export const PricingSection: React.FC = () => {
                     <div className="text-slate-200 font-mono font-bold">
                       ¥{implementationJpy.toLocaleString('ja-JP')}
                     </div>
-                    <div className="text-[9px] text-slate-400 mt-0.5">Estimativa ilustrativa • sob proposta</div>
+                    <div className="text-[9px] text-slate-400 mt-0.5">{PRICING.estimateLabel}</div>
                   </div>
 
                   <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
@@ -277,7 +235,7 @@ export const PricingSection: React.FC = () => {
                     <div className="text-slate-200 font-mono font-bold">
                       {integrationJpy > 0 ? `¥${integrationJpy.toLocaleString('ja-JP')}` : 'Inclusa'}
                     </div>
-                    <div className="text-[9px] text-slate-400 mt-0.5">Estimativa ilustrativa • sob proposta</div>
+                    <div className="text-[9px] text-slate-400 mt-0.5">{PRICING.estimateLabel}</div>
                   </div>
                 </div>
               </div>

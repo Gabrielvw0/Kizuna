@@ -12,6 +12,10 @@ import {
   Building2
 } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
+import metricsData from '../data/metrics.json';
+
+// Meta proposta de pilotos (ex.: "3–5" -> "3 a 5"): fonte única em metrics.json
+const PILOT_TARGET = metricsData.phases.find((p) => p.id === 'm3_6')!.targetNumber.replace('–', ' a ');
 
 const CHANNELS = [
   {
@@ -71,9 +75,9 @@ const METRO_STATIONS = [
   {
     station: 'ESTAÇÃO 03',
     name: 'Pilotos Controlados',
-    jp: '3〜5社限定パイロット導入',
+    jp: '限定パイロット導入',
     location: 'Região metropolitana de Tóquio (alvo)',
-    detail: 'Pilotos do Kizuna Start em 3 a 5 PMEs selecionadas, para validar a aderência ao mercado japonês (meta proposta).',
+    detail: `Pilotos do Kizuna Start em ${PILOT_TARGET} PMEs selecionadas, para validar a aderência ao mercado japonês (meta proposta).`,
     milestone: 'Ajustes a partir dos pilotos'
   },
   {

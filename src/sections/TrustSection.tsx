@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckSquare, Calendar, FolderKanban, MessageSquare, ArrowRight, Sparkles, Layers } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
+import { getPlan, yen } from '../data/pricing';
 
 interface TeamBlock {
   id: string;
@@ -89,7 +90,7 @@ export const TrustSection: React.FC = () => {
           <div className="h-8 w-[1px] bg-white/10" />
           <div className="text-right">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl md:text-3xl font-black text-white font-mono">¥980</span>
+              <span className="text-2xl md:text-3xl font-black text-white font-mono">{yen(getPlan('start').priceMonthly)}</span>
               <span className="text-xs font-mono text-slate-300">/ usuário/mês</span>
               <span className="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-400/30 text-[10px] font-mono text-amber-300">
                 税抜
@@ -280,7 +281,7 @@ export const TrustSection: React.FC = () => {
                 <Layers className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <p className="text-xs text-slate-300 leading-relaxed">
                   Em vez de exigir uma troca traumática de sistemas no primeiro dia, o{' '}
-                  <strong className="text-white">Kizuna Start (¥980 税抜)</strong> resolve a rotina imediata da equipe.
+                  <strong className="text-white">Kizuna Start ({yen(getPlan('start').priceMonthly)} 税抜)</strong> resolve a rotina imediata da equipe.
                 </p>
               </div>
             </div>

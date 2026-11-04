@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Compass, CheckCircle2, ArrowRight, Sparkles, Orbit } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
+import { getPlan, yen } from '../data/pricing';
 
 interface CompetitorNode {
   id: string;
@@ -67,7 +68,7 @@ const COMPETITORS: CompetitorNode[] = [
     quadrant: 'Quadrante Superior Direito ★',
     scope: 'Modular (Equipes → ERP)',
     cultural: 'Alta (Keigo, Ringi, APPI)',
-    limitation: 'Proposta: combinar facilidade de entrada (¥980, preço sugerido) com engenharia corporativa e adaptação local.',
+    limitation: `Proposta: combinar facilidade de entrada (${yen(getPlan('start').priceMonthly)}, preço sugerido) com engenharia corporativa e adaptação local.`,
     xPercent: 80,
     yPercent: 22,
     isKizuna: true

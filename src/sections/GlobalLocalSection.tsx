@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePresentation } from '../core/PresentationContext';
+import { getPlan, yen } from '../data/pricing';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 const GLOBAL_ITEMS = [
@@ -239,7 +240,7 @@ export const GlobalLocalSection: React.FC = () => {
             onClick={nextStep}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer shadow-lg"
           >
-            <span>{scene < 2 ? 'Aproximar Sistemas' : 'TELA 05 | KIZUNA START (¥980)'}</span>
+            <span>{scene < 2 ? 'Aproximar Sistemas' : `TELA 05 | KIZUNA START (${yen(getPlan('start').priceMonthly)})`}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

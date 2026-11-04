@@ -81,5 +81,51 @@
     "quote": "Crescimento pode aumentar. Tolerância a incidentes críticos não.",
     "badge": "META INEGOCIÁVEL • 0–12 MESES",
     "rationale": "No mercado corporativo japonês, um único incidente grave de segurança ou vazamento de dados no primeiro ano compromete irreversivelmente a confiança construída. Por isso, governança, controle de permissões, logs e validação humana permanecem inegociáveis do mês 1 ao mês 12."
+  },
+  "riskPanel": {
+    "badge": "RISCOS E GATILHOS PROPOSTOS",
+    "disclaimer": "Gatilhos, limiares e status são propostas do projeto, sem dados reais de operação. O status exibido é ilustrativo.",
+    "quadrants": [
+      {
+        "id": "mercado",
+        "title": "MERCADO",
+        "jp": "市場・文化適応",
+        "risk": "Baixa taxa de adoção cultural inicial por desconfiança de software estrangeiro",
+        "trigger": "Retenção da Equipe",
+        "triggerValue": "< 60% em 90 dias",
+        "response": "Workshop presencial de onboarding com consultor japonês nativo e integrador local",
+        "status": "WATCH"
+      },
+      {
+        "id": "produto",
+        "title": "PRODUTO",
+        "jp": "製品・UX/敬語",
+        "risk": "Rejeição de terminologia corporativa ou fricção no Keigo/fluxos de Ringi",
+        "trigger": "NPS da Equipe",
+        "triggerValue": "NPS < 30",
+        "response": "Revisão imediata da interface com o comitê consultivo japonês e atualização quinzenal",
+        "status": "OPTIMAL"
+      },
+      {
+        "id": "comercial",
+        "title": "COMERCIAL",
+        "jp": "営業・意思決定サイクル",
+        "risk": "Ciclo de vendas excessivamente longo devido à lentidão nos processos de Nemawashi",
+        "trigger": "Tempo Médio de Fechamento",
+        "triggerValue": "> 6 meses",
+        "response": "Ativação do modelo “Land & Expand”: entrada gratuita pelo Kizuna Start por 30 dias na equipe",
+        "status": "WATCH"
+      },
+      {
+        "id": "financeiro",
+        "title": "FINANCEIRO",
+        "jp": "財務・獲得効率",
+        "risk": "Custo de aquisição elevado de clientes corporativos no Japão",
+        "trigger": "Relação CAC vs LTV",
+        "triggerValue": "CAC > LTV / 3",
+        "response": "Fortalecimento de parcerias com integradores locais (SIers) com comissão de receita recorrente",
+        "status": "OPTIMAL"
+      }
+    ]
   }
 }

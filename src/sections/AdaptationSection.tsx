@@ -12,6 +12,12 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
+import { PRICING, getPlan, yen } from '../data/pricing';
+
+// Exemplo de 税抜/税込 calculado a partir do preço sugerido do Start e da alíquota em pricing.json
+const EXAMPLE_NET = getPlan('start').priceMonthly;
+const EXAMPLE_TAX = Math.floor(EXAMPLE_NET * PRICING.taxRate);
+const TAX_PCT = Math.round(PRICING.taxRate * 100);
 
 interface AdaptationPillar {
   id: string;
@@ -57,10 +63,10 @@ const SEVEN_PILLARS: AdaptationPillar[] = [
     id: 'moeda',
     code: '03 MOEDA & IMPOSTOS',
     title: 'Iene (¥) & Imposto sobre Consumo (税抜/税込)',
-    jp: '円（JPY）と消費税計算（10%）',
+    jp: `円（JPY）と消費税計算（${TAX_PCT}%）`,
     icon: <DollarSign className="w-4 h-4" />,
-    shortDesc: 'Cálculo de imposto sobre consumo (10%) com exibição separada 税抜 e 税込.',
-    previewSnippet: '小計: ¥980 (税抜) + 消費税 (10%): ¥98 = 合計: ¥1.078 (税込)',
+    shortDesc: `Cálculo de imposto sobre consumo (${TAX_PCT}%) com exibição separada 税抜 e 税込.`,
+    previewSnippet: `小計: ${yen(EXAMPLE_NET)} (税抜) + 消費税 (${TAX_PCT}%): ${yen(EXAMPLE_TAX)} = 合計: ${yen(EXAMPLE_NET + EXAMPLE_TAX)} (税込)`,
     bullets: [
       'Sistema de Fatura Qualificada (Qualified Invoice System / インボイス制度)',
       'Exibição obrigatória e transparente dos valores antes e pós-imposto',

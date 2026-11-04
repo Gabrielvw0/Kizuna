@@ -1,5 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import sourcesData from '../data/sources.json';
+import { getPlan, scaleStory, yen } from '../data/pricing';
+
+// Preços exibidos nos rótulos de navegação vêm de pricing.json (fonte única)
+const PRICE = {
+  start: yen(getPlan('start').priceMonthly),
+  business: yen(getPlan('business').priceMonthly),
+  enterprise: yen(getPlan('enterprise').priceMonthly)
+};
 
 export interface SectionMeta {
   index: number;
@@ -86,14 +94,14 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     code: '05',
     id: 'kizuna-start',
     shortTitle: 'KIZUNA START',
-    fullTitle: '05 | COMEÇAMOS PELA EQUIPE — Kizuna Start (¥980)',
+    fullTitle: `05 | COMEÇAMOS PELA EQUIPE — Kizuna Start (${PRICE.start})`,
     bgThemeName: 'Team Core',
     storyQuestion: 'Por onde o Kizuna começa a gerar valor sem complexidade desnecessária?',
     metamorphosisFromTo: 'Tarefas + Calendário + Projetos + Comunicação → Núcleo Kizuna',
     narrativeNode: 'KIZUNA',
     kanji: '始',
     sceneCount: 2,
-    sceneLabels: ['Os 4 Blocos da Equipe', 'Núcleo Kizuna Start (¥980 税抜)']
+    sceneLabels: ['Os 4 Blocos da Equipe', `Núcleo Kizuna Start (${PRICE.start} 税抜)`]
   },
   {
     index: 5,
@@ -123,11 +131,11 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     fullTitle: '07 | À MEDIDA QUE A CONFIANÇA CRESCE, A PLATAFORMA CRESCE',
     bgThemeName: 'Land & Expand Rings',
     storyQuestion: 'Como evoluímos de gestão de equipes para uma plataforma empresarial completa?',
-    metamorphosisFromTo: 'Start (¥980) → Business (¥1.980) → Enterprise (¥3.500)',
+    metamorphosisFromTo: `Start (${PRICE.start}) → Business (${PRICE.business}) → Enterprise (${PRICE.enterprise})`,
     narrativeNode: 'PRODUTO',
     kanji: '拡',
     sceneCount: 3,
-    sceneLabels: ['Anel 1: Start (¥980)', 'Anel 2: Business (¥1.980)', 'Anel 3: Enterprise (¥3.500)']
+    sceneLabels: [`Anel 1: Start (${PRICE.start})`, `Anel 2: Business (${PRICE.business})`, `Anel 3: Enterprise (${PRICE.enterprise})`]
   },
   {
     index: 7,
@@ -137,12 +145,12 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     fullTitle: '08 | NÃO BASTA TRADUZIR — Adaptação ao Contexto Japonês',
     rBadge: 'R2 • ADAPTAÇÃO DO PRODUTO',
     bgThemeName: 'Kintsugi & Ringi',
-    storyQuestion: 'Como o Kizuna se adapta à língua, UX, Ringi, Nemawashi, integrações e compliance?',
-    metamorphosisFromTo: '01 Nome → 02 Idioma → 03 UX → 04 Ringi & Nemawashi → 05 Integrações → 06 Compliance',
+    storyQuestion: 'Como o Kizuna se adapta ao idioma e ao Keigo, ao calendário e à moeda, aos rituais Ringi/Nemawashi e à conformidade legal?',
+    metamorphosisFromTo: '01 Idioma → 02 Calendário → 03 Moeda & Impostos → 04 Hierarquia & Rituais → 05 Notificações → 06 Relatórios & Selo → 07 Conformidade Legal',
     narrativeNode: 'ADAPTAÇÃO',
     kanji: '和',
     sceneCount: 3,
-    sceneLabels: ['Identidade, Idioma & UX', 'Processos: Ringi & Nemawashi', 'Integrações & Compliance']
+    sceneLabels: ['Idioma, Calendário & Moeda', 'Hierarquia, Rituais & Notificações', 'Relatórios, Selo & Conformidade']
   },
   {
     index: 8,
@@ -210,11 +218,11 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     fullTitle: '13 | COMO O KIZUNA GERA VALOR? — Planos (税抜) & Simulador',
     bgThemeName: 'Revenue Architecture',
     storyQuestion: 'Como funciona a assinatura por usuário (税抜) e a separação de implantação e integrações?',
-    metamorphosisFromTo: 'Start (¥980) | Business (¥1.980) | Enterprise (¥3.500) → Simulador 10 → 40 → 100',
+    metamorphosisFromTo: `Start (${PRICE.start}) | Business (${PRICE.business}) | Enterprise (${PRICE.enterprise}) → Simulador ${scaleStory}`,
     narrativeNode: 'NEGÓCIO',
     kanji: '価',
     sceneCount: 2,
-    sceneLabels: ['3 Planos (¥980 • ¥1.980 • ¥3.500 税抜)', 'Simulador (10 → 40 → 100) + Licenças / Implantação / Integrações']
+    sceneLabels: [`3 Planos (${PRICE.start} • ${PRICE.business} • ${PRICE.enterprise} 税抜)`, `Simulador (${scaleStory}) + Licenças / Implantação / Integrações`]
   },
   {
     index: 13,

@@ -1,17 +1,23 @@
 {
-  "badge": "PREÇOS SUGERIDOS — HIPÓTESE ESTRATÉGICA PARA O MODELO DE ENTRADA",
+  "badge": "PREÇOS SUGERIDOS — HIPÓTESE ESTRATÉGICA PARA O PROJETO",
   "title": "VALOR → PREÇO",
   "subtitle": "Plataforma modular integrada, com expansão por usuário e complexidade.",
   "currency": "¥",
   "currencyCode": "JPY",
-  "presets": [10, 50, 100, 500, 1000],
-  "defaultUsers": 50,
+  "presets": [
+    10,
+    25,
+    40,
+    75,
+    100
+  ],
+  "defaultUsers": 40,
   "revenueStreams": [
     {
       "id": "saas",
       "number": "01",
       "title": "Licença SaaS",
-      "detail": "¥980 / ¥1.980 / ¥3.500 por usuário/mês (recorrência previsível)"
+      "detail": "Valor por usuário/mês conforme o plano (recorrência previsível)"
     },
     {
       "id": "implantacao",
@@ -40,7 +46,6 @@
       "stageLabel": "Entrada",
       "conceptWord": "ORGANIZAR",
       "priceMonthly": 980,
-      "priceAnnual": 11760,
       "audience": "Para pequenas equipes",
       "positioning": "Porta de entrada operacional. O cliente não precisa substituir sua operação inteira no primeiro dia.",
       "description": "Começa organizando uma área ou equipe em idioma e padrão japonês, preparando o terreno para expansão futura.",
@@ -52,7 +57,16 @@
       ],
       "additionalScope": [],
       "highlight": false,
-      "accent": "#94A3B8"
+      "accent": "#94A3B8",
+      "users": {
+        "min": 1,
+        "max": 20,
+        "default": 10
+      },
+      "estimates": {
+        "implementation": 150000,
+        "integration": 0
+      }
     },
     {
       "id": "business",
@@ -61,7 +75,6 @@
       "stageLabel": "Expansão",
       "conceptWord": "INTELIGÊNCIA",
       "priceMonthly": 1980,
-      "priceAnnual": 23760,
       "audience": "Para empresas em crescimento",
       "positioning": "Inteligência + IA supervisionada (2× Start).",
       "description": "Conecta múltiplos departamentos com automação, relatórios executivos e recomendações da IA com Human Validation Gate.",
@@ -74,7 +87,16 @@
       ],
       "additionalScope": [],
       "highlight": true,
-      "accent": "#E11D48"
+      "accent": "#E11D48",
+      "users": {
+        "min": 21,
+        "max": 60,
+        "default": 40
+      },
+      "estimates": {
+        "implementation": 450000,
+        "integration": 300000
+      }
     },
     {
       "id": "enterprise",
@@ -83,7 +105,6 @@
       "stageLabel": "Governança",
       "conceptWord": "ESCALA",
       "priceMonthly": 3500,
-      "priceAnnual": 42000,
       "audience": "Para grandes empresas",
       "positioning": "Maior valor por usuário e potencial de expansão por volume de licenças.",
       "description": "O software é licenciado por usuário; a complexidade de implantação, migração e integração com legados é contratada sob proposta.",
@@ -99,7 +120,16 @@
         "Serviços profissionais — sob proposta"
       ],
       "highlight": false,
-      "accent": "#38BDF8"
+      "accent": "#38BDF8",
+      "users": {
+        "min": 61,
+        "max": null,
+        "default": 100
+      },
+      "estimates": {
+        "implementation": 1200000,
+        "integration": 800000
+      }
     }
   ],
   "expansionJourney": {
@@ -109,22 +139,22 @@
     "tiers": [
       {
         "plan": "START",
-        "price": "¥980",
         "transitionLabel": "adoção",
         "role": "ORGANIZAÇÃO — Porta de entrada operacional em uma equipe ou departamento inicial."
       },
       {
         "plan": "BUSINESS",
-        "price": "¥1.980",
         "transitionLabel": "expansão",
         "role": "INTELIGÊNCIA + IA — Integração entre departamentos, automação e análise operacional."
       },
       {
         "plan": "ENTERPRISE",
-        "price": "¥3.500",
         "transitionLabel": "governança",
         "role": "GOVERNANÇA + ESCALA — Licença corporativa + implantação, integrações e serviços sob proposta."
       }
     ]
-  }
+  },
+  "taxRate": 0.1,
+  "annualRule": "anual = mensal × 12, sem desconto",
+  "estimateLabel": "Estimativa ilustrativa • sob proposta"
 }

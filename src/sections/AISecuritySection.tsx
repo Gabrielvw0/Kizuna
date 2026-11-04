@@ -14,6 +14,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
+import { PRICING } from '../data/pricing';
 
 const TRUST_PILLARS = [
   {
@@ -216,7 +217,7 @@ export const AISecuritySection: React.FC = () => {
               </div>
               <div className="text-sm font-bold text-white mb-1">Ação Controlada</div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Recurso reservado no módulo de compras e ordem de faturamento gerada com impostos calculados (10% 税抜).
+                Recurso reservado no módulo de compras e ordem de faturamento gerada com impostos calculados ({Math.round(PRICING.taxRate * 100)}% 税抜).
               </p>
             </div>
             <div className="text-[10px] font-mono text-emerald-300 mt-2">

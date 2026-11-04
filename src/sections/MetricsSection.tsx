@@ -12,6 +12,7 @@ import {
   Cpu
 } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
+import metricsData from '../data/metrics.json';
 
 interface TacticalQuadrant {
   id: 'mercado' | 'produto' | 'comercial' | 'financeiro';
@@ -27,60 +28,22 @@ interface TacticalQuadrant {
   borderClass: string;
 }
 
-const TACTICAL_QUADRANTS: TacticalQuadrant[] = [
-  {
-    id: 'mercado',
-    title: 'MERCADO',
-    jp: '市場・文化適応',
-    risk: 'Baixa taxa de adoção cultural inicial por desconfiança de software estrangeiro',
-    trigger: 'Retenção da Equipe',
-    triggerValue: '< 60% em 90 dias',
-    response: 'Workshop presencial de onboarding com consultor japonês nativo e integrador local',
-    status: 'WATCH',
-    icon: <Handshake className="w-5 h-5 text-amber-400" />,
-    colorClass: 'text-amber-400',
-    borderClass: 'border-amber-500/50'
-  },
-  {
-    id: 'produto',
-    title: 'PRODUTO',
-    jp: '製品・UX/敬語',
-    risk: 'Rejeição de terminologia corporativa ou fricção no Keigo/fluxos de Ringi',
-    trigger: 'NPS da Equipe',
-    triggerValue: 'NPS < 30',
-    response: 'Revisão imediata da interface com o comitê consultivo japonês e atualização quinzenal',
-    status: 'OPTIMAL',
-    icon: <Cpu className="w-5 h-5 text-emerald-400" />,
-    colorClass: 'text-emerald-400',
-    borderClass: 'border-emerald-500/50'
-  },
-  {
-    id: 'comercial',
-    title: 'COMERCIAL',
-    jp: '営業・意思決定サイクル',
-    risk: 'Ciclo de vendas excessivamente longo devido à lentidão nos processos de Nemawashi',
-    trigger: 'Tempo Médio de Fechamento',
-    triggerValue: '> 6 meses',
-    response: 'Ativação do modelo “Land & Expand”: entrada gratuita pelo Kizuna Start por 30 dias na equipe',
-    status: 'WATCH',
-    icon: <TrendingUp className="w-5 h-5 text-rose-400" />,
-    colorClass: 'text-rose-400',
-    borderClass: 'border-rose-500/50'
-  },
-  {
-    id: 'financeiro',
-    title: 'FINANCEIRO',
-    jp: '財務・獲得効率',
-    risk: 'Custo de aquisição elevado de clientes corporativos no Japão',
-    trigger: 'Relação CAC vs LTV',
-    triggerValue: 'CAC > LTV / 3',
-    response: 'Fortalecimento de parcerias com integradores locais (SIers) com comissão de receita recorrente',
-    status: 'OPTIMAL',
-    icon: <DollarSign className="w-5 h-5 text-cyan-400" />,
-    colorClass: 'text-cyan-400',
-    borderClass: 'border-cyan-500/50'
-  }
-];
+// Conteúdo (riscos, gatilhos, respostas e status ilustrativo) vem de src/data/metrics.json (riskPanel).
+// Aqui ficam apenas ícone e cores de cada quadrante.
+const QUADRANT_STYLE: Record<
+  TacticalQuadrant['id'],
+  { icon: React.ReactNode; colorClass: string; borderClass: string }
+> = {
+  mercado: { icon: <Handshake className="w-5 h-5 text-amber-400" />, colorClass: 'text-amber-400', borderClass: 'border-amber-500/50' },
+  produto: { icon: <Cpu className="w-5 h-5 text-emerald-400" />, colorClass: 'text-emerald-400', borderClass: 'border-emerald-500/50' },
+  comercial: { icon: <TrendingUp className="w-5 h-5 text-rose-400" />, colorClass: 'text-rose-400', borderClass: 'border-rose-500/50' },
+  financeiro: { icon: <DollarSign className="w-5 h-5 text-cyan-400" />, colorClass: 'text-cyan-400', borderClass: 'border-cyan-500/50' }
+};
+
+const TACTICAL_QUADRANTS: TacticalQuadrant[] = metricsData.riskPanel.quadrants.map((q) => ({
+  ...(q as Omit<TacticalQuadrant, 'icon' | 'colorClass' | 'borderClass'>),
+  ...QUADRANT_STYLE[q.id as TacticalQuadrant['id']]
+}));
 
 export const MetricsSection: React.FC = () => {
   const { setSceneIndex, nextStep } = usePresentation();

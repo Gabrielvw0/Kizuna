@@ -14,6 +14,10 @@ import {
   Layers
 } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
+import metricsData from '../data/metrics.json';
+
+// Meta proposta de pilotos (3–5 empresas): fonte única em metrics.json
+const PILOT_TARGET = metricsData.phases.find((p) => p.id === 'm3_6')!.targetNumber;
 
 const SLOGAN_WORDS = [
   { word: 'GLOBAL', sub: 'Escala & Engenharia' },
@@ -34,7 +38,7 @@ const SEVEN_CHANNELS = [
 
 const FUNNEL_STAGES = [
   { stage: 'LEAD', jp: '見込み客', metric: '100+', desc: 'Contatos qualificados em feiras, webinars e busca B2B.' },
-  { stage: 'PILOT', jp: '実証パイロット', metric: '3~5', desc: 'Equipes testando o Kizuna Start por 30 dias em ambiente real.' },
+  { stage: 'PILOT', jp: '実証パイロット', metric: PILOT_TARGET, desc: 'Equipes testando o Kizuna Start por 30 dias em ambiente real.' },
   { stage: 'CUSTOMER', jp: '正規顧客化', metric: 'A definir', desc: 'Conversão dos pilotos em contratos pagos (Business/Enterprise): meta a definir após os pilotos.' }
 ];
 
