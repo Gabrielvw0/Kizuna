@@ -162,10 +162,10 @@ export const AiIntelligenceModule: React.FC = () => {
         role: 'assistant',
         timestamp: nowStr,
         textJp:
-          '【BOM・MRP影響解析】部品構成表（BOM）上、主力「製品 KZ-500」1台あたり部品 C が 8個必要です。現在、製造部の田中健一課長より豊田通商株式会社向け緊急購買稟議 #PR-2026-00842（¥2,840,000）が提出され、山田部長の最終承認待ちとなっています。今すぐ決裁することで納期遅延を100%回避できます。',
+          '【BOM・MRP影響解析】部品構成表（BOM）上、主力「製品 KZ-500」1台あたり部品 C が 8個必要です。現在、製造部の田中健一課長より青葉部品株式会社向け緊急購買稟議 #PR-2026-00842（¥2,840,000）が提出され、山田部長の最終承認待ちとなっています。今すぐ決裁することで納期遅延を100%回避できます。',
         textSub: t(
-          '[BOM Impact Analysis] Product KZ-500 requires 8 units of Component C per assembly. Purchase Request #PR-2026-00842 (Toyota Tsusho, ¥2,840,000) is awaiting your final Ringi stamp. Immediate approval prevents any production delay.',
-          '[Análise de Impacto BOM] O Produto KZ-500 requer 8 unidades do Componente C por montagem. A Requisição #PR-2026-00842 (Toyota Tsusho, ¥2.840.000) aguarda seu carimbo final. Aprovar agora evita atrasos na linha.'
+          '[BOM Impact Analysis] Product KZ-500 requires 8 units of Component C per assembly. Purchase Request #PR-2026-00842 (Aoba Components, ¥2,840,000) is awaiting your final Ringi stamp. Immediate approval prevents any production delay.',
+          '[Análise de Impacto BOM] O Produto KZ-500 requer 8 unidades do Componente C por montagem. A Requisição #PR-2026-00842 (Aoba Components, ¥2.840.000) aguarda seu carimbo final. Aprovar agora evita atrasos na linha.'
         ),
         metrics: [
           { label: '欠品対象品目', value: 'KZ-00882 (部品C)', delta: '現在庫 0 / 最低 50' },
@@ -245,13 +245,13 @@ export const AiIntelligenceModule: React.FC = () => {
         textJp:
           '【AIコンプライアンス監査完了】全 1,482 件の仕訳伝票・適格請求書（T番号）・タイムスタンプを照合しました。改ざん検知 0件、国税庁適格請求書発行事業者API照合 100% 一致を確認しました。',
         textSub: t(
-          '[AI Compliance Audit Complete] Verified 1,482 journal entries, T-numbers, and cryptographic timestamps. 0 anomalies detected; 100% NTA API match.',
+          '[AI Compliance Audit Complete] SIMULATED output over fictitious data (demo). No real tax-authority verification is performed.',
           '[Auditoria de IA Concluída] 1.482 lançamentos, registros T-Number e timestamps verificados. 0 anomalias detectadas; 100% de conformidade com a Receita Japonesa.'
         ),
         metrics: [
           { label: '電帳法タイムスタンプ', value: '100% 適合', delta: '違反 0件' },
-          { label: '適格請求書 T番号照合', value: '100% 有効', delta: '国税庁API連携' },
-          { label: 'J-SOX 職務分掌統制', value: '99.98% 正常', delta: '電子印鑑検証済' },
+          { label: '適格請求書 T番号照合', value: 'デモ表示', delta: '模擬 (実連携なし)' },
+          { label: 'J-SOX 職務分掌統制 (デモ表示)', value: 'デモ値', delta: '電子印鑑検証済' },
         ],
       };
       setMessages((prev) => [...prev, userMsg, aiMsg]);
@@ -323,7 +323,7 @@ export const AiIntelligenceModule: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-xs text-blue-800 font-semibold">
             <Cpu className="w-3.5 h-3.5" />
-            <span>KIZUNA ENTERPRISE AI ENGINE • 丸の内プライベートLLM基盤</span>
+            <span>KIZUNA ENTERPRISE AI ENGINE • デモ用LLM基盤 (模擬)</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mt-0.5 flex items-baseline gap-3">
             <span>Kizuna Intelligence (AI 経営参謀)</span>
@@ -539,7 +539,7 @@ export const AiIntelligenceModule: React.FC = () => {
                 <span className="font-mono text-[11px] text-slate-500">PR-2026-00842</span>
               </div>
               <div className="font-bold text-slate-900">
-                豊田通商向け 部品C 購買稟議の即時承認
+                青葉部品向け 部品C 購買稟議の即時承認
               </div>
               <p className="text-[11px] text-slate-600 leading-relaxed">
                 名古屋支社の欠品（KZ-00882）を解消し、製品 KZ-500 の製造ライン停止を未然に防ぎます。

@@ -164,7 +164,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     narrativeNode: 'CONFIANÇA',
     kanji: '守',
     sceneCount: 3,
-    sceneLabels: ['RBAC, Audit Trail & Governança', 'Portão de Validação Humana', 'Execução & Registro']
+    sceneLabels: ['RBAC, Audit Trail & Governança', 'Portão de Validação Humana', 'Decisão Humana & Registro']
   },
   {
     index: 9,
@@ -285,6 +285,9 @@ interface PresentationContextType {
   erpDemoOpen: boolean;
   navMenuOpen: boolean;
   backupVideoMode: boolean;
+  gateApproved: boolean;
+  approveGate: () => void;
+  revokeGate: () => void;
   isFullscreen: boolean;
   commandCue: CommandCue | null;
   goToSection: (index: number, initialScene?: number) => void;
@@ -319,6 +322,10 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [erpDemoOpen, setErpDemoOpen] = useState<boolean>(false);
   const [navMenuOpen, setNavMenuOpen] = useState<boolean>(false);
   const [backupVideoMode, setBackupVideoMode] = useState<boolean>(false);
+  // Aprovação humana da tela 09: só muda por clique explícito no Hanko (nunca por navegação).
+  const [gateApproved, setGateApproved] = useState<boolean>(false);
+  const approveGate = useCallback(() => setGateApproved(true), []);
+  const revokeGate = useCallback(() => setGateApproved(false), []);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [commandCue, setCommandCue] = useState<CommandCue | null>(null);
   const cueTimerRef = useRef<number | null>(null);
@@ -409,6 +416,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const resetCurrentScene = useCallback(() => {
     setBackupVideoMode(false);
+    setGateApproved(false);
     setSceneIndexState(0);
     triggerCue('RESET', `TELA ${currentSection.code} • CENA 1/${currentSection.sceneCount}`);
   }, [currentSection, triggerCue]);
@@ -425,6 +433,11 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setBackupVideoMode(true);
     triggerCue('SIMULAÇÃO DE RESERVA', 'Automática • ESC ou ← → para assumir');
   }, [currentIndex, erpDemoOpen, backupVideoMode, sceneIndex, currentSection, triggerCue]);
+
+  // A aprovação nunca sobrevive à saída da tela 09 nem ao retorno às cenas 1 e 2.
+  useEffect(() => {
+    if (currentIndex !== 8 || sceneIndex < 2) setGateApproved(false);
+  }, [currentIndex, sceneIndex]);
 
   // Rede de segurança: fora da tela 06 (ou com o ERP aberto) a simulação nunca fica ligada.
   useEffect(() => {
@@ -591,6 +604,9 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         erpDemoOpen,
         navMenuOpen,
         backupVideoMode,
+        gateApproved,
+        approveGate,
+        revokeGate,
         isFullscreen,
         commandCue,
         goToSection,

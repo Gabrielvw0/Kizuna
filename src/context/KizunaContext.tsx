@@ -13,7 +13,16 @@ import {
   DocumentItem,
   AuditLogEntry,
   EmployeeRecord,
+  ActivityRecord,
+  ActivityStatus,
+  ProjectRecord,
 } from '../types/erp';
+import {
+  DEMO_TODAY,
+  INITIAL_ACTIVITIES,
+  INITIAL_PROJECTS,
+  TEAM_MEMBERS,
+} from '../data/startActivitiesData';
 import {
   BRANCHES,
   BranchInfo,
@@ -56,6 +65,8 @@ interface KizunaContextType {
   documents: DocumentItem[];
   auditLogs: AuditLogEntry[];
   employees: EmployeeRecord[];
+  activities: ActivityRecord[];
+  projects: ProjectRecord[];
 
   // Computed / Reactive Executive KPIs
   kpis: {
@@ -116,6 +127,18 @@ interface KizunaContextType {
   stampDocument: (docId: string, kanji?: string) => void;
   recordCustomAction: (actionJp: string, detailJp: string, targetId?: string, metricsDelta?: string) => void;
   resetDemoState: () => void;
+
+  // Kizuna Start: atividades e projetos (dados fictícios)
+  createActivity: (input: {
+    title: string;
+    assigneeId: string;
+    dueDate: string;
+    projectId: string | null;
+  }) => boolean;
+  setActivityStatus: (id: string, status: ActivityStatus) => void;
+  assignActivity: (id: string, assigneeId: string) => void;
+  setActivityDueDate: (id: string, dueDate: string) => void;
+  setActivityProject: (id: string, projectId: string | null) => void;
 }
 
 const KizunaContext = createContext<KizunaContextType | undefined>(undefined);
@@ -123,7 +146,7 @@ const KizunaContext = createContext<KizunaContextType | undefined>(undefined);
 const STORAGE_KEY = 'kizuna_erp_state_v2';
 
 export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeModule, setActiveModule] = useState<ModuleId>('dashboard');
+  const [activeModule, setActiveModule] = useState<ModuleId>('activities');
   const [activeBranch, setActiveBranch] = useState<BranchId>('ALL');
   const [subLang, setSubLang] = useState<SubLang>('EN');
 
@@ -137,6 +160,8 @@ export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [documents, setDocuments] = useState<DocumentItem[]>(INITIAL_DOCUMENTS);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(INITIAL_AUDIT_LOGS);
   const [employees] = useState<EmployeeRecord[]>(INITIAL_EMPLOYEES);
+  const [activities, setActivities] = useState<ActivityRecord[]>(INITIAL_ACTIVITIES);
+  const [projects] = useState<ProjectRecord[]>(INITIAL_PROJECTS);
 
   // Delta accumulators for live executive presentation impact
   const [revenueDelta, setRevenueDelta] = useState<number>(0);
@@ -846,8 +871,8 @@ export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     showToast(
       `✓ 文書 #${docId} に電子印鑑 (${kanji}) を押印しました`,
       subLang === 'EN'
-        ? 'Digital Hanko seal & NTA timestamp applied.'
-        : 'Carimbo Hanko digital e timestamp fiscal aplicados.',
+        ? 'Digital Hanko seal applied (demo).'
+        : 'Carimbo Hanko digital aplicado (demonstração).',
       `電子印鑑 +1 | Audit Log +1`
     );
   };
@@ -878,7 +903,117 @@ export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     showToast(`✓ ${actionJp}`, detailJp, metricsDelta || 'Audit Log +1');
   };
 
+  // ---- Kizuna Start: atividades. Cada mudança grava uma linha na trilha de auditoria. ----
+  const logActivityAudit = (
+    targetId: string,
+    actionJp: string,
+    actionEn: string,
+    actionPt: string,
+    detail: string
+  ) => {
+    const time = getNowTimeStr();
+    setAuditLogs((prev) => [
+      {
+        id: `AUD-${905 + prev.length}`,
+        time,
+        date: '2026年10月21日',
+        actorJp: '山田 太郎',
+        actorRomaji: 'Taro Yamada',
+        departmentJp: 'Kizuna Start・アクティビティ',
+        targetId,
+        actionJp,
+        actionEn,
+        actionPt,
+        detailJp: detail,
+        detailEn: detail,
+        detailPt: detail,
+        severity: 'INFO',
+      },
+      ...prev,
+    ]);
+  };
+
+  const memberName = (id: string) => TEAM_MEMBERS.find((m) => m.id === id)?.nameRomaji ?? id;
+
+  const createActivity: KizunaContextType['createActivity'] = ({ title, assigneeId, dueDate, projectId }) => {
+    const cleanTitle = title.trim();
+    if (!cleanTitle || !assigneeId || !dueDate) return false;
+    const newId = `ATV-${String(activities.length + 1).padStart(4, '0')}`;
+    setActivities((prev) => [
+      { id: newId, title: cleanTitle, assigneeId, dueDate, status: 'TODO', projectId, createdAt: DEMO_TODAY },
+      ...prev,
+    ]);
+    logActivityAudit(
+      newId,
+      `アクティビティ登録: ${newId}`,
+      `Activity created: ${newId}`,
+      `Atividade criada: ${newId}`,
+      `"${cleanTitle}" → ${memberName(assigneeId)}, prazo ${dueDate}${projectId ? `, projeto ${projectId}` : ''}`
+    );
+    showToast(`✓ Atividade ${newId} criada`, `${cleanTitle} — responsável: ${memberName(assigneeId)}, prazo ${dueDate}`, 'Audit Log +1');
+    return true;
+  };
+
+  const setActivityStatus: KizunaContextType['setActivityStatus'] = (id, status) => {
+    const cur = activities.find((a) => a.id === id);
+    if (!cur || cur.status === status) return;
+    setActivities((prev) =>
+      prev.map((a) =>
+        a.id === id
+          ? { ...a, status, completedAt: status === 'DONE' ? DEMO_TODAY : undefined }
+          : a
+      )
+    );
+    logActivityAudit(
+      id,
+      `ステータス変更: ${id}`,
+      `Status changed: ${id}`,
+      `Status alterado: ${id}`,
+      `${cur.status} → ${status} (${cur.title})`
+    );
+  };
+
+  const assignActivity: KizunaContextType['assignActivity'] = (id, assigneeId) => {
+    const cur = activities.find((a) => a.id === id);
+    if (!cur || cur.assigneeId === assigneeId) return;
+    setActivities((prev) => prev.map((a) => (a.id === id ? { ...a, assigneeId } : a)));
+    logActivityAudit(
+      id,
+      `担当者変更: ${id}`,
+      `Assignee changed: ${id}`,
+      `Responsável alterado: ${id}`,
+      `${memberName(cur.assigneeId)} → ${memberName(assigneeId)} (${cur.title})`
+    );
+  };
+
+  const setActivityDueDate: KizunaContextType['setActivityDueDate'] = (id, dueDate) => {
+    const cur = activities.find((a) => a.id === id);
+    if (!cur || !dueDate || cur.dueDate === dueDate) return;
+    setActivities((prev) => prev.map((a) => (a.id === id ? { ...a, dueDate } : a)));
+    logActivityAudit(
+      id,
+      `期限変更: ${id}`,
+      `Due date changed: ${id}`,
+      `Prazo alterado: ${id}`,
+      `${cur.dueDate} → ${dueDate} (${cur.title})`
+    );
+  };
+
+  const setActivityProject: KizunaContextType['setActivityProject'] = (id, projectId) => {
+    const cur = activities.find((a) => a.id === id);
+    if (!cur || cur.projectId === projectId) return;
+    setActivities((prev) => prev.map((a) => (a.id === id ? { ...a, projectId } : a)));
+    logActivityAudit(
+      id,
+      `プロジェクト紐付け変更: ${id}`,
+      `Project link changed: ${id}`,
+      `Vínculo de projeto alterado: ${id}`,
+      `${cur.projectId ?? 'sem projeto'} → ${projectId ?? 'sem projeto'} (${cur.title})`
+    );
+  };
+
   const resetDemoState = () => {
+    setActivities(INITIAL_ACTIVITIES);
     setPartners(INITIAL_PARTNERS);
     setSalesOrders(INITIAL_SALES_ORDERS);
     setInvoices(INITIAL_INVOICES);
@@ -926,6 +1061,13 @@ export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         documents,
         auditLogs,
         employees,
+        activities,
+        projects,
+        createActivity,
+        setActivityStatus,
+        assignActivity,
+        setActivityDueDate,
+        setActivityProject,
         kpis,
         isCommandOpen,
         setCommandOpen,

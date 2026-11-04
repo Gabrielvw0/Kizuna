@@ -19,17 +19,17 @@ export const ComplianceAuditModule: React.FC = () => {
       status: '🟢 Compliant',
       detailJp: '優良な電子帳簿要件・検索機能確保・タイムスタンプ自動付与済',
       detailSub: t(
-        'NTA certified timestamping & immutable search index active.',
-        'Timestamp certificado pela Agência Tributária Nacional (NTA) ativo.'
+        'Demo display: no real certified timestamping or immutable index.',
+        'Exibição de demonstração: sem timestamp certificado nem índice imutável reais.'
       ),
     },
     {
       titleJp: 'インボイス制度',
       titleSub: t('Qualified Invoice System', 'Sistema Japonês de Invoices'),
       status: '🟢 Active',
-      detailJp: '適格請求書発行事業者登録番号: T1010001293847 (国税庁API自動照合)',
+      detailJp: '適格請求書発行事業者登録番号: T0000000000000 (ダミー番号・実照合なし)',
       detailSub: t(
-        'Automatic NTA API verification of counterparty T-Numbers.',
+        'Simulated display: no real NTA API verification is performed.',
         'Validação automática de número T junto à Receita Japonesa.'
       ),
     },

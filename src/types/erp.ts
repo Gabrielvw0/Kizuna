@@ -3,6 +3,7 @@ export type BranchId = 'ALL' | 'TOKYO' | 'OSAKA' | 'NAGOYA' | 'FUKUOKA';
 export type SubLang = 'EN' | 'PT';
 
 export type ModuleId =
+  | 'activities'
   | 'dashboard'
   | 'analytics'
   | 'ai'
@@ -243,4 +244,36 @@ export interface EmployeeRecord {
   stampKanji: string;
   email: string;
   grade: string;
+}
+
+// ---------------------------------------------------------------------------
+// Kizuna Start: atividades, equipes e projetos (dados fictícios de demonstração)
+// ---------------------------------------------------------------------------
+export type TeamId = 'OPERACOES' | 'COMERCIAL' | 'ATENDIMENTO';
+
+export type ActivityStatus = 'TODO' | 'DOING' | 'DONE';
+
+export interface TeamMember {
+  id: string;
+  nameJp: string;
+  nameRomaji: string;
+  team: TeamId;
+}
+
+export interface ProjectRecord {
+  id: string; // PRJ-001
+  name: string;
+  nameJp: string;
+  teamId: TeamId;
+}
+
+export interface ActivityRecord {
+  id: string; // ATV-0001
+  title: string;
+  assigneeId: string;
+  dueDate: string; // AAAA-MM-DD
+  status: ActivityStatus;
+  projectId: string | null;
+  createdAt: string; // AAAA-MM-DD
+  completedAt?: string;
 }

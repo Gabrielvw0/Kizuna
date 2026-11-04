@@ -30,7 +30,6 @@ export const Topbar: React.FC = () => {
 
   const [isBranchMenuOpen, setIsBranchMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [selectedCorp, setSelectedCorp] = useState<'KIZUNA_CORP' | 'KIZUNA_MFG'>('KIZUNA_CORP');
 
   const pendingPrs = purchaseRequests.filter((p) => p.status === 'PENDING_APPROVAL');
 
@@ -41,15 +40,13 @@ export const Topbar: React.FC = () => {
         <div className="relative">
           <button
             onClick={() => setIsBranchMenuOpen((prev) => !prev)}
-            className="flex items-center gap-2.5 px-3 py-1.5 rounded border border-slate-200 hover:border-slate-300 bg-slate-50/70 hover:bg-slate-100/80 transition-colors text-left"
+            className="flex items-center gap-2.5 px-3 py-1.5 rounded border border-slate-200 hover:border-slate-300 bg-slate-50/70 hover:bg-slate-100/80 transition-colors text-left whitespace-nowrap"
           >
             <Building2 className="w-4 h-4 text-blue-900 shrink-0" />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
-                  {selectedCorp === 'KIZUNA_CORP'
-                    ? 'KIZUNA CORPORATION'
-                    : 'KIZUNA PRECISION MFG.'}
+                  {t('DEMO COMPANY', 'EMPRESA DEMO')}
                 </span>
                 <span className="text-[10px] font-mono text-blue-800 bg-blue-50 px-1 rounded border border-blue-200">
                   {currentBranchInfo.code}
@@ -57,7 +54,7 @@ export const Topbar: React.FC = () => {
               </div>
               <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
                 <span>{currentBranchInfo.nameJp}</span>
-                <span className="text-[11px] font-normal text-slate-500">
+                <span className="hidden xl:inline text-[11px] font-normal text-slate-500">
                   ({subLang === 'EN' ? currentBranchInfo.nameEn : currentBranchInfo.namePt})
                 </span>
               </div>
@@ -67,41 +64,10 @@ export const Topbar: React.FC = () => {
 
           {isBranchMenuOpen && (
             <div className="absolute left-0 mt-1.5 w-80 bg-white border border-slate-200 rounded-md shadow-xl py-2 z-50">
-              {/* Company Switcher Section */}
-              <div className="px-3 py-1.5 border-b border-slate-100">
-                <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                  会社切替 / {t('Company Switcher', 'Alternar Empresa do Grupo')}
-                </div>
-                <div className="grid grid-cols-1 gap-1">
-                  <button
-                    onClick={() => setSelectedCorp('KIZUNA_CORP')}
-                    className={`px-2.5 py-1.5 rounded text-xs flex items-center justify-between ${
-                      selectedCorp === 'KIZUNA_CORP'
-                        ? 'bg-slate-900 text-white font-semibold'
-                        : 'text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    <span>絆コーポレーション株式会社 (KIZUNA CORP.)</span>
-                    {selectedCorp === 'KIZUNA_CORP' && <Check className="w-3.5 h-3.5" />}
-                  </button>
-                  <button
-                    onClick={() => setSelectedCorp('KIZUNA_MFG')}
-                    className={`px-2.5 py-1.5 rounded text-xs flex items-center justify-between ${
-                      selectedCorp === 'KIZUNA_MFG'
-                        ? 'bg-slate-900 text-white font-semibold'
-                        : 'text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    <span>絆プレシジョン製造株式会社 (KIZUNA MFG.)</span>
-                    {selectedCorp === 'KIZUNA_MFG' && <Check className="w-3.5 h-3.5" />}
-                  </button>
-                </div>
-              </div>
-
               {/* Branch Switcher Section */}
               <div className="px-3 pt-2 pb-1">
                 <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                  本支社・拠点切替 / {t('Branch Office Filter', 'Filtrar por Filial')}
+                  {t('Branch / unit filter (Enterprise demo)', 'Filtro de filial / unidade (demonstração Enterprise)')}
                 </div>
                 <div className="space-y-0.5">
                   {BRANCHES.map((b) => {
@@ -143,7 +109,7 @@ export const Topbar: React.FC = () => {
         {/* Global Command Center Search Button (⌘K) */}
         <button
           onClick={() => setCommandOpen(true)}
-          className="hidden md:flex items-center justify-between gap-6 w-80 lg:w-96 px-3 py-1.5 rounded border border-slate-300 hover:border-blue-600 bg-slate-50/80 hover:bg-white text-xs text-slate-500 transition-all"
+          className="hidden lg:flex items-center justify-between gap-6 w-80 lg:w-96 px-3 py-1.5 rounded border border-slate-300 hover:border-blue-600 bg-slate-50/80 hover:bg-white text-xs text-slate-500 transition-all"
         >
           <div className="flex items-center gap-2 truncate">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />

@@ -66,7 +66,7 @@ export const OrderInvoiceDrawer: React.FC = () => {
     {
       type: 'PAYMENT',
       id: invoice.paymentId || 'PAY-2026-01928',
-      titleJp: '入金消込レコード (みずほ銀行)',
+      titleJp: '入金消込レコード (デモ銀行 (架空))',
       titleEn: 'Payment Record',
       titlePt: 'Registro de Pagamento',
       amount: order.amount,

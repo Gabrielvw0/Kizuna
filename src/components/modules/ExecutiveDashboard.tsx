@@ -430,8 +430,8 @@ export const ExecutiveDashboard: React.FC = () => {
                 </div>
                 <p className="text-slate-600 mt-1 leading-relaxed">
                   {t(
-                    'Purchase Request #PR-2026-00842 (Toyota Tsusho, ¥2,840,000) awaits final Ringi stamp.',
-                    'Requisição #PR-2026-00842 (Toyota Tsusho, ¥2.840.000) aguarda carimbo final de aprovação.'
+                    'Purchase Request #PR-2026-00842 (Aoba Components, ¥2,840,000) awaits final Ringi stamp.',
+                    'Requisição #PR-2026-00842 (Aoba Components, ¥2.840.000) aguarda carimbo final de aprovação.'
                   )}
                 </p>
               </div>

@@ -336,7 +336,7 @@ export const HrProductionModule: React.FC = () => {
                   >
                     <div>
                       <div className="font-bold text-amber-950">
-                        3. 購買稟議・発注: #PR-2026-00842 (豊田通商株式会社)
+                        3. 購買稟議・発注: #PR-2026-00842 (青葉部品株式会社)
                       </div>
                       <div className="text-slate-600 mt-0.5">
                         田中 健一 (製造部) 申請 • ¥2,840,000 • ワークフロー決裁連動

@@ -9,6 +9,7 @@ import {
   Search,
   GitPullRequest,
   TrendingUp,
+  ListChecks,
 } from 'lucide-react';
 
 export const DemoModeModal: React.FC = () => {
@@ -35,7 +36,7 @@ export const DemoModeModal: React.FC = () => {
             <div>
               <h3 className="text-sm font-bold tracking-wide">Kizuna Demo Mode</h3>
               <p className="text-[11px] text-slate-400 font-mono">
-                Scenario: Executive Presentation (Marunouchi Enterprise Edition)
+                Cenário de demonstração • dados fictícios • sem integrações reais
               </p>
             </div>
           </div>
@@ -74,6 +75,37 @@ export const DemoModeModal: React.FC = () => {
               {t('Presentation Narrative Shortcuts', 'Atalhos do Roteiro de Apresentação')}
             </div>
 
+            <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider pt-1">
+              Kizuna Start • {t('core experience', 'experiência principal')}
+            </div>
+            <button
+              onClick={() => {
+                setIsDemoPanelOpen(false);
+                setActiveModule('activities');
+              }}
+              className="w-full p-3 rounded bg-emerald-950/40 hover:bg-emerald-950/60 border border-emerald-700/60 text-left flex items-center justify-between group transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <ListChecks className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div>
+                  <div className="text-xs font-bold text-white">
+                    {t('Start: Team & Activities', 'Start: Equipes e Atividades')}
+                  </div>
+                  <div className="text-[11px] text-slate-400">
+                    {t(
+                      'Create → assign → due date → status → project → indicators → management view',
+                      'Criar → atribuir → prazo → status → projeto → indicadores → visão gerencial'
+                    )}
+                  </div>
+                </div>
+              </div>
+              <Play className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-400" />
+            </button>
+
+            <div className="text-[10px] font-mono text-sky-400 uppercase tracking-wider pt-2">
+              Business • {t('expansion (not part of Start)', 'expansão (fora do Start)')}
+            </div>
+
             <button
               onClick={() => {
                 setIsDemoPanelOpen(false);
@@ -87,12 +119,12 @@ export const DemoModeModal: React.FC = () => {
                 <div>
                   <div className="text-xs font-bold text-white">
                     {t(
-                      'Act 1: Investigate AR Increase (¥12.7M ↑ 14.2%)',
-                      'Ato 1: Investigar Aumento do Contas a Receber (¥12.7M ↑ 14.2%)'
+                      'Expansion demo: investigate accounts receivable (fictitious figures)',
+                      'Demo de expansão: investigar contas a receber (valores fictícios)'
                     )}
                   </div>
                   <div className="text-[11px] text-slate-400">
-                    Dashboard → 株式会社山田 → SO-2026-10482 → INV-2026-00389 → 会計仕訳
+                    Dashboard → SO-2026-10482 → INV-2026-00389 → {t('journal entry', 'lançamento')}
                   </div>
                 </div>
               </div>
@@ -111,8 +143,8 @@ export const DemoModeModal: React.FC = () => {
                 <div>
                   <div className="text-xs font-bold text-white">
                     {t(
-                      'Command Center (⌘K): Relational Graph Search',
-                      'Command Center (⌘K): Busca com Grafo Relacional'
+                      'Expansion demo: Command Center (⌘K) relational search',
+                      'Demo de expansão: Command Center (⌘K) busca relacional'
                     )}
                   </div>
                   <div className="text-[11px] text-slate-400">
@@ -136,12 +168,12 @@ export const DemoModeModal: React.FC = () => {
                 <div>
                   <div className="text-xs font-bold text-white">
                     {t(
-                      'Final Finale ("Wow Moment"): Ringi Approval PR-2026-00842',
-                      'Momento Uau Final: Aprovar Ringi PR-2026-00842 com Hanko'
+                      'Business: Ringi approval PR-2026-00842 (demo)',
+                      'Business: aprovação Ringi PR-2026-00842 (demonstração)'
                     )}
                   </div>
                   <div className="text-[11px] text-slate-400">
-                    承認待ち 3→2 | 買掛金 ¥9.84M→¥12.68M | 発注 24→25 | Audit Log +1
+                    {t('Requires an explicit click on the Hanko button', 'Exige clique explícito no botão do Hanko')} • Audit Log +1
                   </div>
                 </div>
               </div>

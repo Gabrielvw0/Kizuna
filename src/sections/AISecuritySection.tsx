@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import {
   Shield,
   FileSearch,
@@ -41,36 +41,19 @@ const TRUST_PILLARS = [
 ];
 
 export const AISecuritySection: React.FC = () => {
-  const { sceneIndex, setSceneIndex, nextStep } = usePresentation();
-  // Cena 1: pilares de governança • Cena 2: portão bloqueado • Cena 3: execução e registro.
-  // O portão só aparece desbloqueado na cena 3 (o portão 3D também abre nessa cena).
+  const { sceneIndex, setSceneIndex, nextStep, gateApproved, approveGate, revokeGate } = usePresentation();
+  // Cena 1: pilares • Cena 2: portão fechado • Cena 3: decisão humana.
+  // O portão só abre pelo clique explícito no Hanko; navegar (setas, botões) nunca aprova.
   const scene = Math.min(2, Math.max(0, sceneIndex));
-  const gateApproved = scene >= 2;
-  const [stampAnim, setStampAnim] = useState<boolean>(false);
-  const stampTimer = useRef<number | null>(null);
-  const hankoStamped = gateApproved || stampAnim;
-
-  useEffect(() => {
-    return () => {
-      if (stampTimer.current) window.clearTimeout(stampTimer.current);
-    };
-  }, []);
+  const hankoStamped = gateApproved;
 
   const handleApproveWithHanko = () => {
-    setStampAnim(true);
-    if (stampTimer.current) window.clearTimeout(stampTimer.current);
-    stampTimer.current = window.setTimeout(() => {
-      stampTimer.current = null;
-      setStampAnim(false);
-      setSceneIndex(2);
-    }, 450);
+    setSceneIndex(2);
+    approveGate();
   };
 
   const handleResetGate = () => {
-    if (stampTimer.current) window.clearTimeout(stampTimer.current);
-    stampTimer.current = null;
-    setStampAnim(false);
-    setSceneIndex(1);
+    revokeGate();
   };
 
   return (
@@ -138,6 +121,7 @@ export const AISecuritySection: React.FC = () => {
               <button
                 onClick={handleApproveWithHanko}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white text-xs font-mono font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(225,29,72,0.4)] border border-red-300 transition-all cursor-pointer animate-pulse"
+                title="Aprovação humana explícita"
               >
                 <Stamp className="w-4 h-4 text-amber-200" />
                 <span>Validar com Hanko (押印)</span>
@@ -202,7 +186,7 @@ export const AISecuritySection: React.FC = () => {
             {/* Hanko Stamp Visual */}
             <div className="flex items-center justify-between pt-2 border-t border-white/10">
               <span className="text-[10px] font-mono text-amber-300 font-bold">
-                {hankoStamped ? '承認印: 済' : 'Aguardando Selo'}
+                {hankoStamped ? '承認印: 済' : 'Aguardando Hanko'}
               </span>
               <div
                 className={`w-9 h-9 rounded-md border-2 flex items-center justify-center font-serif text-[10px] transition-all duration-300 ${
@@ -256,11 +240,11 @@ export const AISecuritySection: React.FC = () => {
               <div className="p-2 rounded-lg bg-black/60 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 leading-snug">
                 ID: #KZ-2026-9941
                 <br />
-                APROVADOR: Tanaka-san (部長)
+                APROVADOR: responsável (demonstração)
                 <br />
-                TIMESTAMP: 2026-10-27 15:42 JST
+                TIMESTAMP: exemplo de demonstração
                 <br />
-                STATUS: REGISTRADO (DEMO)
+                STATUS: {gateApproved ? 'REGISTRADO (DEMO)' : 'AGUARDANDO APROVAÇÃO'}
               </div>
             </div>
             <div className="text-[10px] font-mono text-slate-400 mt-2">
@@ -284,7 +268,13 @@ export const AISecuritySection: React.FC = () => {
                 <strong className="text-white">nenhuma execução sem o aval formal de um responsável.</strong>
               </>
             )}
-            {scene === 2 && (
+            {scene === 2 && !gateApproved && (
+              <>
+                Aguardando aprovação humana:{' '}
+                <strong className="text-white">a navegação não aprova. Só o clique no Hanko abre o portão.</strong>
+              </>
+            )}
+            {scene === 2 && gateApproved && (
               <>
                 Execução autorizada e registrada:{' '}
                 <strong className="text-white">tecnologia rápida com responsabilidade e controle de governança humana.</strong>
@@ -295,7 +285,7 @@ export const AISecuritySection: React.FC = () => {
             onClick={nextStep}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer self-end sm:self-auto"
           >
-            <span>{scene === 0 ? 'Ver o portão de validação' : scene === 1 ? 'Simular aprovação humana' : 'Avançar'}</span>
+            <span>{scene === 0 ? 'Ver o portão de validação' : scene === 1 ? 'Ir para a decisão humana' : gateApproved ? 'Avançar' : 'Avançar sem aprovar'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

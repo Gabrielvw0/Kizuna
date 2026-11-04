@@ -76,9 +76,9 @@ export const PartnerDrawer: React.FC = () => {
     ...partner.payments.map((payId) => ({
       type: 'PAYMENT' as const,
       id: payId,
-      titleJp: '銀行振込 (みずほ銀行 丸の内営業部)',
-      titleEn: 'Wire Transfer (Mizuho Bank Marunouchi)',
-      titlePt: 'Transferência Bancária (Mizuho Bank)',
+      titleJp: '銀行振込 (デモ銀行 本店営業部 (架空))',
+      titleEn: 'Wire Transfer (Demo Bank HQ (fictitious))',
+      titlePt: 'Transferência Bancária (Demo Bank (fictitious))',
       statusJp: '照合済',
     })),
     ...partnerJes.map((je) => ({
@@ -331,7 +331,7 @@ export const PartnerDrawer: React.FC = () => {
               <div className="font-semibold text-slate-800">取引条件 / Trading Terms</div>
               <div>締日・支払条件: 月末締め翌月末日銀行振込</div>
               <div>取引開始日: {partner.sinceDate}</div>
-              <div>決済口座: みずほ銀行 丸の内営業部 (当座)</div>
+              <div>決済口座: デモ銀行 本店営業部 (架空) (当座)</div>
             </div>
           </div>
         </div>

@@ -80,10 +80,10 @@ export const PdfDocumentModal: React.FC = () => {
                   絆コーポレーション株式会社 (KIZUNA CORPORATION)
                 </div>
                 <div className="text-xs text-slate-600">
-                  〒100-0005 東京都千代田区丸の内 1-9-2 東京本社
+                  〒000-0000 東京都 サンプル区 ダミー町 1-1-1 (架空の所在地) 東京本社
                 </div>
                 <div className="text-[11px] font-mono text-slate-500">
-                  適格請求書発行事業者登録番号: T1010001293847
+                  適格請求書発行事業者登録番号: T0000000000000 (ダミー)
                 </div>
 
                 {/* Hanko Box */}

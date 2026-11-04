@@ -35,11 +35,11 @@ const latLngToVec3 = (lat: number, lng: number, radius: number): THREE.Vector3 =
 };
 
 export const WorldStage: React.FC = () => {
-  const { currentIndex, sceneIndex, safeMode } = usePresentation();
+  const { currentIndex, sceneIndex, safeMode, gateApproved } = usePresentation();
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const stateRef = useRef({ currentIndex, sceneIndex });
-  stateRef.current = { currentIndex, sceneIndex };
+  const stateRef = useRef({ currentIndex, sceneIndex, gateApproved });
+  stateRef.current = { currentIndex, sceneIndex, gateApproved };
 
   useEffect(() => {
     if (safeMode) return;
@@ -668,7 +668,7 @@ export const WorldStage: React.FC = () => {
       animId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
 
-      const { currentIndex: sIdx, sceneIndex: scIdx } = stateRef.current;
+      const { currentIndex: sIdx, sceneIndex: scIdx, gateApproved: gateOk } = stateRef.current;
       const { pose, env } = getCameraPoseForSection(sIdx, scIdx);
 
       // Camera smooth lerp
@@ -791,7 +791,7 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       gateGroup.visible = sIdx === 8;
       if (sIdx === 8) {
-        const isOpen = scIdx >= 2;
+        const isOpen = gateOk;
         gateBars.forEach((bar, i) => {
           const barTargetY = isOpen ? 1.5 : 0;
           bar.position.y = THREE.MathUtils.lerp(bar.position.y, barTargetY, 0.08);

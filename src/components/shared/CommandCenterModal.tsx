@@ -103,7 +103,7 @@ export const CommandCenterModal: React.FC = () => {
               labelJp: `Payment ${inv?.paymentId || 'PAY-2026-01928'} (入金予定・消込)`,
               labelEn: `Payment ${inv?.paymentId || 'PAY-2026-01928'}`,
               labelPt: `Pagamento ${inv?.paymentId || 'PAY-2026-01928'}`,
-              meta: 'みずほ銀行 丸の内支店',
+              meta: 'デモ銀行 本店 (架空)',
             },
             {
               type: 'JE',
@@ -167,7 +167,7 @@ export const CommandCenterModal: React.FC = () => {
       }
     });
 
-    // 3. Partners (Yamada Corp, Toyota Tsusho, etc.)
+    // 3. Partners (Yamada Corp, Aoba Components, etc.)
     partners.forEach((ptn) => {
       const hay = `${ptn.id} ${ptn.code} ${ptn.nameJp} ${ptn.nameEn} ${ptn.invoiceRegNo}`.toLowerCase();
       if (q && hay.includes(q)) {
@@ -279,7 +279,7 @@ export const CommandCenterModal: React.FC = () => {
 
   const quickChips = [
     { label: 'SO-2026-10482', desc: '山田 ¥8.42M' },
-    { label: 'PR-2026-00842', desc: '豊田通商 ¥2.84M' },
+    { label: 'PR-2026-00842', desc: '青葉部品 ¥2.84M' },
     { label: '株式会社山田', desc: 'Customer 360°' },
     { label: 'CT-2026-0841', desc: '基本契約書' },
     { label: 'KZ-00882', desc: '部品 C (欠品)' },

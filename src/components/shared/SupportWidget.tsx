@@ -27,10 +27,10 @@ export const SupportWidget: React.FC = () => {
       sender: 'DESK',
       time: '10:35',
       textJp:
-        '丸の内エンタープライズ・サポートデスク（専任担当: 高橋）でございます。システム操作・会計連携・電子印鑑設定など、ご不明点がございましたらお気軽にお申し付けください。',
+        'デモ用サポートデスク（模擬）でございます。システム操作・会計連携・電子印鑑設定など、ご不明点がございましたらお気軽にお申し付けください。',
       textSub: t(
-        'Welcome to the Marunouchi Enterprise Support Desk (Dedicated Specialist: Takahashi). How may we assist you with Kizuna ERP today?',
-        'Bem-vindo ao Suporte Corporativo Marunouchi (Especialista: Takahashi). Como podemos ajudar na operação do Kizuna ERP?'
+        'Welcome to the Demo Support Desk (simulated). How may we assist you with Kizuna ERP today?',
+        'Bem-vindo ao Suporte de demonstração (simulado). Como podemos ajudar na operação do Kizuna ERP?'
       ),
     },
   ]);
@@ -115,7 +115,7 @@ export const SupportWidget: React.FC = () => {
         'システムヘルス診断・接続テスト完了',
         '基幹DB (3.4ms) / 国税庁インボイスAPI / 全銀EDIゲートウェイ すべて正常',
         'DIAG-2026',
-        '稼働率 99.98% | 応答 3.4ms'
+        '模擬ステータス (デモ表示)'
       );
     }, 600);
   };
@@ -125,7 +125,7 @@ export const SupportWidget: React.FC = () => {
     const ticketId = `SUP-2026-0${Math.floor(890 + Math.random() * 90)}`;
     recordCustomAction(
       `サポートチケット発行: #${ticketId}`,
-      `件名: ${ticketSubject} (担当: 丸の内エンタープライズデスク)`,
+      `件名: ${ticketSubject} (担当: デモ用デスク (模擬))`,
       ticketId,
       `Ticket #${ticketId} 受付完了`
     );
@@ -150,7 +150,7 @@ export const SupportWidget: React.FC = () => {
                 サポート窓口 / {t('Support Desk', 'Suporte 24/7')}
               </div>
               <div className="text-[9px] text-slate-400 font-mono">
-                丸の内専任デスク • ONLINE
+                デモ用デスク (模擬)
               </div>
             </div>
           </button>
@@ -173,8 +173,8 @@ export const SupportWidget: React.FC = () => {
                 </div>
                 <div className="text-[10px] text-slate-400">
                   {t(
-                    'Marunouchi Dedicated Concierge • SLA < 2 min',
-                    'Concierge Corporativo Tóquio • SLA < 2 min'
+                    'Demo support desk (simulated)',
+                    'Suporte de demonstração (simulado)'
                   )}
                 </div>
               </div>
@@ -307,7 +307,7 @@ export const SupportWidget: React.FC = () => {
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>全モジュール正常稼働中 (All Systems Nominal)</span>
                 </div>
-                <span className="font-mono text-[11px] text-emerald-700">99.98%</span>
+                <span className="font-mono text-[11px] text-emerald-700">DEMO</span>
               </div>
 
               <div className="space-y-1.5 font-mono text-[11px]">
@@ -364,7 +364,7 @@ export const SupportWidget: React.FC = () => {
                   優先度 / Priority Level
                 </label>
                 <select className="w-full px-2.5 py-1.5 rounded border border-slate-300 bg-white font-semibold">
-                  <option>通常問い合わせ (Standard SLA - 2h)</option>
+                  <option>通常問い合わせ (デモ)</option>
                   <option>優先対応 (High Priority - 30m)</option>
                   <option>緊急・決算日対応 (Critical Executive - 5m)</option>
                 </select>

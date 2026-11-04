@@ -26,6 +26,8 @@ import { FinaleSection } from './sections/FinaleSection';
 import { KizunaProvider, useKizuna } from './context/KizunaContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { Topbar } from './components/layout/Topbar';
+import { ActivitiesModule } from './components/modules/ActivitiesModule';
+import { MODULE_PLAN, PLAN_CONTEXT_NOTE } from './data/erpModulePlans';
 import { ExecutiveDashboard } from './components/modules/ExecutiveDashboard';
 import { BiAnalytics } from './components/modules/BiAnalytics';
 import { AccountingModule } from './components/modules/AccountingModule';
@@ -46,10 +48,13 @@ import { DemoModeModal } from './components/shared/DemoModeModal';
 import { CheckCircle2, X, ArrowLeft } from 'lucide-react';
 
 const LiveProductDemoWorkspace: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const { activeModule, toast, dismissToast } = useKizuna();
+  const { activeModule, toast, dismissToast, t } = useKizuna();
+  const planNote = PLAN_CONTEXT_NOTE[MODULE_PLAN[activeModule]];
 
   const renderModule = () => {
     switch (activeModule) {
+      case 'activities':
+        return <ActivitiesModule />;
       case 'dashboard':
         return <ExecutiveDashboard />;
       case 'analytics':
@@ -83,16 +88,30 @@ const LiveProductDemoWorkspace: React.FC<{ onClose: () => void }> = ({ onClose }
     <div className="fixed inset-0 z-50 flex h-screen w-screen overflow-hidden bg-[#F8FAFC] text-slate-900 animate-erpDescent">
       <button
         onClick={onClose}
-        className="fixed bottom-5 left-5 z-50 flex items-center gap-2 px-4 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-mono uppercase tracking-wider font-bold shadow-2xl border border-rose-400 transition-all"
+        className="fixed bottom-3 left-3 z-50 flex items-center gap-2 px-3 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-mono uppercase tracking-wider font-bold shadow-2xl border border-rose-400 transition-all"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span>VOLTAR À APRESENTAÇÃO ESTRATÉGICA (ESC)</span>
+        <span>VOLTAR À APRESENTAÇÃO (ESC)</span>
       </button>
 
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar />
+        <div className="shrink-0 bg-amber-100 border-b border-amber-300 px-5 py-1 text-[11px] font-semibold text-amber-950 flex flex-wrap items-center justify-between gap-x-4">
+          <span>
+            {t('DEMONSTRATION • FICTITIOUS DATA', 'DEMONSTRAÇÃO • DADOS FICTÍCIOS')}
+          </span>
+          <span className="font-normal">
+            {t(
+              'Names, addresses, banks, figures and dates are examples. They do not represent real customers, results or integrations.',
+              'Nomes, endereços, bancos, valores e datas são exemplos. Não representam clientes, resultados ou integrações reais.'
+            )}
+          </span>
+        </div>
+        <div className={`shrink-0 border-b px-5 py-1.5 text-[11px] font-semibold ${planNote.cls}`}>
+          {t(planNote.en, planNote.pt)}
+        </div>
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-[1600px] mx-auto">{renderModule()}</div>
         </main>
