@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { usePresentation } from './PresentationContext';
 import { getCameraPoseForSection } from './CameraDirector';
+import { toStage } from './narrativeMap';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 
 interface GlobalHub {
@@ -668,7 +669,9 @@ export const WorldStage: React.FC = () => {
       animId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
 
-      const { currentIndex: sIdx, sceneIndex: scIdx, gateApproved: gateOk } = stateRef.current;
+      // Tela narrativa → cenário técnico (ver narrativeMap.ts)
+      const { currentIndex, sceneIndex, gateApproved: gateOk } = stateRef.current;
+      const { stage: sIdx, scene: scIdx } = toStage(currentIndex, sceneIndex);
       const { pose, env } = getCameraPoseForSection(sIdx, scIdx);
 
       // Camera smooth lerp

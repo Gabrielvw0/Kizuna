@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import sourcesData from '../data/sources.json';
 import { getPlan, scaleStory, yen } from '../data/pricing';
+import { SCREEN, checkNarrativeMap } from './narrativeMap';
 
 // Preços exibidos nos rótulos de navegação vêm de pricing.json (fonte única)
 const PRICE = {
@@ -23,6 +24,8 @@ export interface SectionMeta {
   kanji: string;
   sceneCount: number;
   sceneLabels: string[];
+  /** Chave do bloco correspondente em sources.json (banca e evidências). */
+  sourceKey?: string;
 }
 
 export const PRESENTATION_SECTIONS: SectionMeta[] = [
@@ -33,239 +36,207 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     shortTitle: 'ABERTURA',
     fullTitle: '01 | KIZUNA — Global Reach. Local Trust.',
     bgThemeName: 'Sumi & Orbital Earth',
-    storyQuestion: 'Como levar uma solução de gestão de equipes ao mercado japonês quando o desafio é confiança?',
+    storyQuestion: 'Como levar uma solução de gestão de equipes ao Japão, onde a decisão depende de confiança?',
     metamorphosisFromTo: 'Mundo → Fio Vermelho (赤い糸) → Japão → 絆 Kizuna',
     narrativeNode: 'MUNDO',
     kanji: '絆',
-    sceneCount: 4,
-    sceneLabels: ['O Planeta', 'O Fio Vermelho (赤い糸)', 'Convergência no Japão', 'KIZUNA 絆']
+    sceneCount: 2,
+    sceneLabels: ['O fio vermelho', 'KIZUNA 絆'],
+    sourceKey: '01'
   },
   {
     index: 1,
     code: '02',
     id: 'japao',
     shortTitle: 'POR QUE O JAPÃO?',
-    fullTitle: '02 | POR QUE O JAPÃO? — Um mercado que exige contexto',
-    bgThemeName: 'Archipelago & Data Lanterns',
-    storyQuestion: 'Por que o Japão é uma grande oportunidade que exige compreensão de contexto?',
-    metamorphosisFromTo: 'Globo → Tokyo, Osaka, Nagoya → Dados Reais → Ponte Brasil–Japão (1908)',
+    fullTitle: '02 | POR QUE O JAPÃO? — Oportunidade que exige contexto',
+    bgThemeName: 'Tokyo Skyline',
+    storyQuestion: 'Por que o Japão é uma oportunidade real para uma solução de gestão de equipes?',
+    metamorphosisFromTo: 'PMEs + pressão por modernização → Ponte Brasil–Japão (1908)',
     narrativeNode: 'JAPÃO',
     kanji: '日',
-    sceneCount: 3,
-    sceneLabels: ['Dados do Mercado', 'Oportunidade Empresarial', 'Ponte Brasil ↔ Japão (1908)']
+    sceneCount: 2,
+    sceneLabels: ['A oportunidade em dois números', 'A ponte Brasil ↔ Japão (1908)'],
+    sourceKey: '02'
   },
   {
     index: 2,
     code: '03',
-    id: 'choque-cultural',
-    shortTitle: 'CHOQUE CULTURAL',
-    fullTitle: '03 | O JAPÃO NÃO É APENAS OUTRO MERCADO',
+    id: 'contexto',
+    shortTitle: 'O JAPÃO EXIGE CONTEXTO',
+    fullTitle: '03 | O JAPÃO EXIGE CONTEXTO',
     rBadge: 'R1 • CHOQUE CULTURAL',
     bgThemeName: 'Four Doors',
-    storyQuestion: 'O que muda para uma empresa estrangeira ao entrar no Japão?',
-    metamorphosisFromTo: 'Cultura → Idioma → Hábitos Empresariais → Regulação → Convergência',
+    storyQuestion: 'O que muda para um produto estrangeiro ao entrar no Japão?',
+    metamorphosisFromTo: 'Cultura → Idioma → Hábitos → Regulação → Global × Local = 絆',
     narrativeNode: 'PROBLEMA',
     kanji: '門',
     sceneCount: 5,
-    sceneLabels: [
-      'Porta 01: Cultura',
-      'Porta 02: Idioma',
-      'Porta 03: Hábitos',
-      'Porta 04: Regulação',
-      'Convergência das 4 Portas'
-    ]
+    sceneLabels: ['Porta 1: Cultura', 'Porta 2: Idioma', 'Porta 3: Hábitos empresariais', 'Porta 4: Regulação', 'Global × Local'],
+    sourceKey: '03'
   },
   {
     index: 3,
     code: '04',
-    id: 'global-local',
-    shortTitle: 'GLOBAL × LOCAL',
-    fullTitle: '04 | GLOBAL × LOCAL — Como conectar os dois?',
-    bgThemeName: 'Rift & Hanko',
-    storyQuestion: 'Como uma empresa global conquista um mercado que valoriza o contexto local?',
-    metamorphosisFromTo: 'Capacidade Global × Contexto Local → Fio Vermelho → 絆 + Hanko',
-    narrativeNode: 'CONEXÃO',
-    kanji: '結',
-    sceneCount: 3,
-    sceneLabels: ['A Divisão Global × Local', 'Colisão de Fluxos', 'Conexão Kizuna 絆']
+    id: 'kizuna-start',
+    shortTitle: 'KIZUNA START',
+    fullTitle: `04 | COMEÇAMOS PELA EQUIPE — Kizuna Start (${PRICE.start})`,
+    bgThemeName: 'Team Core',
+    storyQuestion: 'Por onde o Kizuna começa a gerar valor sem exigir a troca de sistemas?',
+    metamorphosisFromTo: 'Atividades + Equipes + Projetos + Indicadores → Kizuna Start',
+    narrativeNode: 'KIZUNA',
+    kanji: '始',
+    sceneCount: 1,
+    sceneLabels: [`Kizuna Start (${PRICE.start} 税抜)`],
+    sourceKey: '05'
   },
   {
     index: 4,
     code: '05',
-    id: 'kizuna-start',
-    shortTitle: 'KIZUNA START',
-    fullTitle: `05 | COMEÇAMOS PELA EQUIPE — Kizuna Start (${PRICE.start})`,
-    bgThemeName: 'Team Core',
-    storyQuestion: 'Por onde o Kizuna começa a gerar valor sem complexidade desnecessária?',
-    metamorphosisFromTo: 'Tarefas + Calendário + Projetos + Comunicação → Núcleo Kizuna',
-    narrativeNode: 'KIZUNA',
-    kanji: '始',
-    sceneCount: 2,
-    sceneLabels: ['Os 4 Blocos da Equipe', `Núcleo Kizuna Start (${PRICE.start} 税抜)`]
-  },
-  {
-    index: 5,
-    code: '06',
     id: 'demonstracao',
     shortTitle: 'DEMONSTRAÇÃO',
-    fullTitle: '06 | UMA INFORMAÇÃO. UMA OPERAÇÃO. — Demonstração ao Vivo',
+    fullTitle: '05 | DEMONSTRAÇÃO REAL — Kizuna Start',
     bgThemeName: 'Live Data Thread',
-    storyQuestion: 'Como a informação nasce na equipe e chega à gestão sem sistemas desconectados?',
-    metamorphosisFromTo: '1. Criar Tarefa → 2. Vincular ao Projeto → 3. Acompanhar → 4. Indicador → 5. Gestão',
+    storyQuestion: 'Como a informação nasce na equipe e chega à gestão?',
+    metamorphosisFromTo: 'Criar → Atribuir → Executar → Projeto → Visão da gestão',
     narrativeNode: 'PRODUTO',
     kanji: '動',
     sceneCount: 5,
     sceneLabels: [
-      '1. Criar Tarefa',
-      '2. Vincular ao Projeto',
-      '3. Acompanhar Status',
-      '4. Indicador (68% → 75%)',
-      '5. Visão da Gestão'
-    ]
+      '1. Criar a atividade',
+      '2. Responsável e prazo',
+      '3. Acompanhar a execução',
+      '4. Relacionar ao projeto',
+      '5. Visão da gestão'
+    ],
+    sourceKey: '06'
+  },
+  {
+    index: 5,
+    code: '06',
+    id: 'adaptacao',
+    shortTitle: 'ADAPTAÇÃO',
+    fullTitle: '06 | NÃO BASTA TRADUZIR — Adaptação ao Japão',
+    rBadge: 'R2 • ADAPTAÇÃO DO PRODUTO',
+    bgThemeName: 'Kintsugi & Ringi',
+    storyQuestion: 'Como o Kizuna se adapta ao idioma, ao calendário, à moeda, ao Ringi e às leis japonesas?',
+    metamorphosisFromTo: 'Keigo + Datas & Moeda → Ringi & Nemawashi + Conformidade',
+    narrativeNode: 'ADAPTAÇÃO',
+    kanji: '和',
+    sceneCount: 2,
+    sceneLabels: ['Idioma, datas e moeda', 'Rituais de aprovação e conformidade'],
+    sourceKey: '08'
   },
   {
     index: 6,
     code: '07',
-    id: 'expansao',
-    shortTitle: 'EXPANSÃO',
-    fullTitle: '07 | À MEDIDA QUE A CONFIANÇA CRESCE, A PLATAFORMA CRESCE',
-    bgThemeName: 'Land & Expand Rings',
-    storyQuestion: 'Como evoluímos de gestão de equipes para uma plataforma empresarial completa?',
-    metamorphosisFromTo: `Start (${PRICE.start}) → Business (${PRICE.business}) → Enterprise (${PRICE.enterprise})`,
-    narrativeNode: 'PRODUTO',
-    kanji: '拡',
-    sceneCount: 3,
-    sceneLabels: [`Anel 1: Start (${PRICE.start})`, `Anel 2: Business (${PRICE.business})`, `Anel 3: Enterprise (${PRICE.enterprise})`]
+    id: 'confianca',
+    shortTitle: 'CONFIANÇA',
+    fullTitle: '07 | A IA PROPÕE. O HUMANO VALIDA. O SISTEMA REGISTRA.',
+    bgThemeName: 'Red Validation Gate',
+    storyQuestion: 'Como a automação respeita a aprovação humana e deixa rastro?',
+    metamorphosisFromTo: 'Proposta → Portão fechado → Hanko → Execução e registro',
+    narrativeNode: 'CONFIANÇA',
+    kanji: '守',
+    sceneCount: 2,
+    sceneLabels: ['Portão fechado', 'Decisão humana (Hanko)'],
+    sourceKey: '09'
   },
   {
     index: 7,
     code: '08',
-    id: 'adaptacao',
-    shortTitle: 'ADAPTAÇÃO',
-    fullTitle: '08 | NÃO BASTA TRADUZIR — Adaptação ao Contexto Japonês',
-    rBadge: 'R2 • ADAPTAÇÃO DO PRODUTO',
-    bgThemeName: 'Kintsugi & Ringi',
-    storyQuestion: 'Como o Kizuna se adapta ao idioma e ao Keigo, ao calendário e à moeda, aos rituais Ringi/Nemawashi e à conformidade legal?',
-    metamorphosisFromTo: '01 Idioma → 02 Calendário → 03 Moeda & Impostos → 04 Hierarquia & Rituais → 05 Notificações → 06 Relatórios & Selo → 07 Conformidade Legal',
-    narrativeNode: 'ADAPTAÇÃO',
-    kanji: '和',
-    sceneCount: 3,
-    sceneLabels: ['Idioma, Calendário & Moeda', 'Hierarquia, Rituais & Notificações', 'Relatórios, Selo & Conformidade']
+    id: 'planos',
+    shortTitle: 'PLANOS & RECEITA',
+    fullTitle: `08 | PLANOS E MODELO DE RECEITA — ${PRICE.start} • ${PRICE.business} • ${PRICE.enterprise}`,
+    bgThemeName: 'Land & Expand',
+    storyQuestion: 'Como o Kizuna cresce com o cliente e como gera receita?',
+    metamorphosisFromTo: `Start → Business → Enterprise → Simulador ${scaleStory}`,
+    narrativeNode: 'NEGÓCIO',
+    kanji: '価',
+    sceneCount: 2,
+    sceneLabels: ['Land & Expand: escopo de cada plano', `Simulador de receita (${scaleStory})`],
+    sourceKey: '13'
   },
   {
     index: 8,
     code: '09',
-    id: 'confianca-governanca',
-    shortTitle: 'GOVERNANÇA & IA',
-    fullTitle: '09 | A CONFIANÇA PRECISA ESTAR NO PRODUTO — IA não decide sozinha',
-    bgThemeName: 'Red Validation Gate',
-    storyQuestion: 'Como combinamos IA e automação com validação humana e rastreabilidade?',
-    metamorphosisFromTo: 'IA Propõe → Portão de Validação Humana → Execução → Audit Trail',
-    narrativeNode: 'CONFIANÇA',
-    kanji: '守',
-    sceneCount: 3,
-    sceneLabels: ['RBAC, Audit Trail & Governança', 'Portão de Validação Humana', 'Decisão Humana & Registro']
+    id: 'entrada',
+    shortTitle: 'ENTRADA & AQUISIÇÃO',
+    fullTitle: '09 | ESTRATÉGIA DE ENTRADA E AQUISIÇÃO B2B',
+    rBadge: 'R3 + R4 • PRAÇA & PROMOÇÃO',
+    bgThemeName: 'Railway & Broadcast',
+    storyQuestion: 'Como entramos no Japão reduzindo risco e como conquistamos os primeiros clientes?',
+    metamorphosisFromTo: 'Parceiro → Pilotos → Referências → Expansão → (Subsidiária?) → Canais B2B',
+    narrativeNode: 'MERCADO',
+    kanji: '道',
+    sceneCount: 4,
+    sceneLabels: [
+      'R3 • Parceiro local e pilotos',
+      'R3 • Referências e expansão',
+      'R3 • Subsidiária (hipótese futura)',
+      'R4 • Mensagem, canais e funil'
+    ],
+    sourceKey: '10'
   },
   {
     index: 9,
     code: '10',
-    id: 'praca-entrada',
-    shortTitle: 'PRAÇA & ENTRADA',
-    fullTitle: '10 | COMO CHEGAMOS AO CLIENTE? — Canais & Modo de Entrada',
-    rBadge: 'R3 • PRAÇA',
-    bgThemeName: 'Archipelago Route',
-    storyQuestion: 'Quais canais utilizamos e como entramos no Japão reduzindo o risco?',
-    metamorphosisFromTo: 'Parceiro Local → Pilotos → Referência → Escala → Presença Própria (株式会社)',
-    narrativeNode: 'MERCADO',
-    kanji: '道',
-    sceneCount: 7,
-    sceneLabels: [
-      'Os 5 Canais de Acesso',
-      'Estação 01 • Brasil (origem)',
-      'Estação 02 • Parceiro local',
-      'Estação 03 • Pilotos',
-      'Estação 04 • Casos de referência',
-      'Estação 05 • Expansão comercial',
-      'Estação 06 • Subsidiária (hipótese)'
-    ]
+    id: 'posicionamento',
+    shortTitle: 'POSICIONAMENTO',
+    fullTitle: '10 | POSICIONAMENTO — Proposta estratégica',
+    bgThemeName: 'Strategic 2x2 Matrix',
+    storyQuestion: 'Se o Japão já possui sistemas, por que escolher o Kizuna?',
+    metamorphosisFromTo: 'Alternativas do mercado → Posição-alvo proposta',
+    narrativeNode: 'NEGÓCIO',
+    kanji: '位',
+    sceneCount: 2,
+    sceneLabels: ['As alternativas existentes', 'A posição-alvo do Kizuna'],
+    sourceKey: '12'
   },
   {
     index: 10,
     code: '11',
-    id: 'promocao',
-    shortTitle: 'PROMOÇÃO',
-    fullTitle: '11 | COMO O KIZUNA SE TORNA CONHECIDO? — Global Reach. Local Trust.',
-    rBadge: 'R4 • PROMOÇÃO',
-    bgThemeName: 'Tokyo Media & Proof',
-    storyQuestion: 'Como construímos reconhecimento de marca, autoridade e prova social no Japão?',
-    metamorphosisFromTo: 'Global Reach. Local Trust. → 7 Canais B2B → Peças em Tóquio & Prova Social',
-    narrativeNode: 'MERCADO',
-    kanji: '伝',
-    sceneCount: 3,
-    sceneLabels: ['Mensagem & Público-Alvo', '7 Canais & Ecossistema Tóquio', 'Prova Social & Credibilidade']
+    id: 'riscos',
+    shortTitle: 'RISCOS & 12 MESES',
+    fullTitle: '11 | RISCOS E PLANEJAMENTO DE 12 MESES',
+    bgThemeName: 'Risk & Milestones',
+    storyQuestion: 'Quais riscos vigiamos e quais marcos propomos para o primeiro ano?',
+    metamorphosisFromTo: '4 riscos e respostas → marcos propostos de 12 meses',
+    narrativeNode: 'NEGÓCIO',
+    kanji: '標',
+    sceneCount: 2,
+    sceneLabels: ['4 riscos e respostas', 'Marcos propostos de 12 meses'],
+    sourceKey: '14'
   },
   {
     index: 11,
     code: '12',
-    id: 'posicionamento',
-    shortTitle: 'POSICIONAMENTO',
-    fullTitle: '12 | SE O JAPÃO JÁ POSSUI SOLUÇÕES, POR QUE ESCOLHER O KIZUNA?',
-    bgThemeName: 'Strategic 2x2 Matrix',
-    storyQuestion: 'Qual é o diferencial estratégico do Kizuna diante das opções globais e locais?',
-    metamorphosisFromTo: 'Global Capability × Local Adaptation → Matriz 2×2 → 5 Diferenciais',
-    narrativeNode: 'NEGÓCIO',
-    kanji: '位',
-    sceneCount: 2,
-    sceneLabels: ['Global Capability × Local Adaptation', 'Mapa 2×2 & Diferenciais Propostos']
-  },
-  {
-    index: 12,
-    code: '13',
-    id: 'preco',
-    shortTitle: 'PREÇO & VALOR',
-    fullTitle: '13 | COMO O KIZUNA GERA VALOR? — Planos (税抜) & Simulador',
-    bgThemeName: 'Revenue Architecture',
-    storyQuestion: 'Como funciona a assinatura por usuário (税抜) e a separação de implantação e integrações?',
-    metamorphosisFromTo: `Start (${PRICE.start}) | Business (${PRICE.business}) | Enterprise (${PRICE.enterprise}) → Simulador ${scaleStory}`,
-    narrativeNode: 'NEGÓCIO',
-    kanji: '価',
-    sceneCount: 2,
-    sceneLabels: [`3 Planos (${PRICE.start} • ${PRICE.business} • ${PRICE.enterprise} 税抜)`, `Simulador (${scaleStory}) + Licenças / Implantação / Integrações`]
-  },
-  {
-    index: 13,
-    code: '14',
-    id: 'riscos-indicadores',
-    shortTitle: 'RISCOS & KPIs',
-    fullTitle: '14 | UMA ESTRATÉGIA PRECISA SER MEDIDA — Riscos & Indicadores',
-    bgThemeName: 'Risk & Telemetry',
-    storyQuestion: 'Como mitigamos os 4 riscos principais e quais KPIs medem o sucesso?',
-    metamorphosisFromTo: '4 Riscos & Respostas → KPIs de Mercado, Produto e Negócio (MRR)',
-    narrativeNode: 'NEGÓCIO',
-    kanji: '標',
-    sceneCount: 2,
-    sceneLabels: ['Os 4 Riscos & Respostas Estratégicas', 'Painel de KPIs: Mercado, Produto e Negócio']
-  },
-  {
-    index: 14,
-    code: '15',
     id: 'encerramento',
     shortTitle: 'ENCERRAMENTO',
-    fullTitle: '15 | 絆 KIZUNA — Global Reach. Local Trust.',
+    fullTitle: '12 | 絆 KIZUNA — Global Reach. Local Trust.',
     bgThemeName: 'Full Circle Red Thread',
-    storyQuestion: 'Qual é a síntese que permanece após percorrer todo o caminho?',
-    metamorphosisFromTo: 'Brasil → Mundo → Japão → Equipes → Empresas → Kizuna (絆)',
+    storyQuestion: 'O que permanece depois da apresentação?',
+    metamorphosisFromTo: 'Equipe → Confiança → Expansão → 絆',
     narrativeNode: 'FUTURO',
     kanji: '絆',
-    sceneCount: 3,
-    sceneLabels: ['O Fio Fecha o Círculo', 'Brasil → Mundo → Japão → Kizuna', '絆 GLOBAL REACH. LOCAL TRUST.']
+    sceneCount: 1,
+    sceneLabels: ['絆 Global Reach. Local Trust.'],
+    sourceKey: '15'
   }
 ];
 
-// Simulação de reserva: só pode ser ativada na tela 06 (índice 5, Demonstração),
+// Simulação de reserva: só pode ser ativada na tela de demonstração,
 // com um passo a cada 2,4 s, e termina sozinha ao chegar no último passo.
-const BACKUP_SIM_SECTION_INDEX = 5;
+const BACKUP_SIM_SECTION_INDEX = SCREEN.DEMO;
 const BACKUP_SIM_STEP_MS = 2400;
+// Portão da tela de confiança: a cena em que a decisão humana pode ocorrer.
+const GATE_DECISION_SCENE = 1;
+
+// Confere em desenvolvimento que roteiro e mapa técnico têm as mesmas cenas.
+const NARRATIVE_MAP_PROBLEMS = checkNarrativeMap(PRESENTATION_SECTIONS.map((s) => s.sceneCount));
+if (NARRATIVE_MAP_PROBLEMS.length > 0) {
+  console.error('[Kizuna] Mapa narrativo inconsistente:', NARRATIVE_MAP_PROBLEMS);
+}
 
 export interface CommandCue {
   id: number;
@@ -332,7 +303,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const totalSections = PRESENTATION_SECTIONS.length;
   const currentSection = PRESENTATION_SECTIONS[currentIndex];
-  const sectionKey = currentSection.code as keyof typeof sourcesData.sections;
+  const sectionKey = (currentSection.sourceKey ?? currentSection.code) as keyof typeof sourcesData.sections;
   const currentSectionData = sourcesData.sections[sectionKey] || sourcesData.sections['01'];
 
   const triggerCue = useCallback((label: string, detail: string) => {
@@ -436,7 +407,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // A aprovação nunca sobrevive à saída da tela 09 nem ao retorno às cenas 1 e 2.
   useEffect(() => {
-    if (currentIndex !== 8 || sceneIndex < 2) setGateApproved(false);
+    if (currentIndex !== SCREEN.TRUST || sceneIndex < GATE_DECISION_SCENE) setGateApproved(false);
   }, [currentIndex, sceneIndex]);
 
   // Rede de segurança: fora da tela 06 (ou com o ERP aberto) a simulação nunca fica ligada.

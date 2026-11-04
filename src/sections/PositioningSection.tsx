@@ -1,240 +1,161 @@
 import React, { useEffect, useState } from 'react';
-import { Compass, CheckCircle2, ArrowRight, Sparkles, Orbit } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
 import { getPlan, yen } from '../data/pricing';
+import { ScreenTitle, InfoTag } from '../components/strategic/ScreenTitle';
 
-interface CompetitorNode {
+interface Alternative {
   id: string;
   name: string;
   jp: string;
-  quadrant: string;
   scope: string;
   cultural: string;
-  limitation: string;
-  xPercent: number;
-  yPercent: number;
+  note: string;
+  x: number;
+  y: number;
   isKizuna?: boolean;
 }
 
-const COMPETITORS: CompetitorNode[] = [
+// Posições e leituras são avaliação qualitativa do grupo (proposta estratégica), sem pesquisa de mercado.
+const ALTERNATIVES: Alternative[] = [
   {
     id: 'sap_oracle',
     name: 'SAP / Oracle',
     jp: '海外メガERP',
-    quadrant: 'Extremo Direito Inferior',
-    scope: 'Altíssimo / Complexo',
-    cultural: 'Baixa (Genérica / Global)',
-    limitation: 'Hipótese do grupo (a validar): soluções amplas tendem a exigir custo e prazo de implantação elevados para PMEs.',
-    xPercent: 78,
-    yPercent: 75
+    scope: 'Amplo e complexo',
+    cultural: 'Genérica / global',
+    note: 'Hipótese do grupo: implantação longa e custosa para PMEs.',
+    x: 78,
+    y: 75
   },
   {
     id: 'obic_bugyo',
-    name: 'OBIC / 奉行 (Bugyo)',
+    name: 'OBIC / 奉行',
     jp: '国内従来型ERP',
-    quadrant: 'Extremo Esquerdo Superior',
-    scope: 'Fechado / Rígido',
-    cultural: 'Alta (Nativa Tradicional)',
-    limitation: 'Hipótese do grupo (a validar): forte aderência local, com possível menor abertura a integrações modernas e à expansão global.',
-    xPercent: 24,
-    yPercent: 28
+    scope: 'Fechado / tradicional',
+    cultural: 'Nativa',
+    note: 'Hipótese do grupo: forte aderência local, menor abertura a integrações modernas.',
+    x: 24,
+    y: 28
   },
   {
     id: 'freee_mf',
-    name: 'Freee / Money Forward',
+    name: 'freee / Money Forward',
     jp: 'クラウド会計・労務',
-    quadrant: 'Centro-Esquerda',
-    scope: 'Focado em Fiscal / Contábil',
-    cultural: 'Média-Alta',
-    limitation: 'Hipótese do grupo (a validar): foco em contabilidade e RH; a cobertura de projetos e tarefas deve ser conferida em fontes oficiais.',
-    xPercent: 32,
-    yPercent: 55
+    scope: 'Foco fiscal e contábil',
+    cultural: 'Média-alta',
+    note: 'Hipótese do grupo: foco em contabilidade e RH; cobertura de projetos a conferir.',
+    x: 32,
+    y: 55
   },
   {
     id: 'notion_asana',
     name: 'Notion / Asana',
     jp: '海外生産性ツール',
-    quadrant: 'Esquerdo Inferior',
-    scope: 'Produtividade de Equipe',
-    cultural: 'Baixa (Sem Regras Locais)',
-    limitation: 'Hipótese do grupo (a validar): produtividade de equipe moderna; o suporte a rituais japoneses (Ringi/Hanko) e a requisitos fiscais locais deve ser conferido.',
-    xPercent: 20,
-    yPercent: 82
+    scope: 'Produtividade de equipe',
+    cultural: 'Baixa',
+    note: 'Hipótese do grupo: suporte a Ringi/Hanko e regras locais a conferir.',
+    x: 20,
+    y: 82
   },
   {
     id: 'kizuna',
-    name: 'KIZUNA (絆)',
+    name: 'KIZUNA 絆',
     jp: 'グローバル技術 × 日本適応',
-    quadrant: 'Quadrante Superior Direito ★',
-    scope: 'Modular (Equipes → ERP)',
-    cultural: 'Alta (Keigo, Ringi, APPI)',
-    limitation: `Proposta: combinar facilidade de entrada (${yen(getPlan('start').priceMonthly)}, preço sugerido) com engenharia corporativa e adaptação local.`,
-    xPercent: 80,
-    yPercent: 22,
+    scope: 'Modular: equipe → empresa',
+    cultural: 'Alta (Keigo, Ringi, APPI como requisitos)',
+    note: `Proposta: entrada simples (${yen(getPlan('start').priceMonthly)}, preço sugerido) com engenharia global e adaptação local desde o início.`,
+    x: 80,
+    y: 22,
     isKizuna: true
   }
 ];
 
+/** Tela 10 • Posicionamento — proposta estratégica. Cena 1: alternativas. Cena 2: posição-alvo. */
 export const PositioningSection: React.FC = () => {
-  const { sceneIndex, setSceneIndex, nextStep } = usePresentation();
-  // Cena 1: as alternativas do mercado no mapa • Cena 2: a posição-alvo do Kizuna
+  const { sceneIndex, setSceneIndex } = usePresentation();
   const scene = Math.min(1, Math.max(0, sceneIndex));
-  const [selectedCompId, setSelectedCompId] = useState<string>(COMPETITORS[0].id);
+  const [selectedId, setSelectedId] = useState<string>(ALTERNATIVES[0].id);
 
-  // Mudar de cena (teclado ou botões) troca o item em análise
+  // A cena define o foco: cena 2 sempre mostra o Kizuna; cena 1 nunca.
   useEffect(() => {
-    const kizunaSelected = selectedCompId === 'kizuna';
-    if (scene === 1 && !kizunaSelected) setSelectedCompId('kizuna');
-    if (scene === 0 && kizunaSelected) setSelectedCompId(COMPETITORS[0].id);
-  }, [scene, selectedCompId]);
+    if (scene === 1 && selectedId !== 'kizuna') setSelectedId('kizuna');
+    if (scene === 0 && selectedId === 'kizuna') setSelectedId(ALTERNATIVES[0].id);
+  }, [scene, selectedId]);
 
-  const activeComp = COMPETITORS.find((c) => c.id === selectedCompId) || COMPETITORS[0];
+  const active = ALTERNATIVES.find((a) => a.id === selectedId) || ALTERNATIVES[0];
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between px-6 md:px-14 pt-6 pb-6 overflow-y-auto select-none">
-      {/* Header */}
-      <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-white/10 pb-3.5">
-        <div>
-          <div className="flex items-center gap-2.5 mb-1.5">
-            <span className="px-2.5 py-0.5 rounded-full bg-red-600/15 border border-red-500/40 text-[10px] font-mono tracking-[0.2em] text-red-300 uppercase">
-              TELA 12 / 15 • POSICIONAMENTO E CONCORRÊNCIA
-            </span>
-            <span className="text-[11px] font-mono text-slate-400 tracking-widest">
-              位 • CONSTELAÇÃO COMPETITIVA 3D
-            </span>
-          </div>
-          <h1 className="text-xl md:text-3xl lg:text-4xl font-black tracking-tight text-white">
-            SE O JAPÃO JÁ POSSUI SISTEMAS,{' '}
-            <span className="text-red-500">POR QUE ESCOLHER O KIZUNA?</span>
-          </h1>
-        </div>
+    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-6 max-w-6xl mx-auto overflow-y-auto select-none">
+      <ScreenTitle
+        kicker="10 • Posicionamento • 位"
+        title={
+          <>
+            Se o Japão já tem sistemas, <span className="text-rose-500">por que o Kizuna?</span>
+          </>
+        }
+        aside={<InfoTag kind="proposta">PROPOSTA ESTRATÉGICA • NÃO É PESQUISA DE MERCADO</InfoTag>}
+      />
 
-        <div className="px-4 py-2 rounded-xl bg-slate-900/90 border border-amber-400/40 text-xs font-mono text-amber-300 shrink-0">
-          ALTA ADAPTAÇÃO LOCAL × ESCOPO MODULAR ESCALÁVEL
-        </div>
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <div className="lg:col-span-7 relative rounded-3xl bg-slate-950/90 border border-white/15 min-h-[320px] overflow-hidden">
+          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/15" />
+          <div className="absolute top-1/2 left-0 right-0 h-px bg-white/15" />
+          <div
+            className={`absolute right-0 top-0 w-1/2 h-1/2 bg-gradient-to-bl from-rose-600/25 to-transparent transition-opacity duration-500 ${
+              scene === 1 ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+          <span className="absolute top-2 left-3 text-[9px] font-mono text-slate-400">▲ ADAPTAÇÃO LOCAL</span>
+          <span className="absolute bottom-2 right-3 text-[9px] font-mono text-slate-400">ESCOPO AMPLO ▶</span>
 
-      {/* Main 2x2 Celestial Constellation Matrix */}
-      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch my-auto py-2">
-        {/* Left 7 Cols: Constellation Scatter Grid */}
-        <div className="lg:col-span-7 relative rounded-3xl bg-slate-950/95 border border-white/15 p-6 flex flex-col justify-between overflow-hidden min-h-[360px] shadow-2xl">
-          <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-slate-400 z-10">
-            <span>▲ EIXO VERTICAL: ADAPTAÇÃO CULTURAL (BAIXA → ALTA/NATIVA)</span>
-            <span className="text-amber-300 font-bold">POSIÇÃO-ALVO DO KIZUNA ★</span>
-          </div>
-
-          <div className="relative flex-1 my-3 rounded-2xl bg-slate-900/50 border border-white/10 overflow-hidden">
-            {/* Center Grid Lines */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-white/15" />
-            <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-white/15" />
-
-            {/* Glowing Golden Apex Quadrant */}
-            <div className={`absolute right-0 top-0 w-1/2 h-1/2 bg-gradient-to-bl from-red-600/25 via-amber-500/10 to-transparent pointer-events-none transition-opacity duration-500 ${scene === 1 ? 'opacity-100' : 'opacity-0'}`} />
-
-            {/* Axis Labels */}
-            <div className="absolute bottom-2 right-4 text-[9px] font-mono text-slate-400 uppercase">
-              Escopo Amplo / Complexo ▶
-            </div>
-            <div className="absolute bottom-2 left-4 text-[9px] font-mono text-slate-400 uppercase">
-              ◀ Escopo Especializado
-            </div>
-
-            {/* Competitor Nodes */}
-            {COMPETITORS.map((comp) => {
-              const isSelected = selectedCompId === comp.id;
-              return (
-                <button
-                  key={comp.id}
-                  onClick={() => {
-                    setSelectedCompId(comp.id);
-                    setSceneIndex(comp.isKizuna ? 1 : 0);
-                  }}
-                  style={{ left: `${comp.xPercent}%`, top: `${comp.yPercent}%` }}
-                  className={`absolute -translate-x-1/2 -translate-y-1/2 px-3 py-2 rounded-xl border text-left transition-all duration-300 hover:scale-105 cursor-pointer ${
-                    comp.isKizuna
-                      ? 'bg-gradient-to-br from-red-600 via-rose-700 to-slate-950 border-2 border-amber-300 shadow-[0_0_35px_rgba(239,68,68,0.7)] z-20 scale-105'
-                      : isSelected
-                      ? 'bg-slate-800 border-white/60 z-10'
-                      : scene === 1
-                      ? 'bg-slate-950/90 border-white/10 opacity-60 hover:opacity-90'
-                      : 'bg-slate-950/90 border-white/20 hover:border-white/40'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className={`text-xs font-black tracking-wide ${
-                        comp.isKizuna ? 'text-white' : 'text-slate-200'
-                      }`}
-                    >
-                      {comp.name}
-                    </span>
-                    {comp.isKizuna && <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin" />}
-                  </div>
-                  <div
-                    className={`text-[9px] font-serif ${
-                      comp.isKizuna ? 'text-amber-200' : 'text-slate-400'
-                    }`}
-                  >
-                    {comp.jp}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-white/10 pt-2">
-            <span>Clique nos concorrentes para comparar diferenciais</span>
-            <span className="text-amber-300 font-bold">Mapa conceitual: avaliação qualitativa do grupo, sem pesquisa de mercado</span>
-          </div>
-        </div>
-
-        {/* Right 5 Cols: Comparative Breakdown Drawer */}
-        <div className="lg:col-span-5 rounded-3xl bg-slate-950/95 border border-red-500/30 p-6 flex flex-col justify-between shadow-2xl">
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-red-400 font-bold">
-                DIAGNÓSTICO COMPETITIVO
-              </span>
-              <span className="text-xs font-serif text-amber-300">{activeComp.jp}</span>
-            </div>
-
-            <div className="flex items-baseline gap-2 mb-2">
-              <h2 className="text-2xl font-black text-white">{activeComp.name}</h2>
-              {activeComp.isKizuna && (
-                <span className="px-2 py-0.5 rounded bg-red-600/30 border border-red-400/50 text-[10px] font-mono text-red-200">
-                  POSIÇÃO-ALVO DO PROJETO
+          {ALTERNATIVES.map((a) => {
+            const isSel = selectedId === a.id;
+            const hidden = a.isKizuna && scene === 0;
+            return (
+              <button
+                key={a.id}
+                onClick={() => {
+                  setSelectedId(a.id);
+                  setSceneIndex(a.isKizuna ? 1 : 0);
+                }}
+                style={{ left: `${a.x}%`, top: `${a.y}%` }}
+                className={`absolute -translate-x-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl border text-left transition-all duration-500 ${
+                  hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                } ${
+                  a.isKizuna
+                    ? 'bg-gradient-to-br from-rose-600 to-slate-950 border-2 border-amber-300 shadow-[0_0_30px_rgba(225,29,72,0.6)] z-20'
+                    : isSel
+                    ? 'bg-slate-800 border-white/60 z-10'
+                    : 'bg-slate-950/90 border-white/20 hover:border-white/50'
+                }`}
+              >
+                <span className="flex items-center gap-1 text-xs font-black text-white">
+                  {a.name}
+                  {a.isKizuna && <Sparkles className="w-3 h-3 text-amber-300" />}
                 </span>
-              )}
+                <span className="block text-[9px] font-serif text-slate-400">{a.jp}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div key={active.id} className="lg:col-span-5 p-6 rounded-3xl bg-slate-950/90 border border-rose-500/30 flex flex-col gap-3 animate-fadeIn">
+          <h2 className="text-2xl font-black text-white">{active.name}</h2>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10">
+              <div className="text-[10px] font-mono text-slate-400">Escopo</div>
+              <div className="font-bold text-white mt-0.5">{active.scope}</div>
             </div>
-
-            <div className="space-y-2.5 my-4">
-              <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10">
-                <div className="text-[10px] font-mono uppercase text-slate-400">Escopo de Solução</div>
-                <div className="text-xs font-bold text-white mt-0.5">{activeComp.scope}</div>
-              </div>
-
-              <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10">
-                <div className="text-[10px] font-mono uppercase text-slate-400">Adaptação Cultural &amp; UX</div>
-                <div className="text-xs font-bold text-amber-300 mt-0.5">{activeComp.cultural}</div>
-              </div>
-
-              <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10">
-                <div className="text-[10px] font-mono uppercase text-slate-400">Hipótese de limitação / Razão de escolha</div>
-                <p className="text-xs text-slate-300 leading-relaxed mt-0.5">{activeComp.limitation}</p>
-              </div>
+            <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10">
+              <div className="text-[10px] font-mono text-slate-400">Adaptação local</div>
+              <div className="font-bold text-amber-300 mt-0.5">{active.cultural}</div>
             </div>
           </div>
-
-          <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400">Diferencial pretendido</span>
-            <button
-              onClick={nextStep}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono uppercase tracking-wider font-bold transition-all cursor-pointer"
-            >
-              <span>{scene === 0 ? 'Ver a posição-alvo do Kizuna' : 'Avançar'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+          <p className="text-sm text-slate-200 leading-relaxed">{active.note}</p>
+          <p className="text-[11px] text-slate-500 mt-auto">
+            {scene === 0 ? 'Toque em uma alternativa para comparar.' : 'Posição-alvo: alta adaptação local com escopo que cresce por módulos.'}
+          </p>
         </div>
       </div>
     </div>

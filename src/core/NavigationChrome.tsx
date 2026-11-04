@@ -122,7 +122,7 @@ export const NavigationChrome: React.FC = () => {
                 </span>
                 <div>
                   <h3 className="text-xs font-mono uppercase tracking-[0.25em] text-white font-bold">
-                    KIZUNA (絆統合基幹業務システム) — MENU DE NAVEGAÇÃO (15 TELAS)
+                    KIZUNA (絆統合基幹業務システム) — MENU DE NAVEGAÇÃO ({totalSections} TELAS)
                   </h3>
                   <p className="text-[11px] text-slate-400 font-mono">
                     GLOBAL REACH. LOCAL TRUST. • Teclas: →/Espaço/Enter (Avançar) | ← (Voltar) | ESC (Menu) | M (Modo Seguro) | B (Roteiro)
@@ -196,7 +196,7 @@ export const NavigationChrome: React.FC = () => {
                         </span>
                         {sec.rBadge && (
                           <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-500/25 border border-rose-500/50 text-rose-200 font-bold">
-                            {sec.rBadge.split(' ')[0]}
+                            {sec.rBadge.split(' • ')[0]}
                           </span>
                         )}
                       </div>
@@ -343,7 +343,7 @@ export const NavigationChrome: React.FC = () => {
               <button
                 onClick={() => setNavMenuOpen(true)}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/[0.04] hover:bg-white/[0.1] border border-white/15 text-xs font-mono text-white transition-all"
-                title="Menu Rápido de 15 Telas (Atalho: ESC)"
+                title="Menu rápido das telas (Atalho: ESC)"
               >
                 <Grid className="w-3 h-3 text-rose-400" />
                 <span className="font-bold">{currentSection.code}</span>

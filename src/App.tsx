@@ -5,21 +5,19 @@ import { VisualBackgroundEngine } from './core/VisualBackgroundEngine';
 import { WorldStage } from './core/WorldStage';
 import { EvidenceAndBancaPanels } from './components/strategic/EvidenceAndBancaPanels';
 
-// 15 Interactive Strategic Experience Screens (PROMPT MESTRE — KIZUNA ERP)
+// 12 telas narrativas (ordem e mapeamento técnico em core/narrativeMap.ts)
+import { SCREEN } from './core/narrativeMap';
 import { IntroSection } from './sections/IntroSection';
-import { GlobantWorldSection } from './sections/GlobantWorldSection';
-import { JapanDestinySection } from './sections/JapanDestinySection';
-import { GlobalLocalSection } from './sections/GlobalLocalSection';
-import { TrustSection } from './sections/TrustSection';
+import { WhyJapanSection } from './sections/WhyJapanSection';
+import { ContextSection } from './sections/ContextSection';
+import { StartSection } from './sections/StartSection';
 import { ValueSection } from './sections/ValueSection';
-import { MarketSection } from './sections/MarketSection';
 import { AdaptationSection } from './sections/AdaptationSection';
 import { AISecuritySection } from './sections/AISecuritySection';
-import { RoadmapSection } from './sections/RoadmapSection';
-import { MarketingMixSection } from './sections/MarketingMixSection';
+import { PlansSection } from './sections/PlansSection';
+import { EntrySection } from './sections/EntrySection';
 import { PositioningSection } from './sections/PositioningSection';
-import { PricingSection } from './sections/PricingSection';
-import { MetricsSection } from './sections/MetricsSection';
+import { RisksSection } from './sections/RisksSection';
 import { FinaleSection } from './sections/FinaleSection';
 
 // Live Product Demo Workspace (accessible on demand during defense)
@@ -150,36 +148,30 @@ const StrategicPresentationStage: React.FC = () => {
 
   const renderSection = () => {
     switch (currentIndex) {
-      case 0:
-        return <IntroSection />; // TELA 01: Abertura
-      case 1:
-        return <GlobantWorldSection />; // TELA 02: Por que o Japão?
-      case 2:
-        return <JapanDestinySection />; // TELA 03: R1 • Choque Cultural
-      case 3:
-        return <GlobalLocalSection />; // TELA 04: Global × Local
-      case 4:
-        return <TrustSection />; // TELA 05: Kizuna Start (¥980)
-      case 5:
-        return <ValueSection />; // TELA 06: Demonstração ao Vivo
-      case 6:
-        return <MarketSection />; // TELA 07: Expansão (Land & Expand)
-      case 7:
-        return <AdaptationSection />; // TELA 08: R2 • Adaptação do Produto
-      case 8:
-        return <AISecuritySection />; // TELA 09: Confiança, Governança e IA
-      case 9:
-        return <RoadmapSection />; // TELA 10: R3 • Praça + Modo de Entrada
-      case 10:
-        return <MarketingMixSection />; // TELA 11: R4 • Promoção
-      case 11:
-        return <PositioningSection />; // TELA 12: Posicionamento Competitivo
-      case 12:
-        return <PricingSection />; // TELA 13: Preço e Modelo de Receita
-      case 13:
-        return <MetricsSection />; // TELA 14: Riscos e Indicadores
-      case 14:
-        return <FinaleSection />; // TELA 15: Encerramento
+      case SCREEN.OPENING:
+        return <IntroSection />;
+      case SCREEN.WHY_JAPAN:
+        return <WhyJapanSection />;
+      case SCREEN.CONTEXT:
+        return <ContextSection />;
+      case SCREEN.START:
+        return <StartSection />;
+      case SCREEN.DEMO:
+        return <ValueSection />;
+      case SCREEN.ADAPTATION:
+        return <AdaptationSection />;
+      case SCREEN.TRUST:
+        return <AISecuritySection />;
+      case SCREEN.PLANS:
+        return <PlansSection />;
+      case SCREEN.ENTRY:
+        return <EntrySection />;
+      case SCREEN.POSITIONING:
+        return <PositioningSection />;
+      case SCREEN.RISKS:
+        return <RisksSection />;
+      case SCREEN.CLOSING:
+        return <FinaleSection />;
       default:
         return <IntroSection />;
     }

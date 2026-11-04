@@ -48,12 +48,12 @@
       "priceMonthly": 980,
       "audience": "Para pequenas equipes",
       "positioning": "Porta de entrada operacional. O cliente não precisa substituir sua operação inteira no primeiro dia.",
-      "description": "Começa organizando uma área ou equipe em idioma e padrão japonês, preparando o terreno para expansão futura.",
+      "description": "Organiza as atividades de uma equipe, com responsáveis, prazos, projetos e indicadores, preparando a expansão futura.",
       "features": [
-        "Tarefas & Calendário",
-        "Projetos da Equipe",
-        "Comunicação Contextual",
-        "Adoção imediata sem fricção"
+        "Atividades: criar, prazo e status",
+        "Equipes e responsáveis",
+        "Projetos da equipe",
+        "Indicadores e visão gerencial"
       ],
       "additionalScope": [],
       "highlight": false,
@@ -167,5 +167,5 @@
     "label": "PROPOSTA COMERCIAL • SUJEITA A VALIDAÇÃO",
     "text": "Teste gratuito de até 30 dias, associado aos pilotos assistidos. Ainda não é política aprovada: depende de validação comercial."
   },
-  "scopeNote": "Escopo por plano: referência é a tela de expansão (tela 7)."
+  "scopeNote": "Escopo por plano: referência é a tela 08 (Planos e modelo de receita)."
 }
