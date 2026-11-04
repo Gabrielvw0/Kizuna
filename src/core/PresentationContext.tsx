@@ -470,6 +470,8 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const handleKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      // Atalhos do navegador (Ctrl+R, Ctrl+F, Alt+←…) não pertencem à apresentação.
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       if (e.key === 'Escape') {
         e.preventDefault();
@@ -495,17 +497,28 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       if (erpDemoOpen) return;
 
-      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+      const isNavKey = e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ' || e.key === 'ArrowLeft' || e.key === 'PageUp';
+      // Com uma janela modal aberta (fontes ou menu), as teclas de navegação não mexem na apresentação.
+      if (isNavKey && (evidenceOpen || navMenuOpen)) {
+        e.preventDefault();
+        return;
+      }
+      // Tecla segurada não dispara uma sequência de cenas.
+      if (isNavKey && e.repeat) {
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        // Espaço sempre avança (mesmo com um botão em foco, para não repetir o último clique).
         e.preventDefault();
         nextStep();
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
         e.preventDefault();
         prevStep();
-      } else if (e.key === ' ' || e.key === 'Enter') {
-        if (tag !== 'BUTTON') {
-          e.preventDefault();
-          nextStep();
-        }
+      } else if (e.key === 'Enter') {
+        // Enter só confirma a opção em foco (comportamento nativo do botão); nunca avança a cena.
+        if (tag !== 'BUTTON' && tag !== 'A') e.preventDefault();
       } else if (e.key === 'p' || e.key === 'P') {
         e.preventDefault();
         toggleStageMode();
@@ -545,6 +558,7 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     toggleBackupSimulation,
     backupVideoMode,
     evidenceOpen,
+    navMenuOpen,
     bancaMode,
     erpDemoOpen
   ]);

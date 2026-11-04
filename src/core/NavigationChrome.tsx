@@ -113,7 +113,7 @@ export const NavigationChrome: React.FC = () => {
                     KIZUNA (絆統合基幹業務システム) — MENU DE NAVEGAÇÃO ({totalSections} TELAS)
                   </h3>
                   <p className="text-[11px] text-slate-400 font-mono">
-                    GLOBAL REACH. LOCAL TRUST. • Teclas: →/Espaço/Enter (Avançar) | ← (Voltar) | ESC (Menu) | M (Modo Seguro) | B (Roteiro)
+                    Teclas: → / Espaço avançar • ← voltar • Enter confirmar a opção em foco • Esc fechar • P palco • B roteiro • E fontes • M modo seguro • V simulação (tela 05) • F tela cheia
                   </p>
                 </div>
               </div>
@@ -401,6 +401,17 @@ export const NavigationChrome: React.FC = () => {
                   />
                 ))}
               </div>
+            </div>
+
+            {/* Dica discreta dos controles (some em telas estreitas) */}
+            <div
+              className="hidden lg:flex items-center gap-3 text-[10px] font-mono text-slate-500 tracking-wide"
+              aria-label="Atalhos de teclado"
+            >
+              <span><kbd className="text-slate-300">← →</kbd> cenas</span>
+              <span><kbd className="text-slate-300">Enter</kbd> confirmar</span>
+              <span><kbd className="text-slate-300">Esc</kbd> fechar / menu</span>
+              <span><kbd className="text-slate-300">F</kbd> tela cheia</span>
             </div>
 
             <div className="flex items-center gap-2">
