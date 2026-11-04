@@ -11,7 +11,7 @@ import { IntroSection } from './sections/IntroSection';
 import { WhyJapanSection } from './sections/WhyJapanSection';
 import { ContextSection } from './sections/ContextSection';
 import { StartSection } from './sections/StartSection';
-import { ValueSection } from './sections/ValueSection';
+import { DemoSection } from './sections/DemoSection';
 import { AdaptationSection } from './sections/AdaptationSection';
 import { AISecuritySection } from './sections/AISecuritySection';
 import { PlansSection } from './sections/PlansSection';
@@ -157,7 +157,7 @@ const StrategicPresentationStage: React.FC = () => {
       case SCREEN.START:
         return <StartSection />;
       case SCREEN.DEMO:
-        return <ValueSection />;
+        return <DemoSection />;
       case SCREEN.ADAPTATION:
         return <AdaptationSection />;
       case SCREEN.TRUST:
@@ -202,11 +202,7 @@ const StrategicPresentationStage: React.FC = () => {
       <EvidenceAndBancaPanels />
 
       {/* Full Live ERP Workspace Overlay */}
-      {erpDemoOpen && (
-        <KizunaProvider>
-          <LiveProductDemoWorkspace onClose={() => setErpDemoOpen(false)} />
-        </KizunaProvider>
-      )}
+      {erpDemoOpen && <LiveProductDemoWorkspace onClose={() => setErpDemoOpen(false)} />}
     </div>
   );
 };
@@ -214,7 +210,9 @@ const StrategicPresentationStage: React.FC = () => {
 export function App() {
   return (
     <PresentationProvider>
-      <StrategicPresentationStage />
+      <KizunaProvider>
+        <StrategicPresentationStage />
+      </KizunaProvider>
     </PresentationProvider>
   );
 }

@@ -134,7 +134,9 @@ interface KizunaContextType {
     assigneeId: string;
     dueDate: string;
     projectId: string | null;
-  }) => boolean;
+  }) => string | null;
+  /** Última atividade criada nesta sessão (usada pela demonstração guiada). */
+  lastCreatedActivityId: string | null;
   setActivityStatus: (id: string, status: ActivityStatus) => void;
   assignActivity: (id: string, assigneeId: string) => void;
   setActivityDueDate: (id: string, dueDate: string) => void;
@@ -148,7 +150,7 @@ const STORAGE_KEY = 'kizuna_erp_state_v2';
 export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeModule, setActiveModule] = useState<ModuleId>('activities');
   const [activeBranch, setActiveBranch] = useState<BranchId>('ALL');
-  const [subLang, setSubLang] = useState<SubLang>('EN');
+  const [subLang, setSubLang] = useState<SubLang>('PT');
 
   // Entities state
   const [partners, setPartners] = useState<Partner[]>(INITIAL_PARTNERS);
@@ -162,6 +164,7 @@ export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [employees] = useState<EmployeeRecord[]>(INITIAL_EMPLOYEES);
   const [activities, setActivities] = useState<ActivityRecord[]>(INITIAL_ACTIVITIES);
   const [projects] = useState<ProjectRecord[]>(INITIAL_PROJECTS);
+  const [lastCreatedActivityId, setLastCreatedActivityId] = useState<string | null>(null);
 
   // Delta accumulators for live executive presentation impact
   const [revenueDelta, setRevenueDelta] = useState<number>(0);
@@ -937,7 +940,7 @@ export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const createActivity: KizunaContextType['createActivity'] = ({ title, assigneeId, dueDate, projectId }) => {
     const cleanTitle = title.trim();
-    if (!cleanTitle || !assigneeId || !dueDate) return false;
+    if (!cleanTitle || !assigneeId || !dueDate) return null;
     const newId = `ATV-${String(activities.length + 1).padStart(4, '0')}`;
     setActivities((prev) => [
       { id: newId, title: cleanTitle, assigneeId, dueDate, status: 'TODO', projectId, createdAt: DEMO_TODAY },
@@ -950,8 +953,9 @@ export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       `Atividade criada: ${newId}`,
       `"${cleanTitle}" → ${memberName(assigneeId)}, prazo ${dueDate}${projectId ? `, projeto ${projectId}` : ''}`
     );
+    setLastCreatedActivityId(newId);
     showToast(`✓ Atividade ${newId} criada`, `${cleanTitle} — responsável: ${memberName(assigneeId)}, prazo ${dueDate}`, 'Audit Log +1');
-    return true;
+    return newId;
   };
 
   const setActivityStatus: KizunaContextType['setActivityStatus'] = (id, status) => {
@@ -1014,6 +1018,7 @@ export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const resetDemoState = () => {
     setActivities(INITIAL_ACTIVITIES);
+    setLastCreatedActivityId(null);
     setPartners(INITIAL_PARTNERS);
     setSalesOrders(INITIAL_SALES_ORDERS);
     setInvoices(INITIAL_INVOICES);
@@ -1064,6 +1069,7 @@ export const KizunaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         activities,
         projects,
         createActivity,
+        lastCreatedActivityId,
         setActivityStatus,
         assignActivity,
         setActivityDueDate,

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useKizuna } from '../../context/KizunaContext';
 import { ActivityRecord, ActivityStatus, TeamId } from '../../types/erp';
 import { DEMO_TODAY, TEAM_LABELS, TEAM_MEMBERS, TEAM_ORDER } from '../../data/startActivitiesData';
@@ -25,7 +25,32 @@ const Bar: React.FC<{ pct: number; tone?: string }> = ({ pct, tone = 'bg-emerald
   </div>
 );
 
-export const ActivitiesModule: React.FC = () => {
+export type GuideZone = 'create' | 'assign' | 'status' | 'project' | 'manager';
+
+interface ActivitiesModuleProps {
+  /** Modo incorporado na apresentação: sem cabeçalho próprio e sem prender o foco do teclado. */
+  embedded?: boolean;
+  /** Zona destacada pela demonstração guiada. */
+  highlight?: GuideZone | null;
+  /** Atividade em foco na demonstração guiada (destaque na lista). */
+  focusId?: string | null;
+  /** Visão controlada de fora (lista ou visão gerencial). */
+  view?: 'list' | 'manager';
+  onViewChange?: (view: 'list' | 'manager') => void;
+  /** Ação do link da trilha completa (no ERP abre o módulo de auditoria). */
+  onOpenAudit?: () => void;
+}
+
+const GUIDE_RING = 'ring-4 ring-rose-400/80 ring-offset-2 ring-offset-white transition-shadow';
+
+export const ActivitiesModule: React.FC<ActivitiesModuleProps> = ({
+  embedded = false,
+  highlight = null,
+  focusId = null,
+  view: controlledView,
+  onViewChange,
+  onOpenAudit,
+}) => {
   const {
     activities,
     projects,
@@ -39,7 +64,25 @@ export const ActivitiesModule: React.FC = () => {
     t,
   } = useKizuna();
 
-  const [view, setView] = useState<'list' | 'manager'>('list');
+  const [internalView, setInternalView] = useState<'list' | 'manager'>('list');
+  const view = controlledView ?? internalView;
+  const setView = (v: 'list' | 'manager') => {
+    setInternalView(v);
+    onViewChange?.(v);
+  };
+  const hl = (zone: GuideZone) => (highlight === zone ? GUIDE_RING : '');
+  const guideAttr = (zone: GuideZone) => (highlight === zone ? { 'data-guide-active': 'true' } : {});
+  // Na apresentação, o foco não pode ficar preso em campos: o controle remoto precisa seguir funcionando.
+  const releaseFocus = (el: HTMLElement | null) => {
+    if (embedded) el?.blur();
+  };
+
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!highlight) return;
+    const el = rootRef.current?.querySelector('[data-guide-active="true"]');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [highlight, focusId, view]);
   const [statusFilter, setStatusFilter] = useState<'ALL' | ActivityStatus | 'OVERDUE'>('ALL');
   const [projectFilter, setProjectFilter] = useState<string>('ALL');
 
@@ -93,6 +136,7 @@ export const ActivitiesModule: React.FC = () => {
     if (ok) {
       setTitle('');
       setFormError('');
+      if (embedded) (document.activeElement as HTMLElement | null)?.blur();
     }
   };
 
@@ -146,9 +190,9 @@ export const ActivitiesModule: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-5">
+    <div ref={rootRef} className="space-y-5">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
+      <div className={`flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4 ${embedded ? 'hidden' : ''}`}>
         <div>
           <div className="text-xs text-slate-500 font-medium">チームとアクティビティの管理 • Kizuna Start</div>
           <h1 className="text-2xl font-bold text-slate-900 mt-0.5 flex flex-wrap items-baseline gap-x-3">
@@ -205,7 +249,7 @@ export const ActivitiesModule: React.FC = () => {
       {view === 'list' && (
         <div className="space-y-4">
           {/* Create */}
-          <form onSubmit={handleCreate} className="bg-white border border-slate-200 rounded-md p-4 shadow-sm">
+          <form onSubmit={handleCreate} {...guideAttr('create')} className={`bg-white border border-slate-200 rounded-md p-4 shadow-sm ${hl('create')}`}>
             <div className="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
               <Plus className="w-3.5 h-3.5" /> {t('New activity', 'Nova atividade')}
             </div>
@@ -306,11 +350,14 @@ export const ActivitiesModule: React.FC = () => {
             {filtered.map((a) => {
               const overdue = isOverdue(a);
               const member = memberById(a.assigneeId);
+              const inFocus = !!highlight && a.id === (focusId ?? filtered[0]?.id);
+              const rowHl = (zone: GuideZone) => (inFocus ? hl(zone) : '');
+              const rowAttr = (zone: GuideZone) => (inFocus ? guideAttr(zone) : {});
               return (
                 <div
                   key={a.id}
                   data-activity-id={a.id}
-                  className={`p-3 grid grid-cols-1 lg:grid-cols-12 gap-2 items-center ${overdue ? 'bg-red-50/40' : ''}`}
+                  className={`p-3 grid grid-cols-1 lg:grid-cols-12 gap-2 items-center ${overdue ? 'bg-red-50/40' : ''} ${inFocus ? 'bg-rose-50/60' : ''}`}
                 >
                   <div className="lg:col-span-4 min-w-0">
                     <div className="flex items-center gap-2">
@@ -329,7 +376,7 @@ export const ActivitiesModule: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="lg:col-span-2 flex items-center gap-1">
+                  <div {...rowAttr('status')} className={`lg:col-span-2 flex items-center gap-1 rounded ${rowHl('status')}`}>
                     {STATUS_ORDER.map((s) => (
                       <button
                         key={s}
@@ -346,8 +393,12 @@ export const ActivitiesModule: React.FC = () => {
 
                   <select
                     value={a.assigneeId}
-                    onChange={(e) => assignActivity(a.id, e.target.value)}
-                    className="lg:col-span-2 px-1.5 py-1 border border-slate-300 rounded text-[11px] bg-white text-slate-900"
+                    onChange={(e) => {
+                      assignActivity(a.id, e.target.value);
+                      releaseFocus(e.currentTarget);
+                    }}
+                    {...rowAttr('assign')}
+                    className={`lg:col-span-2 px-1.5 py-1 border border-slate-300 rounded text-[11px] bg-white text-slate-900 ${rowHl('assign')}`}
                     aria-label={t('Assignee', 'Responsável')}
                   >
                     {TEAM_MEMBERS.map((m) => (
@@ -361,14 +412,18 @@ export const ActivitiesModule: React.FC = () => {
                     type="date"
                     value={a.dueDate}
                     onChange={(e) => setActivityDueDate(a.id, e.target.value)}
-                    className="lg:col-span-2 px-1.5 py-1 border border-slate-300 rounded text-[11px] text-slate-900"
+                    className={`lg:col-span-2 px-1.5 py-1 border border-slate-300 rounded text-[11px] text-slate-900 ${rowHl('assign')}`}
                     aria-label={t('Due date', 'Prazo')}
                   />
 
                   <select
                     value={a.projectId ?? ''}
-                    onChange={(e) => setActivityProject(a.id, e.target.value || null)}
-                    className="lg:col-span-2 px-1.5 py-1 border border-slate-300 rounded text-[11px] bg-white text-slate-900"
+                    onChange={(e) => {
+                      setActivityProject(a.id, e.target.value || null);
+                      releaseFocus(e.currentTarget);
+                    }}
+                    {...rowAttr('project')}
+                    className={`lg:col-span-2 px-1.5 py-1 border border-slate-300 rounded text-[11px] bg-white text-slate-900 ${rowHl('project')}`}
                     aria-label={t('Project', 'Projeto')}
                   >
                     <option value="">{t('No project', 'Sem projeto')}</option>
@@ -386,7 +441,7 @@ export const ActivitiesModule: React.FC = () => {
       )}
 
       {view === 'manager' && (
-        <div className="space-y-4">
+        <div {...guideAttr('manager')} className={`space-y-4 rounded-md ${hl('manager')}`}>
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {/* By team */}
             <div className="bg-white border border-slate-200 rounded-md shadow-sm">
@@ -471,7 +526,7 @@ export const ActivitiesModule: React.FC = () => {
           <span className="text-xs font-bold text-slate-900">
             {t('Recent changes (activity history)', 'Últimas alterações (histórico das atividades)')}
           </span>
-          <button onClick={() => setActiveModule('audit')} className="text-[11px] text-blue-800 hover:underline">
+          <button onClick={() => (onOpenAudit ? onOpenAudit() : setActiveModule('audit'))} className="text-[11px] text-blue-800 hover:underline">
             {t('Open full audit log (Enterprise demo)', 'Abrir trilha completa (demonstração Enterprise)')}
           </button>
         </div>
