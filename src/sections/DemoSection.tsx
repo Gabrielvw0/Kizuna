@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Play, Pause, RotateCcw } from 'lucide-react';
+import { Play, Pause, RotateCcw, Check } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
 import { useKizuna } from '../context/KizunaContext';
 import { ActivitiesModule, GuideZone } from '../components/modules/ActivitiesModule';
 import { DEMO_TODAY, TEAM_MEMBERS } from '../data/startActivitiesData';
-import { ScreenTitle, InfoTag } from '../components/strategic/ScreenTitle';
+import { Kicker, DisplayTitle, Accent, Classification } from '../components/strategic/Editorial';
 
 const STEPS: { zone: GuideZone; title: string; action: string }[] = [
   { zone: 'create', title: 'Criar a atividade', action: 'Preencha o título, escolha responsável e prazo e clique em Criar.' },
@@ -90,94 +90,114 @@ export const DemoSection: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col gap-3 px-4 md:px-10 py-4 overflow-hidden select-none">
-      <ScreenTitle
-        kicker="05 • Demonstração real • Kizuna Start • 動"
-        title={
-          <>
-            Uma informação. <span className="text-rose-500">Uma operação.</span>
-          </>
-        }
-        aside={
-          <div className="flex items-center gap-2">
-            {backupVideoMode && (
-              <span role="status" className="text-[10px] font-mono uppercase tracking-wider text-amber-300">
-                Simulação automática • passo {scene + 1}/5
-              </span>
-            )}
-            <button
-              onClick={resetDemoState}
-              className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/15 bg-slate-900/80 text-[11px] font-mono text-slate-300 hover:border-white/30"
-              title="Restaurar dados da demonstração"
-            >
-              <RotateCcw className="w-3.5 h-3.5" /> Restaurar
-            </button>
-            <button
-              onClick={toggleBackupSimulation}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-mono ${
-                backupVideoMode ? 'bg-amber-500/20 border-amber-400 text-amber-200' : 'bg-slate-900/80 border-white/15 text-slate-300 hover:border-white/30'
-              }`}
-              title="Contingência: executa os 5 passos sozinha, um a cada 2,4 s (tecla V)"
-            >
-              {backupVideoMode ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              {backupVideoMode ? 'Interromper (V)' : 'Simulação de reserva (V)'}
-            </button>
-          </div>
-        }
-      />
+    <div className="relative w-full h-full flex flex-col gap-3 short:gap-2 px-4 md:px-10 py-4 short:py-2 overflow-hidden select-none">
+      {/* Cabeçalho editorial; os controles da demonstração ficam à direita */}
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+        <div>
+          <Kicker code="05" label="Demonstração real • Kizuna Start" jp="動" />
+          <DisplayTitle size="md" className="mt-2 short:mt-1">
+            Uma informação. <Accent>Uma operação.</Accent>
+          </DisplayTitle>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {backupVideoMode && (
+            <span role="status" className="text-[11px] uppercase tracking-[0.16em] text-kin-soft">
+              Simulação automática • passo {scene + 1}/5
+            </span>
+          )}
+          <button
+            onClick={resetDemoState}
+            className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 border border-washi/15 bg-sumi-800/80 text-xs text-washi-muted hover:border-washi/35"
+            title="Restaurar dados da demonstração"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Restaurar
+          </button>
+          <button
+            onClick={toggleBackupSimulation}
+            className={`flex items-center gap-1.5 px-3 py-1.5 border text-xs ${
+              backupVideoMode ? 'bg-kin/15 border-kin text-kin-soft' : 'bg-sumi-800/80 border-washi/15 text-washi-muted hover:border-washi/35'
+            }`}
+            title="Contingência: executa os 5 passos sozinha, um a cada 2,4 s (tecla V)"
+          >
+            {backupVideoMode ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+            {backupVideoMode ? 'Interromper (V)' : 'Simulação de reserva (V)'}
+          </button>
+        </div>
+      </div>
 
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Guia do passo atual + leitura dos indicadores reais */}
-        <div className="lg:col-span-3 flex flex-col gap-3 min-h-0">
-          <div key={scene} className="p-4 rounded-2xl bg-slate-950/90 border border-rose-500/40 animate-fadeIn">
-            <div className="text-[10px] font-mono text-rose-300">PASSO {scene + 1} DE 5</div>
-            <div className="mt-1 text-lg font-black text-white">{step.title}</div>
-            <p className="mt-1 text-xs text-slate-300 leading-snug">{step.action}</p>
-            {/* Abaixo de 1024 px o painel de estado vira uma linha dentro do guia */}
-            <p className="lg:hidden mt-2 text-[11px] font-mono text-slate-300">
-              Estado atual: <strong className="text-white">{stats.open}</strong> em aberto •{' '}
-              <strong className={stats.overdue ? 'text-rose-400' : 'text-white'}>{stats.overdue}</strong> atrasadas •{' '}
-              <strong className="text-emerald-300">{stats.rate}%</strong> concluídas
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+        {/* Roteiro da demonstração: os 5 passos sempre visíveis; o atual aberto */}
+        <div className="lg:col-span-3 flex flex-col min-h-0">
+          {/* Abaixo de 1024 px: só o passo atual e uma linha de estado */}
+          <div key={scene} className="lg:hidden border-l-2 border-beni pl-3 animate-fadeIn">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-beni-soft">Passo {scene + 1} de 5</div>
+            <div className="text-base font-semibold text-washi">{step.title}</div>
+            <p className="text-xs text-washi-muted leading-snug">{step.action}</p>
+            <p className="mt-1 text-[11px] text-washi-muted">
+              Estado atual: <strong className="text-washi">{stats.open}</strong> em aberto •{' '}
+              <strong className={stats.overdue ? 'text-beni-soft' : 'text-washi'}>{stats.overdue}</strong> atrasadas •{' '}
+              <strong className="text-washi">{stats.rate}%</strong> concluídas
               {focus && <> • {focus.id} {STATUS_PT[focus.status].toLowerCase()}</>}
             </p>
           </div>
 
-          <div className="hidden lg:block p-4 rounded-2xl bg-slate-950/90 border border-white/15 text-xs">
-            <div className="text-[10px] font-mono text-slate-400 mb-2">ESTADO ATUAL DO MÓDULO</div>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div>
-                <div className="text-xl font-black font-mono text-white">{stats.open}</div>
-                <div className="text-[10px] text-slate-400">em aberto</div>
+          <ol className="hidden lg:block border-t border-washi/10" aria-label="Passos da demonstração">
+            {STEPS.map((st, i) => {
+              const active = i === scene;
+              const done = i < scene;
+              return (
+                <li key={st.zone} className={`relative py-2.5 short:py-1.5 pl-4 border-b border-washi/10 ${active ? 'bg-beni/[0.07]' : ''}`}>
+                  <span aria-hidden className={`absolute left-0 top-0 bottom-0 w-[2px] ${active ? 'bg-beni' : 'bg-transparent'}`} />
+                  <div className="flex items-baseline gap-3">
+                    <span className={`font-display text-base tabular-nums ${active ? 'text-beni-soft' : 'text-washi-dim'}`}>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className={`text-sm ${active ? 'text-washi font-semibold' : done ? 'text-washi-muted' : 'text-washi-dim'}`}>{st.title}</span>
+                    {done && <Check className="w-3.5 h-3.5 text-washi-dim" aria-label="concluído" />}
+                  </div>
+                  {active && <p className="mt-1 pl-8 text-xs text-washi-muted leading-snug animate-fadeIn">{st.action}</p>}
+                </li>
+              );
+            })}
+          </ol>
+
+          {/* Estado real do módulo, lido do mesmo estado do ERP */}
+          <div className="hidden lg:block mt-4 short:mt-3">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-washi-dim">Estado atual do módulo</div>
+            <div className="mt-2 grid grid-cols-3 divide-x divide-washi/10">
+              <div className="pr-2">
+                <div className="font-display text-3xl short:text-2xl text-washi tabular-nums">{stats.open}</div>
+                <div className="text-[11px] text-washi-dim">em aberto</div>
               </div>
-              <div>
-                <div className={`text-xl font-black font-mono ${stats.overdue ? 'text-rose-400' : 'text-white'}`}>{stats.overdue}</div>
-                <div className="text-[10px] text-slate-400">atrasadas</div>
+              <div className="px-2">
+                <div className={`font-display text-3xl short:text-2xl tabular-nums ${stats.overdue ? 'text-beni-soft' : 'text-washi'}`}>{stats.overdue}</div>
+                <div className="text-[11px] text-washi-dim">atrasadas</div>
               </div>
-              <div>
-                <div className="text-xl font-black font-mono text-emerald-300">{stats.rate}%</div>
-                <div className="text-[10px] text-slate-400">concluídas</div>
+              <div className="pl-2">
+                <div className="font-display text-3xl short:text-2xl text-washi tabular-nums">{stats.rate}%</div>
+                <div className="text-[11px] text-washi-dim">concluídas</div>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-white/10 text-slate-300 leading-relaxed">
+            <div className="mt-3 pt-3 short:mt-2 short:pt-2 border-t border-washi/10 text-xs text-washi-muted leading-relaxed">
               {focus ? (
                 <>
-                  <span className="font-mono text-rose-300">{focus.id}</span> • {STATUS_PT[focus.status]}
+                  <span className="text-washi">{focus.id}</span> • {STATUS_PT[focus.status]}
                   <br />
                   {focusMember?.nameRomaji} • prazo {focus.dueDate.slice(8, 10)}/{focus.dueDate.slice(5, 7)}
                   <br />
                   {focusProject ? focusProject.name : 'sem projeto'}
                 </>
               ) : (
-                <span className="text-slate-500">Nenhuma atividade criada nesta apresentação ainda.</span>
+                <span className="text-washi-dim">Nenhuma atividade criada nesta apresentação ainda.</span>
               )}
             </div>
           </div>
 
-          <div className="hidden lg:flex flex-col gap-2 mt-auto">
-            <InfoTag kind="demo">DADOS FICTÍCIOS • SEM INTEGRAÇÕES REAIS</InfoTag>
+          <div className="hidden lg:flex flex-col gap-2 mt-auto pt-3">
+            <Classification kind="demo">Dados fictícios • sem integrações reais</Classification>
             <button
               onClick={resetDemoState}
-              className="flex items-center gap-1.5 self-start px-3 py-1.5 rounded-lg border border-white/15 bg-white/[0.04] hover:bg-white/[0.1] text-[11px] font-mono text-slate-200"
+              className="flex items-center gap-1.5 self-start px-3 py-1.5 border border-washi/15 bg-sumi-800/80 hover:border-washi/35 text-xs text-washi-muted"
             >
               <RotateCcw className="w-3.5 h-3.5" /> Restaurar dados da demonstração
             </button>
@@ -185,15 +205,13 @@ export const DemoSection: React.FC = () => {
         </div>
 
         {/* O produto real, em sua janela (tema claro do ERP) */}
-        <div className="lg:col-span-9 min-h-0 flex flex-col rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-[#F8FAFC]">
-          <div className="shrink-0 h-8 px-3 flex items-center justify-between bg-slate-900 text-[11px] font-mono text-slate-300">
+        <div className="lg:col-span-9 min-h-0 flex flex-col rounded-md overflow-hidden border border-washi/20 shadow-[0_30px_80px_rgba(0,0,0,0.6)] bg-[#F8FAFC]">
+          <div className="shrink-0 h-8 px-3 flex items-center justify-between bg-sumi-800 border-b border-washi/10 text-[11px] text-washi-muted">
             <span className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <span className="ml-2 text-white font-bold">Kizuna Start • Atividades</span>
+              <span className="font-display text-beni-soft">絆</span>
+              <span className="text-washi font-semibold">Kizuna Start • Atividades</span>
             </span>
-            <span className="text-amber-300">DEMO • dados fictícios • ref. 21/10/2026</span>
+            <span className="text-kin-soft">Demo • dados fictícios • ref. 21/10/2026</span>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto p-4 text-slate-900">
             <ActivitiesModule

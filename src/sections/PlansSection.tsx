@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Check, Layers, Wrench, Plug, Users } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
 import { PRICING, PlanId, getPlan, planForUsers, yen } from '../data/pricing';
-import { ScreenTitle, InfoTag } from '../components/strategic/ScreenTitle';
+import { Kicker, DisplayTitle, Accent, Classification, LegibilityVeil } from '../components/strategic/Editorial';
 
 const PLAN_IDS: PlanId[] = ['start', 'business', 'enterprise'];
 const RING_RADIUS: Record<PlanId, number> = { start: 62, business: 112, enterprise: 162 };
@@ -27,149 +27,159 @@ export const PlansSection: React.FC = () => {
   const { implementation, integration } = simPlan.estimates;
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-4 max-w-6xl mx-auto overflow-y-auto select-none">
-      <ScreenTitle
-        kicker="08 • Planos e receita • 価"
-        title={
-          scene === 0 ? (
-            <>
-              À medida que a confiança cresce, <span className="text-rose-500">a plataforma cresce.</span>
-            </>
-          ) : (
-            <>
-              Receita recorrente <span className="text-rose-500">por usuário.</span>
-            </>
-          )
-        }
-        aside={<InfoTag kind="preco">{PRICING.badge}</InfoTag>}
-      />
-
-      {scene === 0 ? (
-        <div key="rings" className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center animate-fadeIn">
-          {/* Anéis: cada anel é um botão que mostra o escopo do plano */}
-          <div className="flex flex-col items-center gap-2">
-          <svg viewBox="0 0 360 360" className="w-full max-w-[270px]" role="group" aria-label="Planos Kizuna">
-            {[...PLAN_IDS].reverse().map((id) => {
-              const active = planId === id;
-              return (
-                <g key={id} onClick={() => setPlanId(id)} className="cursor-pointer" role="button" aria-pressed={active}>
-                  <circle
-                    cx="180"
-                    cy="180"
-                    r={RING_RADIUS[id]}
-                    fill={active ? 'rgba(225,29,72,0.18)' : 'rgba(15,23,42,0.55)'}
-                    stroke={active ? '#f43f5e' : 'rgba(255,255,255,0.22)'}
-                    strokeWidth={active ? 3 : 1.5}
-                  />
-                  <text
-                    x="180"
-                    y={id === 'start' ? 176 : 180 - RING_RADIUS[id] + 22}
-                    textAnchor="middle"
-                    className="fill-white font-mono text-[11px] font-bold pointer-events-none"
-                  >
-                    {getPlan(id).name.replace('KIZUNA ', '')}
-                  </text>
-                  <text
-                    x="180"
-                    y={id === 'start' ? 192 : 180 - RING_RADIUS[id] + 36}
-                    textAnchor="middle"
-                    className="fill-rose-300 font-mono text-[10px] pointer-events-none"
-                  >
-                    {yen(getPlan(id).priceMonthly)} • {RING_LABEL[id]}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
-          <p className="text-[11px] text-slate-500">Toque em um anel para ver o escopo do plano.</p>
+    <div className="relative w-full h-full select-none">
+      <LegibilityVeil side="left" />
+      <div className="relative h-full max-w-6xl mx-auto px-6 md:px-14 py-4 short:py-1 flex flex-col justify-center gap-4 md:gap-6 short:gap-2 overflow-y-auto">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+          <div>
+            <Kicker code="08" label="Planos e receita" jp="価" />
+            <DisplayTitle className="mt-4 short:mt-2">
+              {scene === 0 ? (
+                <>
+                  À medida que a confiança cresce, <Accent>a plataforma cresce.</Accent>
+                </>
+              ) : (
+                <>
+                  Receita recorrente <Accent>por usuário.</Accent>
+                </>
+              )}
+            </DisplayTitle>
           </div>
+          <Classification kind="preco">{PRICING.badge}</Classification>
+        </div>
 
-          <div key={planId} className="p-5 rounded-3xl bg-slate-950/90 border border-rose-500/40 animate-fadeIn">
-            <div className="flex items-baseline justify-between gap-3">
-              <h2 className="text-xl font-black text-white">{plan.name}</h2>
-              <div className="font-mono">
-                <span className="text-2xl font-black text-white">{yen(plan.priceMonthly)}</span>
-                <span className="text-[10px] text-slate-400"> /usuário/mês 税抜</span>
-              </div>
+        {scene === 0 ? (
+          <div key="rings" className="grid grid-cols-1 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] gap-4 md:gap-12 items-center animate-fadeIn">
+            {/* Anéis concêntricos: equipe → departamentos → empresa; cada anel abre o escopo do plano */}
+            <div className="flex flex-col items-center gap-2">
+              <svg viewBox="0 0 360 360" className="w-full max-w-[200px] md:max-w-[340px] short:md:max-w-[220px]" role="group" aria-label="Planos Kizuna">
+                {[...PLAN_IDS].reverse().map((id) => {
+                  const active = planId === id;
+                  return (
+                    <g key={id} onClick={() => setPlanId(id)} className="cursor-pointer" role="button" aria-pressed={active}>
+                      <circle
+                        cx="180"
+                        cy="180"
+                        r={RING_RADIUS[id]}
+                        fill={active ? 'rgba(215,38,61,0.14)' : 'rgba(17,17,20,0.75)'}
+                        stroke={active ? '#D7263D' : 'rgba(242,238,230,0.22)'}
+                        strokeWidth={active ? 2.5 : 1.2}
+                      />
+                      <text
+                        x="180"
+                        y={id === 'start' ? 176 : 180 - RING_RADIUS[id] + 24}
+                        textAnchor="middle"
+                        className="pointer-events-none"
+                        style={{ fill: '#F2EEE6', fontFamily: '"Noto Serif JP", serif', fontSize: 15, fontWeight: 600 }}
+                      >
+                        {getPlan(id).name.replace('KIZUNA ', '')}
+                      </text>
+                      <text
+                        x="180"
+                        y={id === 'start' ? 194 : 180 - RING_RADIUS[id] + 40}
+                        textAnchor="middle"
+                        className="pointer-events-none"
+                        style={{ fill: active ? '#EC4A5C' : '#B9B3A8', fontSize: 11 }}
+                      >
+                        {yen(getPlan(id).priceMonthly)} • {RING_LABEL[id]}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+              <p className="text-[11px] text-washi-dim short:hidden short:lg:block">Toque em um anel para ver o escopo do plano.</p>
             </div>
-            <div className="text-xs text-amber-300 mt-0.5">{plan.audience}</div>
-            <ul className="mt-3 space-y-1">
-              {plan.features.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm text-slate-200">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>{f}</span>
-                </li>
+
+            <div key={planId} className="md:border-l md:border-washi/15 md:pl-10 animate-fadeIn">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <h2 className="font-display font-semibold text-2xl md:text-3xl short:text-2xl text-washi">{plan.name}</h2>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-display font-semibold text-3xl md:text-4xl short:text-3xl text-washi tabular-nums">{yen(plan.priceMonthly)}</span>
+                  <span className="text-xs text-washi-dim">/usuário/mês <span className="font-display text-kin-soft">税抜</span></span>
+                </div>
+              </div>
+              <div className="mt-1 text-sm text-kin-soft">{plan.audience}</div>
+              <ul className="mt-3 short:mt-2 border-t border-washi/10">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 py-1.5 short:py-0.5 border-b border-washi/10 text-sm md:text-base short:text-sm text-washi">
+                    <Check className="w-4 h-4 text-washi-dim shrink-0 mt-1" aria-hidden />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-xs text-washi-muted flex items-center gap-1.5">
+                <Plug className="w-3.5 h-3.5 text-washi-dim" aria-hidden />
+                {plan.integrationPolicy}
+              </p>
+              {planId === 'start' && (
+                <div className="mt-3 short:mt-2 border-l-2 border-kin pl-3">
+                  <div className="text-[11px] uppercase tracking-[0.16em] text-kin-soft">{PRICING.trial.label}</div>
+                  <p className="text-xs md:text-sm text-washi-muted mt-0.5">{PRICING.trial.text}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div key="simulator" className="flex flex-col gap-4 md:gap-6 short:gap-3 animate-fadeIn">
+            {/* 1. Quantos usuários? */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs uppercase tracking-[0.2em] text-washi-dim flex items-center gap-1.5 mr-1">
+                <Users className="w-4 h-4" aria-hidden /> Usuários
+              </span>
+              {PRICING.presets.map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setUsers(n)}
+                  aria-pressed={users === n}
+                  className={`min-w-[52px] px-3 py-1.5 border text-sm tabular-nums transition-colors ${
+                    users === n ? 'border-beni text-washi bg-beni/15' : 'border-washi/15 text-washi-muted hover:border-washi/35'
+                  }`}
+                >
+                  {n}
+                </button>
               ))}
-            </ul>
-            <p className="mt-3 text-xs text-slate-400">
-              <Plug className="inline w-3.5 h-3.5 mr-1 text-sky-400" />
-              {plan.integrationPolicy}
-            </p>
-            {planId === 'start' && (
-              <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-400/40">
-                <div className="text-[10px] font-mono font-bold text-amber-300">{PRICING.trial.label}</div>
-                <p className="text-xs text-slate-200 mt-0.5">{PRICING.trial.text}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div key="simulator" className="flex flex-col gap-5 animate-fadeIn">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs font-mono text-slate-300 flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-rose-400" /> Usuários:
-            </span>
-            {PRICING.presets.map((n) => (
-              <button
-                key={n}
-                onClick={() => setUsers(n)}
-                aria-pressed={users === n}
-                className={`px-3.5 py-2 rounded-xl text-sm font-mono font-bold transition-all ${
-                  users === n ? 'bg-rose-600 text-white' : 'bg-white/5 text-slate-300 hover:bg-white/10'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-            <span className="text-xs font-mono text-slate-400">
-              → plano indicado: <strong className="text-white">{simPlan.name}</strong>
-            </span>
-          </div>
+              <span className="text-xs text-washi-muted ml-1">
+                → plano indicado: <strong className="text-washi">{simPlan.name}</strong>
+              </span>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 rounded-3xl bg-slate-950 border border-emerald-500/40">
-              <div className="text-[10px] font-mono uppercase text-slate-400">Receita mensal (MRR)</div>
-              <div className="text-3xl md:text-4xl font-black font-mono text-emerald-300 mt-1">{yenJp(monthly)}</div>
-              <div className="text-xs font-mono text-slate-400 mt-1">
-                {yen(simPlan.priceMonthly)} × {users} usuários
+            {/* 2. Receita recorrente: os dois números de impacto */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-washi/15 border-y border-washi/15 py-4 short:py-3">
+              <div className="sm:pr-8">
+                <div className="text-xs uppercase tracking-[0.2em] text-washi-dim">Receita mensal (MRR)</div>
+                <div className="mt-1 font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-washi tabular-nums">{yenJp(monthly)}</div>
+                <div className="mt-1 text-xs md:text-sm text-washi-muted">
+                  {yen(simPlan.priceMonthly)} × {users} usuários
+                </div>
+              </div>
+              <div className="sm:pl-8 mt-3 sm:mt-0">
+                <div className="text-xs uppercase tracking-[0.2em] text-washi-dim">Receita anual (ARR)</div>
+                <div className="mt-1 font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-beni-soft tabular-nums">{yenJp(monthly * 12)}</div>
+                <div className="mt-1 text-xs md:text-sm text-washi-muted">{PRICING.annualRule}</div>
               </div>
             </div>
-            <div className="p-5 rounded-3xl bg-slate-950 border border-amber-500/40">
-              <div className="text-[10px] font-mono uppercase text-slate-400">Receita anual (ARR)</div>
-              <div className="text-3xl md:text-4xl font-black font-mono text-amber-300 mt-1">{yenJp(monthly * 12)}</div>
-              <div className="text-xs font-mono text-slate-400 mt-1">{PRICING.annualRule}</div>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-            <div className="p-4 rounded-2xl bg-slate-950 border border-white/10">
-              <div className="flex items-center gap-1.5 text-rose-400 font-bold"><Layers className="w-4 h-4" /> Licenças</div>
-              <div className="font-mono text-white mt-1">{yenJp(monthly)}/mês</div>
+            {/* 3. O que compõe a receita: licenças recorrentes; implantação e integrações à parte */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 sm:divide-x divide-washi/10">
+              <div className="sm:pr-5 py-1">
+                <div className="flex items-center gap-1.5 text-sm text-washi-muted"><Layers className="w-4 h-4" aria-hidden /> Licenças</div>
+                <div className="mt-0.5 text-lg md:text-xl text-washi tabular-nums">{yenJp(monthly)}/mês</div>
+              </div>
+              <div className="sm:px-5 py-1">
+                <div className="flex items-center gap-1.5 text-sm text-washi-muted"><Wrench className="w-4 h-4" aria-hidden /> Implantação</div>
+                <div className="mt-0.5 text-lg md:text-xl text-washi tabular-nums">{yenJp(implementation)}</div>
+                <div className="text-[11px] text-washi-dim">{PRICING.estimateLabel}</div>
+              </div>
+              <div className="sm:pl-5 py-1">
+                <div className="flex items-center gap-1.5 text-sm text-washi-muted"><Plug className="w-4 h-4" aria-hidden /> Integrações</div>
+                <div className="mt-0.5 text-lg md:text-xl text-washi tabular-nums">{integration === null ? 'Fora do escopo' : yenJp(integration)}</div>
+                <div className="text-[11px] text-washi-dim">{integration === null ? simPlan.integrationPolicy : PRICING.estimateLabel}</div>
+              </div>
             </div>
-            <div className="p-4 rounded-2xl bg-slate-950 border border-white/10">
-              <div className="flex items-center gap-1.5 text-amber-400 font-bold"><Wrench className="w-4 h-4" /> Implantação</div>
-              <div className="font-mono text-white mt-1">{yenJp(implementation)}</div>
-              <div className="text-[10px] text-slate-400">{PRICING.estimateLabel}</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-950 border border-white/10">
-              <div className="flex items-center gap-1.5 text-sky-400 font-bold"><Plug className="w-4 h-4" /> Integrações</div>
-              <div className="font-mono text-white mt-1">{integration === null ? 'Fora do escopo' : yenJp(integration)}</div>
-              <div className="text-[10px] text-slate-400">{integration === null ? simPlan.integrationPolicy : PRICING.estimateLabel}</div>
-            </div>
+            <p className="text-xs text-washi-dim">{PRICING.expansionJourney.disclaimer}</p>
           </div>
-          <p className="text-[11px] text-slate-500">{PRICING.expansionJourney.disclaimer}</p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
