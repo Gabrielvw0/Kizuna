@@ -106,6 +106,13 @@ export const DemoSection: React.FC = () => {
               </span>
             )}
             <button
+              onClick={resetDemoState}
+              className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/15 bg-slate-900/80 text-[11px] font-mono text-slate-300 hover:border-white/30"
+              title="Restaurar dados da demonstração"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Restaurar
+            </button>
+            <button
               onClick={toggleBackupSimulation}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-mono ${
                 backupVideoMode ? 'bg-amber-500/20 border-amber-400 text-amber-200' : 'bg-slate-900/80 border-white/15 text-slate-300 hover:border-white/30'
@@ -126,6 +133,13 @@ export const DemoSection: React.FC = () => {
             <div className="text-[10px] font-mono text-rose-300">PASSO {scene + 1} DE 5</div>
             <div className="mt-1 text-lg font-black text-white">{step.title}</div>
             <p className="mt-1 text-xs text-slate-300 leading-snug">{step.action}</p>
+            {/* Abaixo de 1024 px o painel de estado vira uma linha dentro do guia */}
+            <p className="lg:hidden mt-2 text-[11px] font-mono text-slate-300">
+              Estado atual: <strong className="text-white">{stats.open}</strong> em aberto •{' '}
+              <strong className={stats.overdue ? 'text-rose-400' : 'text-white'}>{stats.overdue}</strong> atrasadas •{' '}
+              <strong className="text-emerald-300">{stats.rate}%</strong> concluídas
+              {focus && <> • {focus.id} {STATUS_PT[focus.status].toLowerCase()}</>}
+            </p>
           </div>
 
           <div className="hidden lg:block p-4 rounded-2xl bg-slate-950/90 border border-white/15 text-xs">

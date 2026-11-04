@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --port 5173 --open",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate": "node scripts/validate.mjs"
   },
   "dependencies": {
     "@types/three": "^0.186.0",

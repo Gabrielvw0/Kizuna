@@ -270,7 +270,7 @@ export const NavigationChrome: React.FC = () => {
               {/* Workspace Kizuna Completo */}
               <button
                 onClick={() => setErpDemoOpen(true)}
-                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-mono tracking-wider bg-white/[0.02] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-mono tracking-wider bg-white/[0.02] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] transition-all"
                 title="Abrir a demonstração do Kizuna (dados fictícios)"
               >
                 <Layers className="w-3 h-3 text-rose-500" />
