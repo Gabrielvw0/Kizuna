@@ -24,7 +24,7 @@ export const RisksSection: React.FC = () => {
   const risk = riskPanel.quadrants.find((q) => q.id === riskId) || riskPanel.quadrants[0];
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-center gap-6 px-6 md:px-14 py-6 max-w-6xl mx-auto overflow-y-auto select-none">
+    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-4 max-w-6xl mx-auto overflow-y-auto select-none">
       <ScreenTitle
         kicker="11 • Riscos e 12 meses • 標"
         title={
@@ -42,8 +42,8 @@ export const RisksSection: React.FC = () => {
       />
 
       {scene === 0 ? (
-        <div key="risks" className="grid grid-cols-1 lg:grid-cols-12 gap-5 animate-fadeIn">
-          <div className="lg:col-span-5 grid grid-cols-2 gap-3">
+        <div key="risks" className="grid grid-cols-1 md:grid-cols-12 gap-4 animate-fadeIn">
+          <div className="md:col-span-5 grid grid-cols-2 gap-3">
             {riskPanel.quadrants.map((q) => {
               const Icon = ICONS[q.id] ?? ShieldCheck;
               const sel = q.id === riskId;
@@ -64,7 +64,7 @@ export const RisksSection: React.FC = () => {
             })}
           </div>
 
-          <div key={risk.id} className="lg:col-span-7 p-6 rounded-3xl bg-slate-950/90 border border-white/15 flex flex-col gap-4 animate-fadeIn">
+          <div key={risk.id} className="md:col-span-7 p-5 rounded-3xl bg-slate-950/90 border border-white/15 flex flex-col gap-4 animate-fadeIn">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400">Risco</div>
               <p className="mt-1 text-lg font-bold text-white leading-snug">{risk.risk}</p>

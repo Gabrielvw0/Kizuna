@@ -86,7 +86,7 @@ export const PositioningSection: React.FC = () => {
   const active = ALTERNATIVES.find((a) => a.id === selectedId) || ALTERNATIVES[0];
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-6 max-w-6xl mx-auto overflow-y-auto select-none">
+    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-4 max-w-6xl mx-auto overflow-y-auto select-none">
       <ScreenTitle
         kicker="10 • Posicionamento • 位"
         title={
@@ -97,8 +97,8 @@ export const PositioningSection: React.FC = () => {
         aside={<InfoTag kind="proposta">PROPOSTA ESTRATÉGICA • NÃO É PESQUISA DE MERCADO</InfoTag>}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-        <div className="lg:col-span-7 relative rounded-3xl bg-slate-950/90 border border-white/15 min-h-[320px] overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
+        <div className="md:col-span-7 relative rounded-3xl bg-slate-950/90 border border-white/15 min-h-[280px] overflow-hidden">
           <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/15" />
           <div className="absolute top-1/2 left-0 right-0 h-px bg-white/15" />
           <div
@@ -140,8 +140,8 @@ export const PositioningSection: React.FC = () => {
           })}
         </div>
 
-        <div key={active.id} className="lg:col-span-5 p-6 rounded-3xl bg-slate-950/90 border border-rose-500/30 flex flex-col gap-3 animate-fadeIn">
-          <h2 className="text-2xl font-black text-white">{active.name}</h2>
+        <div key={active.id} className="md:col-span-5 p-5 rounded-3xl bg-slate-950/90 border border-rose-500/30 flex flex-col gap-2 animate-fadeIn">
+          <h2 className="text-xl font-black text-white">{active.name}</h2>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10">
               <div className="text-[10px] font-mono text-slate-400">Escopo</div>

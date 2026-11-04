@@ -37,7 +37,7 @@ export const ContextSection: React.FC = () => {
   const door = DOORS[Math.min(3, scene)];
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-center gap-6 px-6 md:px-14 py-6 max-w-6xl mx-auto overflow-y-auto select-none">
+    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-4 max-w-6xl mx-auto overflow-y-auto select-none">
       <ScreenTitle
         kicker="03 • R1 • Choque cultural"
         title={

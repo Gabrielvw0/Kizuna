@@ -23,7 +23,7 @@ export const WhyJapanSection: React.FC = () => {
   const scene = Math.min(1, Math.max(0, sceneIndex));
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-center gap-8 px-6 md:px-14 py-6 max-w-6xl mx-auto overflow-y-auto select-none">
+    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-4 max-w-6xl mx-auto overflow-y-auto select-none">
       <ScreenTitle
         kicker="02 • Por que o Japão"
         title={

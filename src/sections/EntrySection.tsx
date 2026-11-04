@@ -58,7 +58,7 @@ export const EntrySection: React.FC = () => {
   const isAcquisition = scene === 3;
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-center gap-6 px-6 md:px-14 py-6 max-w-6xl mx-auto overflow-y-auto select-none">
+    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-4 max-w-6xl mx-auto overflow-y-auto select-none">
       <ScreenTitle
         kicker={isAcquisition ? '09 • R4 • Promoção e aquisição B2B' : '09 • R3 • Praça e modo de entrada • 道'}
         title={
@@ -120,7 +120,7 @@ export const EntrySection: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div key="acquisition" className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fadeIn">
+        <div key="acquisition" className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fadeIn">
           <div className="flex flex-col gap-4">
             <div className="p-5 rounded-2xl bg-slate-950/85 border border-white/15">
               <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400">Para quem</div>
@@ -140,7 +140,7 @@ export const EntrySection: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-5 rounded-3xl bg-slate-950/85 border border-rose-500/30 flex flex-col gap-3">
+          <div className="p-4 rounded-3xl bg-slate-950/85 border border-rose-500/30 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400">Funil do primeiro ano</span>
               <InfoTag kind="proposta">METAS PROPOSTAS</InfoTag>

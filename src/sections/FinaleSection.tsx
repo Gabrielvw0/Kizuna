@@ -13,7 +13,7 @@ export const FinaleSection: React.FC = () => {
   const { goToSection, toggleBancaMode, toggleEvidence } = usePresentation();
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-center items-center gap-6 px-6 md:px-14 py-6 overflow-y-auto select-none">
+    <div className="relative w-full h-full flex flex-col justify-center items-center gap-5 px-6 md:px-14 py-4 overflow-y-auto select-none">
       <div className="flex flex-col items-center text-center animate-fadeIn">
         <div className="text-7xl md:text-8xl font-serif text-rose-500 drop-shadow-[0_0_35px_rgba(220,38,38,0.65)]">絆</div>
         <h1 className="mt-1 text-3xl md:text-5xl font-black tracking-[0.22em] text-white">KIZUNA</h1>

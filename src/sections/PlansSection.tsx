@@ -27,7 +27,7 @@ export const PlansSection: React.FC = () => {
   const { implementation, integration } = simPlan.estimates;
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-center gap-6 px-6 md:px-14 py-6 max-w-6xl mx-auto overflow-y-auto select-none">
+    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-4 max-w-6xl mx-auto overflow-y-auto select-none">
       <ScreenTitle
         kicker="08 • Planos e receita • 価"
         title={
@@ -45,9 +45,10 @@ export const PlansSection: React.FC = () => {
       />
 
       {scene === 0 ? (
-        <div key="rings" className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center animate-fadeIn">
+        <div key="rings" className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center animate-fadeIn">
           {/* Anéis: cada anel é um botão que mostra o escopo do plano */}
-          <svg viewBox="0 0 360 360" className="w-full max-w-[360px] mx-auto" role="group" aria-label="Planos Kizuna">
+          <div className="flex flex-col items-center gap-2">
+          <svg viewBox="0 0 360 360" className="w-full max-w-[270px]" role="group" aria-label="Planos Kizuna">
             {[...PLAN_IDS].reverse().map((id) => {
               const active = planId === id;
               return (
@@ -80,8 +81,10 @@ export const PlansSection: React.FC = () => {
               );
             })}
           </svg>
+          <p className="text-[11px] text-slate-500">Toque em um anel para ver o escopo do plano.</p>
+          </div>
 
-          <div key={planId} className="p-6 rounded-3xl bg-slate-950/90 border border-rose-500/40 animate-fadeIn">
+          <div key={planId} className="p-5 rounded-3xl bg-slate-950/90 border border-rose-500/40 animate-fadeIn">
             <div className="flex items-baseline justify-between gap-3">
               <h2 className="text-xl font-black text-white">{plan.name}</h2>
               <div className="font-mono">
@@ -90,7 +93,7 @@ export const PlansSection: React.FC = () => {
               </div>
             </div>
             <div className="text-xs text-amber-300 mt-0.5">{plan.audience}</div>
-            <ul className="mt-4 space-y-1.5">
+            <ul className="mt-3 space-y-1">
               {plan.features.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
@@ -103,12 +106,11 @@ export const PlansSection: React.FC = () => {
               {plan.integrationPolicy}
             </p>
             {planId === 'start' && (
-              <div className="mt-4 p-3 rounded-xl bg-amber-500/10 border border-amber-400/40">
+              <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-400/40">
                 <div className="text-[10px] font-mono font-bold text-amber-300">{PRICING.trial.label}</div>
                 <p className="text-xs text-slate-200 mt-0.5">{PRICING.trial.text}</p>
               </div>
             )}
-            <p className="mt-4 text-[11px] text-slate-500">Toque em um anel para ver o escopo de cada plano.</p>
           </div>
         </div>
       ) : (
@@ -135,16 +137,16 @@ export const PlansSection: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-6 rounded-3xl bg-slate-950/90 border border-emerald-500/40">
+            <div className="p-5 rounded-3xl bg-slate-950/90 border border-emerald-500/40">
               <div className="text-[10px] font-mono uppercase text-slate-400">Receita mensal (MRR)</div>
-              <div className="text-4xl font-black font-mono text-emerald-300 mt-1">{yenJp(monthly)}</div>
+              <div className="text-3xl md:text-4xl font-black font-mono text-emerald-300 mt-1">{yenJp(monthly)}</div>
               <div className="text-xs font-mono text-slate-400 mt-1">
                 {yen(simPlan.priceMonthly)} × {users} usuários
               </div>
             </div>
-            <div className="p-6 rounded-3xl bg-slate-950/90 border border-amber-500/40">
+            <div className="p-5 rounded-3xl bg-slate-950/90 border border-amber-500/40">
               <div className="text-[10px] font-mono uppercase text-slate-400">Receita anual (ARR)</div>
-              <div className="text-4xl font-black font-mono text-amber-300 mt-1">{yenJp(monthly * 12)}</div>
+              <div className="text-3xl md:text-4xl font-black font-mono text-amber-300 mt-1">{yenJp(monthly * 12)}</div>
               <div className="text-xs font-mono text-slate-400 mt-1">{PRICING.annualRule}</div>
             </div>
           </div>

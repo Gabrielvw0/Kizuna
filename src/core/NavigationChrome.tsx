@@ -5,8 +5,6 @@ import {
 } from './PresentationContext';
 import { KizunaMotif } from '../components/strategic/KizunaMotif';
 import {
-  ChevronLeft,
-  ChevronRight,
   ShieldAlert,
   BookOpen,
   Maximize2,
@@ -23,7 +21,6 @@ const STORYTELLING_ARC = [
   'MUNDO',
   'JAPÃO',
   'PROBLEMA',
-  'CONEXÃO',
   'KIZUNA',
   'PRODUTO',
   'ADAPTAÇÃO',
@@ -99,15 +96,6 @@ export const NavigationChrome: React.FC = () => {
           <div className="mt-1 text-[9px] tracking-[0.15em] text-rose-500">
             ██████████
           </div>
-        </div>
-      )}
-
-      {/* DISCREET R1/R2/R3/R4 ACADEMIC BADGE (Visible even in Stage Mode when present) */}
-      {currentSection.rBadge && (
-        <div className="pointer-events-none fixed top-14 right-6 z-30 px-3 py-1 rounded bg-rose-950/80 border border-rose-500/60 shadow-lg">
-          <span className="text-[11px] font-mono font-bold tracking-[0.22em] text-rose-200">
-            {currentSection.rBadge}
-          </span>
         </div>
       )}
 
@@ -379,46 +367,22 @@ export const NavigationChrome: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-4 font-mono text-xs">
-              <button
-                onClick={() => setNavMenuOpen(true)}
-                className="text-slate-300 hover:text-white tracking-widest flex items-center gap-1.5"
-              >
+              <span className="text-slate-300 tracking-widest flex items-center gap-1.5">
                 <span className="text-rose-400 text-[10px]">赤い糸</span>
                 <span className="text-white font-bold">TELA {currentSection.code}</span>
                 <span className="text-slate-600">/</span>
                 <span className="text-slate-400">{String(totalSections).padStart(2, '0')}</span>
-              </button>
+              </span>
 
               <div className="h-3 w-[1px] bg-white/10" />
 
               <div className="flex items-center gap-2">
-                <button
-                  onClick={prevStep}
-                  disabled={currentIndex === 0 && sceneIndex === 0}
-                  className="p-1 rounded hover:bg-white/10 text-slate-300 hover:text-white disabled:opacity-20"
-                  title="Voltar (←)"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
-
                 <div className="flex items-center gap-1.5 text-[11px] tracking-widest">
                   <span className="text-slate-400">ETAPA</span>
                   <span className="text-rose-400 font-bold">{sceneIndex + 1}</span>
                   <span className="text-slate-600">/</span>
                   <span className="text-slate-300">{currentSection.sceneCount}</span>
                 </div>
-
-                <button
-                  onClick={nextStep}
-                  disabled={
-                    currentIndex === totalSections - 1 &&
-                    sceneIndex === currentSection.sceneCount - 1
-                  }
-                  className="p-1 rounded hover:bg-white/10 text-slate-300 hover:text-white disabled:opacity-20"
-                  title="Avançar (→ / Espaço / Enter)"
-                >
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
               </div>
 
               <div className="hidden sm:flex items-center gap-1 ml-1">

@@ -15,7 +15,7 @@ const CAPABILITIES = [
 export const StartSection: React.FC = () => {
   const start = getPlan('start');
   return (
-    <div className="relative w-full h-full flex flex-col justify-center gap-8 px-6 md:px-14 py-6 max-w-6xl mx-auto overflow-y-auto select-none">
+    <div className="relative w-full h-full flex flex-col justify-center gap-5 px-6 md:px-14 py-4 max-w-6xl mx-auto overflow-y-auto select-none">
       <ScreenTitle
         kicker="04 • Kizuna Start • 始"
         title={
@@ -37,9 +37,9 @@ export const StartSection: React.FC = () => {
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {CAPABILITIES.map(({ icon: Icon, title, text }) => (
-          <div key={title} className="p-5 rounded-2xl bg-slate-950/85 border border-white/15">
+          <div key={title} className="p-4 rounded-2xl bg-slate-950/85 border border-white/15">
             <Icon className="w-6 h-6 text-rose-400" />
             <div className="mt-3 text-lg font-black text-white">{title}</div>
             <p className="mt-1 text-xs sm:text-sm text-slate-300 leading-snug">{text}</p>
