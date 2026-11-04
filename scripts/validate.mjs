@@ -56,7 +56,19 @@ for (const k of keys) {
 }
 
 // 3. Referências obsoletas (fora do ERP de demonstração e dos backups)
-const OBSOLETE = [/68%\s*→\s*75%/, /KZ-104/, /Entrada Japão/, /Preparar proposta comercial para cliente japonês/, /100\+ leads/i, /Comunicação Contextual/];
+const OBSOLETE = [
+  /68%\s*→\s*75%/,
+  /KZ-104/,
+  /Entrada Japão/,
+  /Preparar proposta comercial para cliente japonês/,
+  /100\+ leads/i,
+  /Comunicação Contextual/,
+  // Etapa 8: conceito visual do fio vermelho descartado
+  /fio vermelho/i,
+  /赤い糸/,
+  /AkaiIto/,
+  /Red Thread/i
+];
 const walk = (dir) =>
   fs.readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]

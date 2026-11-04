@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePresentation } from '../core/PresentationContext';
-import { Kicker, DisplayTitle, Accent, Classification, AkaiIto, LegibilityVeil } from '../components/strategic/Editorial';
+import { Kicker, DisplayTitle, Accent, Classification, LegibilityVeil } from '../components/strategic/Editorial';
 
 const FIGURES = [
   {
@@ -40,9 +40,8 @@ export const WhyJapanSection: React.FC = () => {
 
           <div key="figures" className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 animate-fadeIn">
             {FIGURES.map((f) => (
-              <div key={f.number} className="relative">
-                <AkaiIto className="w-full max-w-[220px]" />
-                <div className="mt-4 short:mt-2 font-display font-semibold text-washi leading-none text-5xl sm:text-6xl lg:text-[5.5rem] short:text-[3.25rem] tabular-nums">
+              <div key={f.number} className="relative border-t border-washi/15 pt-4 short:pt-2">
+                <div className=" font-display font-semibold text-washi leading-none text-5xl sm:text-6xl lg:text-[5.5rem] short:text-[3.25rem] tabular-nums">
                   {f.number}
                 </div>
                 <p className="mt-3 short:mt-2 max-w-md text-base md:text-lg short:text-base text-washi leading-snug">{f.text}</p>

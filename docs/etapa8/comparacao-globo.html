@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kizuna Etapa 8 — globo geográfico</title>
+<style>
+  :root { --bg:#0B0B0D; --fg:#F2EEE6; --muted:#B9B3A8; --red:#D7263D; --blue:#5B7DB3; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 Inter, system-ui, sans-serif; }
+  main { max-width:1400px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-family:"Noto Serif JP", Georgia, serif; font-weight:600; font-size:28px; margin:0 0 4px; }
+  p { color:var(--muted); margin:0 0 12px; max-width:900px; }
+  section { margin:28px 0; }
+  h2 { font-size:14px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+  h2 b { color:var(--red); }
+  .grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
+  .grid.three { grid-template-columns:repeat(3, 1fr); }
+  figure { margin:0; }
+  figcaption { font-size:12px; color:var(--muted); margin-bottom:4px; }
+  img { width:100%; height:auto; display:block; border:1px solid #222; }
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid #222; vertical-align:top; }
+  th { color:var(--muted); font-weight:500; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+  @media (max-width:800px) { .grid, .grid.three { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Etapa 8 • correção do globo e remoção do fio vermelho (telas 01 e 04)</h1>
+  <p>Capturas em 1440 × 900, salvo indicação. O fio vermelho, os tubos e as linhas com nó foram removidos. A geografia passou a ser o elemento narrativo.</p>
+
+  <section><h2><b>01.1</b> Antes (Etapa 7) → agora</h2><div class="grid three">
+    <figure><figcaption>Antes: fio vermelho cruzando o globo</figcaption><img src="antes/01-1.jpg" alt="Tela 01.1 antes"></figure>
+    <figure><figcaption>Agora • início: visão ampla, Américas</figcaption><img src="globo/01-1a_inicio.jpg" alt="Tela 01.1 início"></figure>
+    <figure><figcaption>Agora • após ~13 s: Europa, África, Oriente Médio e Índia</figcaption><img src="globo/01-1b_presenca.jpg" alt="Tela 01.1 presença"></figure>
+  </div></section>
+
+  <section><h2><b>01.2</b> Antes → rotação → Japão dominante</h2><div class="grid three">
+    <figure><figcaption>Antes</figcaption><img src="antes/01-2.jpg" alt="Tela 01.2 antes"></figure>
+    <figure><figcaption>Agora • rotação controlada (≈ 5,5 s)</figcaption><img src="globo/01-2a_rotacao.jpg" alt="Tela 01.2 durante a rotação"></figure>
+    <figure><figcaption>Agora • final: Japão em vermelho, dominante</figcaption><img src="globo/01-2b_japao.jpg" alt="Tela 01.2 final"></figure>
+  </div></section>
+
+  <section><h2><b>04</b> Tubo vermelho removido</h2><div class="grid">
+    <figure><figcaption>Antes (Etapa 7)</figcaption><img src="antes/04-1.jpg" alt="Tela 04 antes"></figure>
+    <figure><figcaption>Agora</figcaption><img src="globo/04.jpg" alt="Tela 04 agora"></figure>
+  </div></section>
+
+  <section><h2><b>Tamanhos</b> 800 × 600 e 1024 × 768</h2><div class="grid three">
+    <figure><figcaption>01.1 em 800 × 600</figcaption><img src="globo/01-1_800x600.jpg" alt="Tela 01.1 em 800 por 600"></figure>
+    <figure><figcaption>01.2 em 800 × 600</figcaption><img src="globo/01-2_800x600.jpg" alt="Tela 01.2 em 800 por 600"></figure>
+    <figure><figcaption>01.2 em 1024 × 768</figcaption><img src="globo/01-2_1024x768.jpg" alt="Tela 01.2 em 1024 por 768"></figure>
+  </div></section>
+
+  <section><h2><b>Efeito colateral</b> tela 12 usa o mesmo globo</h2><div class="grid">
+    <figure><figcaption>Tela 12 agora: mesmo planeta, sem fio; composição da tela não foi alterada</figcaption><img src="globo/12_efeito.jpg" alt="Tela 12 com o novo globo"></figure>
+  </div></section>
+
+  <section><h2>Presença da Globant usada no globo</h2>
+    <p>Fonte: Globant S.A., Form 20-F do exercício 2025 (SEC), Item 4.B e Exhibit 8.1. A página de escritórios do site da Globant bloqueia acesso automatizado (HTTP 403).</p>
+    <table>
+      <tr><th>Categoria</th><th>Países</th><th>O que significa</th></tr>
+      <tr><td><span class="dot" style="background:#F2EEE6"></span>Principais centros</td><td>Argentina, Índia, Colômbia, Espanha, Uruguai</td><td>Tabela "Facilities and Infrastructure": centros de desenvolvimento/entrega e gestão de clientes.</td></tr>
+      <tr><td><span class="dot" style="background:var(--blue)"></span>Subsidiária registrada</td><td>Brasil, Chile, Equador, Peru, Costa Rica, México, Panamá, Canadá, EUA, Belarus, Bulgária, Dinamarca, Reino Unido (Inglaterra e País de Gales), França, Alemanha, Irlanda, Itália, Luxemburgo, Moldávia, Países Baixos, Polônia, Portugal, Romênia, China, Hong Kong*, Vietnã, Filipinas, Singapura*, Austrália, África do Sul, Marrocos, Arábia Saudita, Emirados Árabes Unidos, Jordânia (filial)</td><td>Presença societária (Exhibit 8.1). O 20-F diz que há escritórios e funcionários em 31 países, mas não lista quais; por isso não chamamos de escritório. *pontos no mapa.</td></tr>
+      <tr><td>Mercados atendidos</td><td>—</td><td>O 20-F informa só regiões de receita (América do Norte, América Latina, Europa, New Markets). Não aparecem como países.</td></tr>
+      <tr><td><span class="dot" style="background:var(--red)"></span>Japão</td><td>Japão</td><td>Destino do projeto Kizuna. Não há subsidiária da Globant no Japão; o 20-F registra só 28% de participação na Genexus Japan.</td></tr>
+    </table>
+  </section>
+</main>
+</body>
+</html>

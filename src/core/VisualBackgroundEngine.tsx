@@ -79,13 +79,6 @@ export const VisualBackgroundEngine: React.FC = () => {
 
         drawShojiGrid(w, h, 0.05);
 
-        // Safe mode static Red Thread across screen
-        ctx.strokeStyle = 'rgba(239, 68, 68, 0.65)';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(0, h * 0.52);
-        ctx.bezierCurveTo(w * 0.35, h * 0.46, w * 0.65, h * 0.58, w, h * 0.5);
-        ctx.stroke();
       } else {
         // Transparent cinematic vignette + subtle architectural Shoji grid over WorldStage
         drawShojiGrid(w, h, 0.016);

@@ -10,7 +10,6 @@ export interface EnvironmentState {
   globeVisibility: number; // STRICT RULE: 1.0 only for section 0 and 14; 0.0 for 1..13
   globeRotationY: number;
   globeScale: number;
-  redThreadProgress: number; // 0.0 to 1.0 along orbital curve
 
   // Bespoke 3D group visibilities for scenes 01..15
   tokyoSkylineVisibility: number;      // Scene 02 (Por que Japão)
@@ -54,7 +53,6 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     globeVisibility: 0.0,
     globeRotationY: 0,
     globeScale: 1.0,
-    redThreadProgress: 0.0,
     tokyoSkylineVisibility: 0,
     corridorVisibility: 0,
     fusionVisibility: 0,
@@ -74,30 +72,19 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
   switch (sectionIdx) {
     case 0: // TELA 01: ABERTURA • O MUNDO AO JAPÃO (Globo 3D Cinematográfico)
       env.globeVisibility = 1.0;
+      // A orientação do planeta (Américas → Europa/Índia → Japão) é feita por tomadas em WorldStage.
+      // Aqui só a câmera: o globo fica à direita, deixando a esquerda para o texto.
       if (sceneIdx === 0) {
-        // Deep Space
-        pose.pos.set(0, 0.4, 4.6);
-        pose.target.set(0, 0, 0);
-        env.globeRotationY = -0.4;
-        env.redThreadProgress = 0.08;
-      } else if (sceneIdx === 1) {
-        // Orbit towards Brazil (São Paulo hub)
-        pose.pos.set(-0.8, -0.2, 3.4);
-        pose.target.set(-0.2, -0.1, 0);
-        env.globeRotationY = -0.85;
-        env.redThreadProgress = 0.3;
-      } else if (sceneIdx === 2) {
-        // Thread traverses towards Japan via Globant global hubs
-        pose.pos.set(0.6, 0.3, 3.0);
-        pose.target.set(0.2, 0.1, 0);
-        env.globeRotationY = 1.35;
-        env.redThreadProgress = 0.8;
+        // Visão ampla do planeta e da presença internacional da Globant
+        pose.pos.set(-1.45, 0.1, 5.0);
+        pose.target.set(-1.45, 0.05, 0);
+      } else if (sceneIdx === 1 || sceneIdx === 2) {
+        pose.pos.set(-0.9, 0.1, 4.2);
+        pose.target.set(-0.9, 0.05, 0);
       } else {
-        // Dive in towards Tokyo
-        pose.pos.set(0.35, 0.45, 2.3);
-        pose.target.set(0.1, 0.15, 0);
-        env.globeRotationY = 1.85;
-        env.redThreadProgress = 1.0;
+        // Aproximação: o Japão termina dominante, à direita do título
+        pose.pos.set(-0.78, 0.02, 2.75);
+        pose.target.set(-0.78, 0.02, 0);
       }
       break;
 
@@ -211,7 +198,6 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
       pose.target.set(0, 0, 0);
       env.globeRotationY = 2.85;
       env.globeScale = 1.08;
-      env.redThreadProgress = 1.0;
       break;
 
     default:

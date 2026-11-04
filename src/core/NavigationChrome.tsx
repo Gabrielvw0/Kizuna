@@ -3,7 +3,6 @@ import {
   usePresentation,
   PRESENTATION_SECTIONS
 } from './PresentationContext';
-import { KizunaMotif } from '../components/strategic/KizunaMotif';
 import {
   ShieldAlert,
   BookOpen,
@@ -212,7 +211,7 @@ export const NavigationChrome: React.FC = () => {
               mouseActive || navMenuOpen ? 'opacity-100' : 'opacity-30 hover:opacity-100'
             }`}
           >
-            {/* Left: Brand Identity + Official Slogan + Red Thread */}
+            {/* Left: Brand Identity + Official Slogan */}
             <div className="flex items-center gap-3 min-w-0">
               <button
                 onClick={() => goToSection(0, 0)}
@@ -234,10 +233,6 @@ export const NavigationChrome: React.FC = () => {
                   </span>
                 </div>
               </button>
-
-              <div className="hidden lg:block">
-                <KizunaMotif size="sm" state="connected" />
-              </div>
 
               <div className="h-3.5 w-[1px] bg-white/10 hidden md:block shrink-0" />
 
@@ -354,12 +349,12 @@ export const NavigationChrome: React.FC = () => {
             </div>
           </header>
 
-          {/* BOTTOM PRESENTATION CONTROLLER WITH RED THREAD PROGRESS */}
+          {/* BOTTOM PRESENTATION CONTROLLER WITH PROGRESS */}
           <footer className="fixed bottom-0 left-0 right-0 z-40 h-11 px-6 flex items-center justify-between bg-[#05070B]/80 backdrop-blur-md border-t border-white/[0.06] select-none">
-            {/* Red Thread Progress Line */}
+            {/* Progresso da apresentação */}
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/5">
               <div
-                className="h-full bg-gradient-to-r from-rose-700 via-rose-500 to-amber-400 shadow-[0_0_12px_#e11d48] transition-all duration-500"
+                className="h-full bg-beni transition-all duration-500"
                 style={{
                   width: `${((currentIndex + 1) / totalSections) * 100}%`
                 }}
@@ -368,7 +363,6 @@ export const NavigationChrome: React.FC = () => {
 
             <div className="flex items-center gap-4 font-mono text-xs">
               <span className="text-slate-300 tracking-widest flex items-center gap-1.5">
-                <span className="text-rose-400 text-[10px]">赤い糸</span>
                 <span className="text-white font-bold">TELA {currentSection.code}</span>
                 <span className="text-slate-600">/</span>
                 <span className="text-slate-400">{String(totalSections).padStart(2, '0')}</span>

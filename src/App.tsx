@@ -183,7 +183,7 @@ const StrategicPresentationStage: React.FC = () => {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#05080D] text-slate-100 flex flex-col">
-      {/* Camada 1: Living 3D World Stage (Persistent Earth, Orbit, Red Thread, Tokyo Architecture & Validation Gate) */}
+      {/* Camada 1: Living 3D World Stage (Globo geográfico, Tokyo Architecture & Validation Gate) */}
       <WorldStage />
 
       {/* Subtle Background Atmosphere & High-Contrast Safe Mode Layer */}

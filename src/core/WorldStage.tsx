@@ -4,26 +4,7 @@ import { usePresentation } from './PresentationContext';
 import { getCameraPoseForSection } from './CameraDirector';
 import { toStage } from './narrativeMap';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
-
-interface GlobalHub {
-  name: string;
-  lat: number;
-  lng: number;
-  isJapan?: boolean;
-  isBrazil?: boolean;
-}
-
-const GLOBAL_HUBS: GlobalHub[] = [
-  { name: 'São Paulo (Brasil)', lat: -23.55, lng: -46.63, isBrazil: true },
-  { name: 'Buenos Aires', lat: -34.6, lng: -58.38 },
-  { name: 'New York', lat: 40.71, lng: -74.0 },
-  { name: 'San Francisco', lat: 37.77, lng: -122.41 },
-  { name: 'Madrid', lat: 40.41, lng: -3.7 },
-  { name: 'London', lat: 51.5, lng: -0.12 },
-  { name: 'Pune / India', lat: 18.52, lng: 73.85 },
-  { name: 'Singapore', lat: 1.35, lng: 103.81 },
-  { name: 'Tokyo (Japão)', lat: 35.68, lng: 139.76, isJapan: true }
-];
+import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
 const latLngToVec3 = (lat: number, lng: number, radius: number): THREE.Vector3 => {
   const phi = ((90 - lat) * Math.PI) / 180;
@@ -34,6 +15,169 @@ const latLngToVec3 = (lat: number, lng: number, radius: number): THREE.Vector3 =
     radius * Math.sin(phi) * Math.sin(theta)
   );
 };
+
+// Paleta do globo (mesmos tons dos tokens sumi/washi/beni/ai)
+const GLOBE_COLORS = {
+  ocean: '#060A12',
+  land: '#262D3A',
+  border: 'rgba(160, 175, 200, 0.30)',
+  coast: 'rgba(170, 186, 210, 0.38)',
+  principal: '#F2EEE6', // principais centros da Globant
+  subsidiaria: '#5B7DB3', // subsidiária registrada (azul discreto)
+  japan: '#D7263D' // destino do projeto
+};
+
+/**
+ * Textura equiretangular do planeta desenhada a partir do world.geojson.
+ * x = (lng + 180) / 360, y = (90 − lat) / 180 — o mesmo mapeamento UV do SphereGeometry.
+ */
+function buildGlobeTexture(geojsonRaw: string, anisotropy: number): THREE.CanvasTexture {
+  const W = 4096;
+  const H = 2048;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d')!;
+
+  // Oceano escuro com leve variação para dar volume
+  const ocean = ctx.createLinearGradient(0, 0, 0, H);
+  ocean.addColorStop(0, '#05080F');
+  ocean.addColorStop(0.5, GLOBE_COLORS.ocean);
+  ocean.addColorStop(1, '#05080F');
+  ctx.fillStyle = ocean;
+  ctx.fillRect(0, 0, W, H);
+
+  // Retícula muito discreta (paralelos e meridianos a cada 30°)
+  ctx.strokeStyle = 'rgba(120, 140, 175, 0.07)';
+  ctx.lineWidth = 1.5;
+  for (let lng = -180; lng <= 180; lng += 30) {
+    const x = ((lng + 180) / 360) * W;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, H);
+    ctx.stroke();
+  }
+  for (let lat = -60; lat <= 60; lat += 30) {
+    const y = ((90 - lat) / 180) * H;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+
+  const toXY = (pair: [number, number]): [number, number] => [((pair[0] + 180) / 360) * W, ((90 - pair[1]) / 180) * H];
+  const tracePolygon = (poly: [number, number][][]) => {
+    poly.forEach((ring) => {
+      ring.forEach((pair, i) => {
+        const [x, y] = toXY(pair);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+    });
+  };
+
+  let features: any[] = [];
+  try {
+    features = JSON.parse(geojsonRaw).features || [];
+  } catch {
+    features = [];
+  }
+
+  const colorFor = (name: string) =>
+    name === 'Japan'
+      ? GLOBE_COLORS.japan
+      : GLOBANT_PRESENCE[name] === 'principal'
+      ? GLOBE_COLORS.principal
+      : GLOBANT_PRESENCE[name] === 'subsidiaria'
+      ? GLOBE_COLORS.subsidiaria
+      : GLOBE_COLORS.land;
+
+  // Desenha primeiro os países neutros e depois os destacados (bordas por cima)
+  const ordered = [...features].sort((a, b) => {
+    const rank = (f: any) => (f.properties?.name === 'Japan' ? 2 : GLOBANT_PRESENCE[f.properties?.name] ? 1 : 0);
+    return rank(a) - rank(b);
+  });
+
+  ordered.forEach((feat) => {
+    const name: string = feat.properties?.name || '';
+    const polys: [number, number][][][] =
+      feat.geometry?.type === 'Polygon'
+        ? [feat.geometry.coordinates]
+        : feat.geometry?.type === 'MultiPolygon'
+        ? feat.geometry.coordinates
+        : [];
+    const highlighted = name === 'Japan' || !!GLOBANT_PRESENCE[name];
+    ctx.beginPath();
+    polys.forEach(tracePolygon);
+    ctx.fillStyle = colorFor(name);
+    ctx.fill('evenodd');
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = name === 'Japan' ? 'rgba(255, 190, 196, 0.9)' : highlighted ? 'rgba(10, 14, 22, 0.55)' : GLOBE_COLORS.border;
+    ctx.lineWidth = name === 'Japan' ? 3 : 1.6;
+    ctx.stroke();
+  });
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = Math.min(8, anisotropy || 1);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+/** Rótulo em sprite (canvas) — usado para identificar o Japão sem legenda. */
+function makeLabelSprite(text: string): THREE.Sprite {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d')!;
+  const draw = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '600 120px "Noto Serif JP", "Times New Roman", serif';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#F2EEE6';
+    ctx.shadowColor = 'rgba(0,0,0,0.85)';
+    ctx.shadowBlur = 24;
+    ctx.fillText(text, 24, canvas.height / 2);
+  };
+  draw();
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  // Redesenha quando a fonte editorial terminar de carregar
+  document.fonts?.ready.then(() => {
+    draw();
+    tex.needsUpdate = true;
+  });
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false });
+  return new THREE.Sprite(mat);
+}
+
+/** Rotação do globo que coloca (lat, lng) no centro da visão (câmera no eixo +Z). */
+const orientationFor = (lat: number, lng: number) => ({
+  y: -Math.PI / 2 - (lng * Math.PI) / 180,
+  x: (lat * Math.PI) / 180
+});
+
+/**
+ * Enquadramento do globo independente da proporção da tela: as poses foram compostas em 16:9;
+ * em telas mais estreitas (4:3, 800×600) a câmera recua e o deslocamento lateral acompanha,
+ * para o planeta continuar à direita do texto e o Japão inteiro na tela.
+ */
+function frameGlobePose(pose: { pos: THREE.Vector3; target: THREE.Vector3 }, aspect: number) {
+  const ref = 16 / 9;
+  if (aspect >= ref) return pose;
+  const k = Math.min(1.45, Math.pow(ref / aspect, 0.9));
+  const pos = pose.pos.clone();
+  const target = pose.target.clone();
+  pos.z *= k;
+  // mantém a mesma fração horizontal da tela: x ∝ distância × proporção
+  const xScale = (k * aspect) / ref;
+  pos.x *= xScale * 1.12;
+  target.x = pos.x;
+  return { pos, target };
+}
+
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 export const WorldStage: React.FC = () => {
   const { currentIndex, sceneIndex, safeMode, gateApproved } = usePresentation();
@@ -67,17 +211,32 @@ export const WorldStage: React.FC = () => {
     }
 
     // =========================================================================
-    // 01 & 15. EARTH GLOBE GROUP (ONLY VISIBLE ON SCENE 01 AND SCENE 15)
+    // 01 & 15. GLOBO GEOGRÁFICO (TELA 01 E TELA 12)
+    // Etapa 8: a geografia é o elemento narrativo. Países com presença da Globant
+    // (Form 20-F 2025) em branco/azul discreto; o Japão, destino do projeto, em vermelho.
     // =========================================================================
     const globeRoot = new THREE.Group();
     scene.add(globeRoot);
+    const GLOBE_R = 1.18;
 
-    const globeGeo = new THREE.SphereGeometry(1.18, 48, 48);
-    const globeMat = new THREE.MeshBasicMaterial({ color: 0x070c16, transparent: true, opacity: 0.95 });
+    const globeTexture = buildGlobeTexture(worldGeoJsonRaw, renderer.capabilities.getMaxAnisotropy());
+    const globeGeo = new THREE.SphereGeometry(GLOBE_R, 128, 96);
+    const globeMat = new THREE.MeshPhongMaterial({
+      map: globeTexture,
+      emissiveMap: globeTexture,
+      emissive: new THREE.Color(0xffffff),
+      emissiveIntensity: 0.5, // o lado em sombra continua legível
+      specular: new THREE.Color(0x2a3a55),
+      shininess: 18,
+      transparent: true,
+      opacity: 1,
+      fog: false // a névoa da cena apagava a geografia
+    });
     const globeMesh = new THREE.Mesh(globeGeo, globeMat);
     globeRoot.add(globeMesh);
 
-    const atmosGeo = new THREE.SphereGeometry(1.23, 36, 36);
+    // Atmosfera discreta (borda azul fria)
+    const atmosGeo = new THREE.SphereGeometry(GLOBE_R * 1.045, 64, 48);
     const atmosMat = new THREE.ShaderMaterial({
       vertexShader: `
         varying vec3 vNormal;
@@ -87,121 +246,63 @@ export const WorldStage: React.FC = () => {
         }
       `,
       fragmentShader: `
+        uniform float uOpacity;
         varying vec3 vNormal;
         void main() {
-          float intensity = pow(0.68 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.8);
-          gl_FragColor = vec4(0.22, 0.45, 0.85, 1.0) * intensity * 0.7;
+          float intensity = pow(0.66 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.2);
+          gl_FragColor = vec4(0.36, 0.52, 0.82, 1.0) * intensity * 0.55 * uOpacity;
         }
       `,
+      uniforms: { uOpacity: { value: 1 } },
       blending: THREE.AdditiveBlending,
       side: THREE.BackSide,
-      transparent: true
+      transparent: true,
+      depthWrite: false,
+      fog: false
     });
     const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
     globeRoot.add(atmosMesh);
 
-    // Meridians
-    const meridiansGroup = new THREE.Group();
-    globeRoot.add(meridiansGroup);
-    const merMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.12 });
-    for (let i = 0; i < 8; i++) {
-      const ringGeo = new THREE.BufferGeometry();
-      const pts: THREE.Vector3[] = [];
-      const angle = (i * Math.PI) / 8;
-      for (let j = 0; j <= 64; j++) {
-        const theta = (j * Math.PI * 2) / 64;
-        pts.push(new THREE.Vector3(Math.cos(theta) * 1.185 * Math.sin(angle), Math.sin(theta) * 1.185, Math.cos(theta) * 1.185 * Math.cos(angle)));
-      }
-      ringGeo.setFromPoints(pts);
-      meridiansGroup.add(new THREE.Line(ringGeo, merMat));
-    }
+    // Iluminação controlada: luz-chave fria do alto à esquerda + preenchimento baixo.
+    // Fica fora do globeRoot (não gira com o planeta) e só existe quando o globo aparece.
+    const globeLights = new THREE.Group();
+    scene.add(globeLights);
+    const keyLight = new THREE.DirectionalLight(0xdfe8ff, 1.35);
+    keyLight.position.set(-3.2, 2.4, 3.6);
+    globeLights.add(keyLight);
+    globeLights.add(new THREE.AmbientLight(0x8090b0, 0.38));
 
-    // Continents
-    const continentsGroup = new THREE.Group();
-    const japanGroup = new THREE.Group();
-    globeRoot.add(continentsGroup);
-    globeRoot.add(japanGroup);
-
-    try {
-      const geo = JSON.parse(worldGeoJsonRaw);
-      const landMat = new THREE.LineBasicMaterial({ color: 0x64748b, transparent: true, opacity: 0.5 });
-      const japanMat = new THREE.LineBasicMaterial({ color: 0xe11d48, transparent: true, opacity: 0.98 });
-
-      geo.features?.forEach((feat: any) => {
-        const iso = feat.properties?.ISO_A3 || feat.properties?.iso_a3 || feat.properties?.ADM0_A3 || '';
-        const name = feat.properties?.NAME || feat.properties?.name || '';
-        const isJapan = iso === 'JPN' || name === 'Japan';
-
-        const coordsList =
-          feat.geometry?.type === 'Polygon'
-            ? [feat.geometry.coordinates]
-            : feat.geometry?.type === 'MultiPolygon'
-            ? feat.geometry.coordinates
-            : [];
-
-        coordsList.forEach((poly: any) => {
-          const ring = poly[0];
-          if (!ring || ring.length < 3) return;
-          const pts: THREE.Vector3[] = [];
-          ring.forEach((pair: [number, number]) => {
-            pts.push(latLngToVec3(pair[1], pair[0], isJapan ? 1.192 : 1.185));
-          });
-          const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), isJapan ? japanMat : landMat);
-          if (isJapan) japanGroup.add(line);
-          else continentsGroup.add(line);
-        });
-      });
-    } catch {
-      // Fallback
-    }
-
-    // Hubs
-    const hubsGroup = new THREE.Group();
-    globeRoot.add(hubsGroup);
-    GLOBAL_HUBS.forEach((hub) => {
-      const pos = latLngToVec3(hub.lat, hub.lng, 1.196);
-      const dotGeo = new THREE.SphereGeometry(hub.isJapan ? 0.032 : hub.isBrazil ? 0.026 : 0.016, 16, 16);
-      const dotMat = new THREE.MeshBasicMaterial({
-        color: hub.isJapan ? 0xe11d48 : hub.isBrazil ? 0xf59e0b : 0x38bdf8
-      });
-      const dot = new THREE.Mesh(dotGeo, dotMat);
-      dot.position.copy(pos);
-      hubsGroup.add(dot);
-
-      if (hub.isBrazil || hub.isJapan) {
-        const haloGeo = new THREE.RingGeometry(0.02, hub.isJapan ? 0.065 : 0.05, 32);
-        const haloMat = new THREE.MeshBasicMaterial({
-          color: hub.isJapan ? 0xe11d48 : 0xf59e0b,
-          transparent: true,
-          opacity: 0.6,
-          side: THREE.DoubleSide
-        });
-        const halo = new THREE.Mesh(haloGeo, haloMat);
-        halo.position.copy(pos.clone().multiplyScalar(1.002));
-        halo.lookAt(pos.clone().multiplyScalar(2));
-        hubsGroup.add(halo);
-      }
+    // Japão: halo vermelho e rótulo, para ser identificado sem legenda
+    const japanPos = latLngToVec3(JAPAN.lat, JAPAN.lng, GLOBE_R * 1.004);
+    const japanHaloMat = new THREE.MeshBasicMaterial({
+      color: 0xd7263d,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide,
+      depthWrite: false
     });
+    const japanHalo = new THREE.Mesh(new THREE.RingGeometry(0.105, 0.118, 64), japanHaloMat);
+    japanHalo.position.copy(japanPos);
+    japanHalo.lookAt(japanPos.clone().multiplyScalar(2));
+    globeRoot.add(japanHalo);
 
-    // Orbital Red Thread Spline
-    const threadPoints = [
-      latLngToVec3(-23.55, -46.63, 1.22), // Sao Paulo (Brasil)
-      latLngToVec3(-34.6, -58.38, 1.25),  // Buenos Aires
-      latLngToVec3(0, -60, 1.45),         // Orbital Atlantic lift
-      latLngToVec3(40.71, -74.0, 1.26),   // New York
-      latLngToVec3(37.77, -122.41, 1.35), // San Francisco
-      latLngToVec3(51.5, -0.12, 1.38),    // London
-      latLngToVec3(40.41, -3.7, 1.28),    // Madrid
-      latLngToVec3(18.52, 73.85, 1.36),   // Pune / India
-      latLngToVec3(1.35, 103.81, 1.32),   // Singapore
-      latLngToVec3(35.68, 139.76, 1.21),  // Tokyo (Japão)
-      latLngToVec3(-23.55, -46.63, 1.22)  // Closing the loop back to Brazil
-    ];
-    const threadCurve = new THREE.CatmullRomCurve3(threadPoints, false, 'catmullrom', 0.25);
-    const threadGeo = new THREE.TubeGeometry(threadCurve, 140, 0.0075, 8, false);
-    const threadMat = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.88 });
-    const threadMesh = new THREE.Mesh(threadGeo, threadMat);
-    globeRoot.add(threadMesh);
+    const japanLabel = makeLabelSprite('日本  JAPÃO');
+    japanLabel.position.copy(latLngToVec3(JAPAN.lat + 12, JAPAN.lng - 2, GLOBE_R * 1.08));
+    japanLabel.scale.set(0.42, 0.105, 1);
+    (japanLabel.material as THREE.SpriteMaterial).opacity = 0;
+    globeRoot.add(japanLabel);
+
+    // Jurisdições pequenas demais para o mapa base (Singapura, Hong Kong)
+    GLOBANT_PRESENCE_POINTS.forEach((pt) => {
+      const dot = new THREE.Mesh(
+        new THREE.CircleGeometry(0.012, 20),
+        new THREE.MeshBasicMaterial({ color: 0x86a3cf, transparent: true, opacity: 0.95, side: THREE.DoubleSide })
+      );
+      const pos = latLngToVec3(pt.lat, pt.lng, GLOBE_R * 1.003);
+      dot.position.copy(pos);
+      dot.lookAt(pos.clone().multiplyScalar(2));
+      globeRoot.add(dot);
+    });
 
     // =========================================================================
     // 02. TOKYO 3D SKYLINE GROUP (SCENE 02: POR QUE JAPÃO)
@@ -324,40 +425,7 @@ export const WorldStage: React.FC = () => {
     const threadWeaveGroup = new THREE.Group();
     scene.add(threadWeaveGroup);
 
-    // 4 Nodes: People, Tasks, Projects, Decisions
-    const weaveNodes = [
-      { x: -1.2, y: 0.5, z: 0, label: 'Pessoas' },
-      { x: 1.2, y: 0.5, z: 0, label: 'Tarefas' },
-      { x: 1.2, y: -0.5, z: 0, label: 'Projetos' },
-      { x: -1.2, y: -0.5, z: 0, label: 'Decisões' }
-    ];
-
-    weaveNodes.forEach((n) => {
-      const nodeGeo = new THREE.SphereGeometry(0.08, 16, 16);
-      const nodeMat = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.85 });
-      const node = new THREE.Mesh(nodeGeo, nodeMat);
-      node.position.set(n.x, n.y, n.z);
-      threadWeaveGroup.add(node);
-    });
-
-    // Connecting Looping Ribbon
-    const weavePts = [
-      new THREE.Vector3(-1.2, 0.5, 0),
-      new THREE.Vector3(0, 0.8, 0.3),
-      new THREE.Vector3(1.2, 0.5, 0),
-      new THREE.Vector3(0.5, 0, -0.2),
-      new THREE.Vector3(1.2, -0.5, 0),
-      new THREE.Vector3(0, -0.7, 0.2),
-      new THREE.Vector3(-1.2, -0.5, 0),
-      new THREE.Vector3(-0.4, 0, -0.1),
-      new THREE.Vector3(-1.2, 0.5, 0)
-    ];
-    const weaveCurve = new THREE.CatmullRomCurve3(weavePts, true);
-    const weaveTube = new THREE.Mesh(
-      new THREE.TubeGeometry(weaveCurve, 64, 0.015, 8, true),
-      new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.9 })
-    );
-    threadWeaveGroup.add(weaveTube);
+    // Etapa 8: tubo e nós vermelhos decorativos removidos.
 
     // Floating UI wireframe plane
     const uiBoard = new THREE.Mesh(
@@ -653,8 +721,52 @@ export const WorldStage: React.FC = () => {
     // =========================================================================
     let animId: number;
     let clock = new THREE.Clock();
-    const currentPos = camera.position.clone();
-    const currentTarget = new THREE.Vector3(0, 0, 0);
+    // Começa já no enquadramento da cena atual (sem "deslizar" o globo por baixo do texto)
+    const initialShot = (() => {
+      const { currentIndex: ci, sceneIndex: si } = stateRef.current;
+      const st = toStage(ci, si);
+      const p0 = getCameraPoseForSection(st.stage, st.scene).pose;
+      return st.stage === 0 ? { ...p0, ...frameGlobePose(p0, width / height) } : p0;
+    })();
+    camera.position.copy(initialShot.pos);
+    camera.lookAt(initialShot.target);
+    const currentPos = initialShot.pos.clone();
+    const currentTarget = initialShot.target.clone();
+    let lastElapsed = 0;
+
+    // Orientação do globo: tomadas com duração e suavização, sem rotação infinita.
+    // Tela 01.1: visão ampla nas Américas → passa lentamente pela Europa, África e Índia (presença da Globant).
+    // Tela 01.2: rotação controlada até o Japão, que termina dominante.
+    type GlobeShot = { lat: number; lng: number; dur: number; delay?: number };
+    const GLOBE_SHOTS: Record<string, GlobeShot[]> = {
+      '0:0': [
+        { lat: 8, lng: -64, dur: 0 },
+        { lat: 20, lng: 40, dur: 12, delay: 1.2 }
+      ],
+      '0:1': [{ lat: 15, lng: -20, dur: 4 }],
+      '0:2': [{ lat: 25, lng: 80, dur: 4 }],
+      '0:3': [{ lat: 33, lng: 137, dur: 5.5 }]
+    };
+    let shotKey = '';
+    let shotQueue: GlobeShot[] = [];
+    let shotNextAt = 0;
+    let tween: { fromX: number; fromY: number; toX: number; toY: number; start: number; dur: number } | null = null;
+    let firstGlobeFrame = true;
+    const startShot = (shot: GlobeShot, now: number) => {
+      const o = orientationFor(shot.lat, shot.lng);
+      // menor caminho angular a partir da rotação atual
+      const cur = globeRoot.rotation.y;
+      const delta = Math.atan2(Math.sin(o.y - cur), Math.cos(o.y - cur));
+      if (firstGlobeFrame) {
+        // primeira aparição: começa já na orientação planejada
+        globeRoot.rotation.set(o.x, cur + delta, 0);
+        tween = null;
+        return;
+      }
+      // voltar de outra tomada nunca "salta": no mínimo 3,5 s de transição
+      const dur = shot.dur > 0 ? shot.dur : 3.5;
+      tween = { fromX: globeRoot.rotation.x, fromY: cur, toX: o.x, toY: cur + delta, start: now, dur };
+    };
 
     const onResize = () => {
       width = container.clientWidth || window.innerWidth;
@@ -674,9 +786,14 @@ export const WorldStage: React.FC = () => {
       const { stage: sIdx, scene: scIdx } = toStage(currentIndex, sceneIndex);
       const { pose, env } = getCameraPoseForSection(sIdx, scIdx);
 
-      // Camera smooth lerp
-      currentPos.lerp(pose.pos, 0.045);
-      currentTarget.lerp(pose.target, 0.045);
+      const dt = Math.min(0.1, elapsed - lastElapsed);
+      lastElapsed = elapsed;
+
+      // Camera smooth lerp (no globo, aproximação mais lenta e cinematográfica)
+      const camK = sIdx === 0 || sIdx === 14 ? 1 - Math.exp(-dt * 0.9) : 0.045;
+      const framed = sIdx === 0 ? frameGlobePose(pose, camera.aspect) : pose;
+      currentPos.lerp(framed.pos, camK);
+      currentTarget.lerp(framed.target, camK);
       camera.position.copy(currentPos);
       camera.lookAt(currentTarget);
 
@@ -685,16 +802,45 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       const isGlobeActive = sIdx === 0 || sIdx === 14;
       globeRoot.visible = isGlobeActive;
+      globeLights.visible = isGlobeActive;
       if (isGlobeActive) {
         globeRoot.scale.lerp(new THREE.Vector3(env.globeScale, env.globeScale, env.globeScale), 0.05);
-        globeRoot.rotation.y = THREE.MathUtils.lerp(globeRoot.rotation.y, env.globeRotationY, 0.04);
-        atmosMesh.material.opacity = env.globeVisibility * 0.7;
-        globeMesh.material.opacity = env.globeVisibility * 0.95;
-        merMat.opacity = env.globeVisibility * 0.12;
+        atmosMat.uniforms.uOpacity.value = env.globeVisibility;
+        globeMat.opacity = env.globeVisibility;
 
-        if (sIdx === 0 && scIdx === 0) {
-          globeRoot.rotation.y += 0.0006;
+        const key = sIdx + ':' + scIdx;
+        if (key !== shotKey) {
+          shotKey = key;
+          shotQueue = [...(GLOBE_SHOTS[key] || [{ lat: 12, lng: (-(env.globeRotationY + Math.PI / 2) * 180) / Math.PI, dur: 3 }])];
+          const first = shotQueue.shift()!;
+          startShot(first, elapsed);
+          shotNextAt = Number.POSITIVE_INFINITY;
+          if (!tween && shotQueue.length) shotNextAt = elapsed + (shotQueue[0].delay || 0);
         }
+        firstGlobeFrame = false;
+        if (tween) {
+          const t = Math.min(1, (elapsed - tween.start) / tween.dur);
+          const e = easeInOutCubic(t);
+          globeRoot.rotation.x = tween.fromX + (tween.toX - tween.fromX) * e;
+          globeRoot.rotation.y = tween.fromY + (tween.toY - tween.fromY) * e;
+          if (t >= 1) {
+            tween = null;
+            if (shotQueue.length) shotNextAt = elapsed + (shotQueue[0].delay || 0);
+          }
+        } else if (shotQueue.length && elapsed >= shotNextAt) {
+          startShot(shotQueue.shift()!, elapsed);
+          shotNextAt = Number.POSITIVE_INFINITY;
+        }
+
+        // Japão: halo e rótulo só quando a rotação o traz para a frente
+        const japanFront = japanPos.clone().applyMatrix4(globeRoot.matrixWorld).normalize().z;
+        const showJapan = sIdx === 0 && scIdx === 3 ? Math.max(0, Math.min(1, (japanFront - 0.55) / 0.3)) : sIdx === 14 ? Math.max(0, Math.min(1, (japanFront - 0.4) / 0.3)) * 0.8 : 0;
+        japanHaloMat.opacity += (showJapan * 0.95 - japanHaloMat.opacity) * Math.min(1, dt * 3);
+        const labelMat = japanLabel.material as THREE.SpriteMaterial;
+        const labelTarget = sIdx === 0 && scIdx === 3 ? showJapan : 0;
+        labelMat.opacity += (labelTarget - labelMat.opacity) * Math.min(1, dt * 3);
+      } else {
+        shotKey = '';
       }
 
       // -----------------------------------------------------------------------
@@ -748,11 +894,10 @@ export const WorldStage: React.FC = () => {
       }
 
       // -----------------------------------------------------------------------
-      // 5. Thread Weaving UI (Scene 05)
+      // 5. Quadro discreto da tela 04
       // -----------------------------------------------------------------------
       threadWeaveGroup.visible = sIdx === 4;
       if (sIdx === 4) {
-        weaveTube.rotation.z = Math.sin(elapsed * 0.8) * 0.05;
         uiBoard.rotation.y = Math.sin(elapsed * 0.6) * 0.08;
       }
 

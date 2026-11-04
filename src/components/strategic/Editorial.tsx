@@ -3,7 +3,7 @@ import React from 'react';
 /**
  * Etapa 8 • Sistema editorial da apresentação.
  * Preto profundo e grafite, branco para leitura, vermelho japonês como assinatura,
- * dourado e azul só como apoio. O akai ito (fio vermelho) é o elemento recorrente.
+ * dourado e azul só como apoio. Sem elementos decorativos sem função.
  *
  * Famílias de composição:
  *  A • cinematográfica — pouco texto, um elemento dominante;
@@ -11,23 +11,7 @@ import React from 'react';
  *  C • evidência — números e dados grandes e legíveis.
  */
 
-/** Fio vermelho: linha fina com um nó. Usado como divisor e marcador de narrativa. */
-export const AkaiIto: React.FC<{ className?: string; knot?: boolean; vertical?: boolean }> = ({
-  className = '',
-  knot = true,
-  vertical = false
-}) =>
-  vertical ? (
-    <span aria-hidden className={`relative block w-px bg-gradient-to-b from-beni via-beni/70 to-transparent ${className}`}>
-      {knot && <span className="absolute -left-[3px] top-0 w-[7px] h-[7px] rounded-full bg-beni shadow-[0_0_12px_rgba(215,38,61,0.8)]" />}
-    </span>
-  ) : (
-    <span aria-hidden className={`relative block h-px bg-gradient-to-r from-beni via-beni/70 to-transparent ${className}`}>
-      {knot && <span className="absolute -top-[3px] left-0 w-[7px] h-[7px] rounded-full bg-beni shadow-[0_0_12px_rgba(215,38,61,0.8)]" />}
-    </span>
-  );
-
-/** Linha de contexto: número da tela, fio vermelho curto e rótulo. */
+/** Linha de contexto: número da tela e rótulo. */
 export const Kicker: React.FC<{ code: string; label: string; jp?: string; className?: string }> = ({
   code,
   label,
@@ -36,7 +20,7 @@ export const Kicker: React.FC<{ code: string; label: string; jp?: string; classN
 }) => (
   <div className={`flex items-center gap-3 text-[11px] md:text-xs uppercase tracking-[0.24em] text-washi-muted ${className}`}>
     <span className="font-semibold text-beni-soft tabular-nums">{code}</span>
-    <AkaiIto className="w-8 md:w-12" knot={false} />
+    <span aria-hidden className="text-washi-dim">/</span>
     <span>{label}</span>
     {jp && <span className="font-display normal-case tracking-normal text-washi-dim">{jp}</span>}
   </div>
@@ -92,8 +76,10 @@ export const Classification: React.FC<{
  * Véu de legibilidade: escurece só a área do texto para que o 3D continue visível
  * sem atravessar a leitura (profundidade controlada).
  */
-export const LegibilityVeil: React.FC<{ side?: 'left' | 'center' | 'bottom' }> = ({ side = 'left' }) => {
+export const LegibilityVeil: React.FC<{ side?: 'left' | 'leftNarrow' | 'center' | 'bottom' }> = ({ side = 'left' }) => {
   const cls = {
+    // só a coluna de texto: a metade direita (geografia) fica limpa
+    leftNarrow: 'bg-gradient-to-r from-sumi/90 via-sumi/55 via-35% to-transparent to-55%',
     left: 'bg-gradient-to-r from-sumi/95 via-sumi/75 to-transparent md:to-sumi/0',
     center: 'bg-[radial-gradient(ellipse_at_center,rgba(11,11,13,0.82)_0%,rgba(11,11,13,0.45)_45%,transparent_75%)]',
     bottom: 'bg-gradient-to-t from-sumi/95 via-sumi/60 to-transparent'

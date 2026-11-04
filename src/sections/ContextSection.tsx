@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePresentation } from '../core/PresentationContext';
-import { Kicker, DisplayTitle, Accent, AkaiIto, LegibilityVeil } from '../components/strategic/Editorial';
+import { Kicker, DisplayTitle, Accent, LegibilityVeil } from '../components/strategic/Editorial';
 
 const DOORS = [
   {
@@ -59,8 +59,7 @@ export const ContextSection: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-[1fr_minmax(160px,1.1fr)_1fr] items-center gap-4">
             <div className="text-left">
               <div className="text-xs md:text-sm uppercase tracking-[0.28em] text-ai-soft">Global</div>
-              <AkaiIto className="mt-2 w-24 !from-ai !via-ai/60" knot={false} />
-              <p className="mt-3 text-lg md:text-2xl font-display text-washi leading-snug">
+              <p className="mt-2 text-lg md:text-2xl font-display text-washi leading-snug">
                 Engenharia, escala e métodos internacionais.
               </p>
             </div>
@@ -69,8 +68,7 @@ export const ContextSection: React.FC = () => {
             </div>
             <div className="text-right">
               <div className="text-xs md:text-sm uppercase tracking-[0.28em] text-beni-soft">Local</div>
-              <AkaiIto className="mt-2 w-24 ml-auto rotate-180" knot={false} />
-              <p className="mt-3 text-lg md:text-2xl font-display text-washi leading-snug">
+              <p className="mt-2 text-lg md:text-2xl font-display text-washi leading-snug">
                 Keigo, Ringi e Hanko, leis japonesas e relação de longo prazo.
               </p>
             </div>
@@ -131,7 +129,6 @@ export const ContextSection: React.FC = () => {
               <div className="text-xs md:text-sm uppercase tracking-[0.22em] text-washi-dim">O que o mercado espera</div>
               <p className="mt-2 font-display text-xl md:text-[1.9rem] short:text-[1.35rem] text-washi leading-snug">{door.seen}</p>
             </div>
-            <AkaiIto className="w-40 md:w-64" />
             <div>
               <div className="text-xs md:text-sm uppercase tracking-[0.22em] text-beni-soft">O que isso exige do Kizuna</div>
               <p className="mt-2 text-lg md:text-2xl short:text-lg text-washi font-semibold leading-snug">{door.requires}</p>

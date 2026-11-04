@@ -33,9 +33,18 @@
           "title": "Posicionamento: GLOBAL REACH. LOCAL TRUST.",
           "source": "Arquitetura estratégica do projeto Kizuna",
           "date": "2026",
-          "info": "Slogan do projeto e metáfora do fio vermelho (赤い糸) ligando Brasil, Japão e o produto. O Kizuna não é um produto oficial da Globant; não há operação comercial, parceiro ou subsidiária japonesa estabelecidos.",
+          "info": "Slogan do projeto. O Kizuna não é um produto oficial da Globant; não há operação comercial, parceiro ou subsidiária japonesa estabelecidos.",
           "methodology": "Narrativa em 12 telas conduzidas pelo apresentador.",
           "implication": "Dá unidade conceitual do início ao encerramento."
+        },
+        {
+          "type": "FATO INSTITUCIONAL",
+          "title": "Presença internacional da Globant no globo da abertura",
+          "source": "Globant S.A. — Form 20-F do exercício de 2025 (SEC, 27/02/2026): Item 4.B (Facilities and Infrastructure) e Exhibit 8.1 (List of Subsidiaries)",
+          "date": "31/12/2025",
+          "info": "Branco: principais centros de desenvolvimento/entrega e gestão de clientes listados no 20-F (Argentina, Índia, Colômbia, Espanha, Uruguai). Azul: demais países com subsidiária registrada no Exhibit 8.1 (presença societária; o relatório não diz quais têm escritório). O 20-F informa operação por subsidiárias com escritórios e funcionários em 31 países. Mercados atendidos aparecem só por região de receita e não são mostrados como países. Japão (vermelho) é o destino do projeto: a Globant não tem subsidiária japonesa no Exhibit 8.1; o relatório registra apenas participação minoritária de 28% na Genexus Japan.",
+          "methodology": "Países mapeados a partir da tabela de instalações e da lista de subsidiárias do relatório anual; Singapura e Hong Kong aparecem como pontos por serem pequenos demais para o mapa base.",
+          "implication": "O globo mostra a escala global da referência empresarial sem apresentar subsidiária ou mercado atendido como escritório local."
         }
       ]
     },

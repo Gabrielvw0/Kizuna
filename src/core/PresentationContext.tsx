@@ -37,11 +37,11 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     fullTitle: '01 | KIZUNA — Global Reach. Local Trust.',
     bgThemeName: 'Sumi & Orbital Earth',
     storyQuestion: 'Como levar uma solução de gestão de equipes ao Japão, onde a decisão depende de confiança?',
-    metamorphosisFromTo: 'Mundo → Fio Vermelho (赤い糸) → Japão → 絆 Kizuna',
+    metamorphosisFromTo: 'Mundo → presença internacional da Globant → Japão → 絆 Kizuna',
     narrativeNode: 'MUNDO',
     kanji: '絆',
     sceneCount: 2,
-    sceneLabels: ['O fio vermelho', 'KIZUNA 絆']
+    sceneLabels: ['Presença global', 'Rumo ao Japão • KIZUNA 絆']
   },
   {
     index: 1,
@@ -203,7 +203,7 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     id: 'encerramento',
     shortTitle: 'ENCERRAMENTO',
     fullTitle: '12 | 絆 KIZUNA — Global Reach. Local Trust.',
-    bgThemeName: 'Full Circle Red Thread',
+    bgThemeName: 'Retorno ao globo',
     storyQuestion: 'O que permanece depois da apresentação?',
     metamorphosisFromTo: 'Equipe → Confiança → Expansão → 絆',
     narrativeNode: 'FUTURO',
