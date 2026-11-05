@@ -73,7 +73,7 @@ const PillarBand: React.FC<{ p: Pillar; index: number }> = ({ p, index }) => {
           <Icon className="w-4 h-4 text-washi-dim" aria-hidden />
         </div>
         <h2 className="mt-1 font-display font-semibold text-xl md:text-2xl short:text-xl text-washi leading-tight">{p.title}</h2>
-        <p className="mt-1.5 short:mt-1 text-sm md:text-base short:text-sm text-washi-muted leading-snug">{p.why}</p>
+        <p className="mt-1.5 short:mt-0.5 text-sm md:text-base short:text-xs short:lg:text-sm text-washi-muted leading-snug">{p.why}</p>
         <div className="mt-2 short:mt-1">{p.tag}</div>
       </div>
 
@@ -85,7 +85,7 @@ const PillarBand: React.FC<{ p: Pillar; index: number }> = ({ p, index }) => {
           key={showPt ? 'pt' : 'jp'}
           lang={showPt ? 'pt-BR' : 'ja'}
           className={`mt-2 text-washi leading-snug animate-fadeIn ${
-            showPt ? 'text-base md:text-lg short:text-base' : 'font-display text-xl md:text-2xl lg:text-[1.75rem] short:text-lg short:lg:text-xl'
+            showPt ? 'text-base md:text-lg short:text-base' : 'font-display text-xl md:text-2xl lg:text-[1.75rem] short:text-base short:lg:text-xl'
           }`}
         >
           {showPt ? p.pt : p.jp}
@@ -103,12 +103,29 @@ const PillarBand: React.FC<{ p: Pillar; index: number }> = ({ p, index }) => {
   );
 };
 
+/** Pilar recolhido: continua visível (número, nome e classificação) e abre a cena dele ao clicar. */
+const PillarRow: React.FC<{ p: Pillar; index: number; onOpen: () => void }> = ({ p, index, onOpen }) => {
+  const Icon = p.icon;
+  return (
+    <button
+      onClick={onOpen}
+      className="w-full flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5 short:py-1 border-t border-washi/10 text-left hover:bg-washi/[0.03]"
+    >
+      <span className="font-display text-base text-washi-dim tabular-nums">{String(index).padStart(2, '0')}</span>
+      <Icon className="w-4 h-4 text-washi-dim" aria-hidden />
+      <span className="font-display text-base md:text-lg text-washi-muted">{p.title}</span>
+      <span className="ml-auto opacity-70">{p.tag}</span>
+    </button>
+  );
+};
+
 /**
- * Tela 06 • Adaptação ao Japão (R2) — composição em faixas: o japonês é o protagonista.
- * Cena 1: idioma e formatos • Cena 2: aprovação e conformidade.
+ * Tela 06 • Adaptação ao Japão (R2) — os quatro pilares sempre visíveis.
+ * Cena 1 abre os pilares de comunicação (idioma e formatos);
+ * cena 2 abre os de decisão e conformidade (preparam a tela 07).
  */
 export const AdaptationSection: React.FC = () => {
-  const { sceneIndex } = usePresentation();
+  const { sceneIndex, setSceneIndex } = usePresentation();
   const scene = Math.min(1, Math.max(0, sceneIndex));
 
   return (
@@ -117,14 +134,22 @@ export const AdaptationSection: React.FC = () => {
       <div className="relative h-full max-w-6xl mx-auto px-6 md:px-14 py-4 short:py-1 flex flex-col justify-center gap-4 md:gap-6 short:gap-1.5 overflow-y-auto">
         <div>
           <Kicker code="06" label="R2 • Adaptação do produto" jp="和" />
-          <DisplayTitle className="mt-4 short:mt-1">
+          <DisplayTitle className="mt-4 short:mt-1 short:!text-[1.8rem] short:lg:!text-[2.15rem]">
             Não basta traduzir. <Accent>É preciso respeitar o contexto.</Accent>
           </DisplayTitle>
         </div>
-        <div key={scene} className="border-b border-washi/10 animate-fadeIn">
-          {GROUPS[scene].map((p, i) => (
-            <PillarBand key={p.title} p={p} index={scene * 2 + i + 1} />
-          ))}
+        <div className="border-b border-washi/10">
+          {GROUPS.map((group, g) =>
+            group.map((p, i) =>
+              g === scene ? (
+                <div key={p.title} className="animate-fadeIn">
+                  <PillarBand p={p} index={g * 2 + i + 1} />
+                </div>
+              ) : (
+                <PillarRow key={p.title} p={p} index={g * 2 + i + 1} onOpen={() => setSceneIndex(g)} />
+              )
+            )
+          )}
         </div>
       </div>
     </div>

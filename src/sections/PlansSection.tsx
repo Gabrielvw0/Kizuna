@@ -21,6 +21,7 @@ export const PlansSection: React.FC = () => {
   const [users, setUsers] = useState<number>(PRICING.defaultUsers);
 
   const plan = getPlan(planId);
+  const activeLevel = PLAN_IDS.indexOf(planId);
   const simPlanId = planForUsers(users);
   const simPlan = getPlan(simPlanId);
   const monthly = simPlan.priceMonthly * users;
@@ -55,15 +56,35 @@ export const PlansSection: React.FC = () => {
               <svg viewBox="0 0 360 360" className="w-full max-w-[200px] md:max-w-[340px] short:md:max-w-[220px]" role="group" aria-label="Planos Kizuna">
                 {[...PLAN_IDS].reverse().map((id) => {
                   const active = planId === id;
+                  const level = PLAN_IDS.indexOf(id);
+                  const included = level <= activeLevel; // o plano escolhido inclui os anéis internos
+                  // acende de dentro para fora; apaga de fora para dentro
+                  const delay = included ? level * 160 : (2 - level) * 90;
                   return (
-                    <g key={id} onClick={() => setPlanId(id)} className="cursor-pointer" role="button" aria-pressed={active}>
+                    <g
+                      key={id}
+                      onClick={() => setPlanId(id)}
+                      className="cursor-pointer"
+                      role="button"
+                      aria-pressed={active}
+                      aria-label={`${getPlan(id).name}: ver escopo`}
+                      style={{
+                        transformOrigin: '180px 180px',
+                        transform: active ? 'scale(1.04)' : 'scale(1)',
+                        transition: `transform 600ms cubic-bezier(0.22,1,0.36,1) ${delay}ms`
+                      }}
+                    >
                       <circle
                         cx="180"
                         cy="180"
                         r={RING_RADIUS[id]}
-                        fill={active ? 'rgba(215,38,61,0.14)' : 'rgba(17,17,20,0.75)'}
-                        stroke={active ? '#D7263D' : 'rgba(242,238,230,0.22)'}
-                        strokeWidth={active ? 2.5 : 1.2}
+                        style={{
+                          fill: active ? 'rgba(215,38,61,0.16)' : included ? 'rgba(215,38,61,0.07)' : 'rgba(17,17,20,0.78)',
+                          stroke: active ? '#D7263D' : included ? 'rgba(236,74,92,0.55)' : 'rgba(242,238,230,0.2)',
+                          strokeWidth: active ? 3 : included ? 1.8 : 1.2,
+                          filter: active ? 'drop-shadow(0 0 10px rgba(215,38,61,0.55))' : 'none',
+                          transition: `fill 500ms ease ${delay}ms, stroke 500ms ease ${delay}ms, stroke-width 500ms ease ${delay}ms`
+                        }}
                       />
                       <text
                         x="180"
@@ -79,7 +100,7 @@ export const PlansSection: React.FC = () => {
                         y={id === 'start' ? 194 : 180 - RING_RADIUS[id] + 40}
                         textAnchor="middle"
                         className="pointer-events-none"
-                        style={{ fill: active ? '#EC4A5C' : '#B9B3A8', fontSize: 11 }}
+                        style={{ fill: included ? '#EC4A5C' : '#B9B3A8', fontSize: 11, transition: `fill 500ms ease ${delay}ms` }}
                       >
                         {yen(getPlan(id).priceMonthly)} • {RING_LABEL[id]}
                       </text>
@@ -100,8 +121,12 @@ export const PlansSection: React.FC = () => {
               </div>
               <div className="mt-1 text-sm text-kin-soft">{plan.audience}</div>
               <ul className="mt-3 short:mt-2 border-t border-washi/10">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 py-1.5 short:py-0.5 border-b border-washi/10 text-sm md:text-base short:text-sm text-washi">
+                {plan.features.map((f, i) => (
+                  <li
+                    key={f}
+                    className="flex items-start gap-2.5 py-1.5 short:py-0.5 border-b border-washi/10 text-sm md:text-base short:text-sm text-washi animate-fadeIn"
+                    style={{ animationDelay: `${120 + i * 70}ms`, animationFillMode: 'both' }}
+                  >
                     <Check className="w-4 h-4 text-washi-dim shrink-0 mt-1" aria-hidden />
                     <span>{f}</span>
                   </li>
@@ -143,37 +168,51 @@ export const PlansSection: React.FC = () => {
               </span>
             </div>
 
-            {/* 2. Receita recorrente: os dois números de impacto */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-washi/15 border-y border-washi/15 py-4 short:py-3">
-              <div className="sm:pr-8">
+            {/* 2. A conta: usuários × preço = MRR; MRR × 12 = ARR */}
+            <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-3 md:gap-6 border-y border-washi/15 py-4 short:py-3">
+              <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-washi-dim">Receita mensal (MRR)</div>
-                <div className="mt-1 font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-washi tabular-nums">{yenJp(monthly)}</div>
-                <div className="mt-1 text-xs md:text-sm text-washi-muted">
-                  {yen(simPlan.priceMonthly)} × {users} usuários
+                <div className="mt-1 text-sm md:text-base text-washi-muted tabular-nums">
+                  {users} usuários × {yen(simPlan.priceMonthly)}
+                </div>
+                <div key={'m' + monthly} className="font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-washi tabular-nums animate-fadeIn">
+                  {yenJp(monthly)}
                 </div>
               </div>
-              <div className="sm:pl-8 mt-3 sm:mt-0">
+              <div className="hidden md:flex flex-col items-center pb-3 text-washi-dim" aria-hidden>
+                <span className="text-sm tabular-nums">× 12</span>
+                <span className="text-2xl leading-none">→</span>
+              </div>
+              <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-washi-dim">Receita anual (ARR)</div>
-                <div className="mt-1 font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-beni-soft tabular-nums">{yenJp(monthly * 12)}</div>
-                <div className="mt-1 text-xs md:text-sm text-washi-muted">{PRICING.annualRule}</div>
+                <div className="mt-1 text-sm md:text-base text-washi-muted">{PRICING.annualRule}</div>
+                <div key={'a' + monthly} className="font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-beni-soft tabular-nums animate-fadeIn">
+                  {yenJp(monthly * 12)}
+                </div>
               </div>
             </div>
 
-            {/* 3. O que compõe a receita: licenças recorrentes; implantação e integrações à parte */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 sm:divide-x divide-washi/10">
-              <div className="sm:pr-5 py-1">
-                <div className="flex items-center gap-1.5 text-sm text-washi-muted"><Layers className="w-4 h-4" aria-hidden /> Licenças</div>
-                <div className="mt-0.5 text-lg md:text-xl text-washi tabular-nums">{yenJp(monthly)}/mês</div>
+            {/* 3. Componentes: o que é recorrente e o que é cobrado à parte, sob proposta */}
+            <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-4 md:gap-8">
+              <div className="border-l-2 border-washi/40 pl-4">
+                <div className="text-[11px] uppercase tracking-[0.2em] text-washi-dim">Recorrente</div>
+                <div className="mt-1 flex items-center gap-1.5 text-sm text-washi-muted"><Layers className="w-4 h-4" aria-hidden /> Licenças</div>
+                <div className="text-xl md:text-2xl text-washi tabular-nums">{yenJp(monthly)}/mês</div>
               </div>
-              <div className="sm:px-5 py-1">
-                <div className="flex items-center gap-1.5 text-sm text-washi-muted"><Wrench className="w-4 h-4" aria-hidden /> Implantação</div>
-                <div className="mt-0.5 text-lg md:text-xl text-washi tabular-nums">{yenJp(implementation)}</div>
-                <div className="text-[11px] text-washi-dim">{PRICING.estimateLabel}</div>
-              </div>
-              <div className="sm:pl-5 py-1">
-                <div className="flex items-center gap-1.5 text-sm text-washi-muted"><Plug className="w-4 h-4" aria-hidden /> Integrações</div>
-                <div className="mt-0.5 text-lg md:text-xl text-washi tabular-nums">{integration === null ? 'Fora do escopo' : yenJp(integration)}</div>
-                <div className="text-[11px] text-washi-dim">{integration === null ? simPlan.integrationPolicy : PRICING.estimateLabel}</div>
+              <div className="border-l-2 border-washi/15 pl-4">
+                <div className="text-[11px] uppercase tracking-[0.2em] text-washi-dim">À parte • sob proposta</div>
+                <div className="mt-1 grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="flex items-center gap-1.5 text-sm text-washi-muted"><Wrench className="w-4 h-4" aria-hidden /> Implantação</div>
+                    <div className="text-xl md:text-2xl text-washi tabular-nums">{yenJp(implementation)}</div>
+                    <div className="text-[11px] text-washi-dim">{PRICING.estimateLabel}</div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5 text-sm text-washi-muted"><Plug className="w-4 h-4" aria-hidden /> Integrações</div>
+                    <div className="text-xl md:text-2xl text-washi tabular-nums">{integration === null ? 'Fora do escopo' : yenJp(integration)}</div>
+                    <div className="text-[11px] text-washi-dim">{integration === null ? simPlan.integrationPolicy : PRICING.estimateLabel}</div>
+                  </div>
+                </div>
               </div>
             </div>
             <p className="text-xs text-washi-dim">{PRICING.expansionJourney.disclaimer}</p>

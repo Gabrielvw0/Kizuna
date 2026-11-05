@@ -16,7 +16,10 @@ export const AISecuritySection: React.FC = () => {
   const decision = scene === 1;
   const open = decision && gateApproved;
 
-  const handleHanko = () => {
+  // Só o clique com o ponteiro aprova. Enter/Espaço num botão em foco geram um "click" com
+  // detail === 0 — esse é ignorado, para que nenhuma tecla aprove o Hanko.
+  const handleHanko = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (e.detail === 0) return;
     setSceneIndex(1);
     approveGate();
   };
@@ -25,7 +28,7 @@ export const AISecuritySection: React.FC = () => {
 
   return (
     <div className="relative w-full h-full select-none">
-      <div className="relative h-full max-w-6xl mx-auto px-6 md:px-14 py-4 flex flex-col justify-center gap-5 md:gap-8 short:gap-3 overflow-y-auto">
+      <div className="relative h-full max-w-6xl mx-auto px-6 md:px-14 py-4 flex flex-col justify-center gap-5 md:gap-8 short:gap-2 py-4 short:py-1 overflow-y-auto">
         <div className="text-center">
           <Kicker code="07" label="Confiança" jp="守" className="justify-center" />
           <DisplayTitle className="mt-3 short:mt-1 short:!text-[1.8rem] short:lg:!text-[2.15rem]">
@@ -34,7 +37,7 @@ export const AISecuritySection: React.FC = () => {
           </DisplayTitle>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-4 md:gap-x-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-4 short:gap-y-2 md:gap-x-16">
           {/* 01 • fora do portão: a proposta */}
           <div>
             <div className="flex items-center gap-2 text-[11px] md:text-xs uppercase tracking-[0.2em] text-washi-dim">
@@ -64,19 +67,28 @@ export const AISecuritySection: React.FC = () => {
             <div className="mt-2 font-display text-2xl md:text-3xl short:text-2xl text-washi">
               {open ? 'Aprovado pelo responsável' : 'Fechado'}
             </div>
-            <p className="mt-1 text-sm text-washi-muted">
+            <p className="mt-1 short:mt-0.5 text-sm short:text-xs text-washi-muted">
               {open ? 'O carimbo (Hanko) registrou quem decidiu.' : 'Nada é executado sem o aval formal de um responsável.'}
             </p>
-            <div
-              className={`mx-auto mt-3 short:mt-2 w-12 h-12 short:w-10 short:h-10 border-2 flex items-center justify-center font-display text-xs transition-all duration-300 ${
-                open ? 'border-beni bg-beni text-washi rotate-6 hanko-animate' : 'border-washi/20 text-washi-dim'
-              }`}
-              aria-label={open ? 'Carimbo aplicado' : 'Carimbo não aplicado'}
-            >
-              承認
+            {/* Espaço do carimbo: vazio e tracejado até o clique; depois, o Hanko vermelho */}
+            <div className="mt-3 short:mt-1 flex flex-col items-center gap-1.5 short:gap-1">
+              <div
+                className={`w-20 h-20 short:w-12 short:h-12 flex items-center justify-center font-display transition-all duration-300 ${
+                  open
+                    ? 'bg-beni text-washi text-2xl short:text-base -rotate-6 hanko-animate shadow-[0_0_30px_rgba(215,38,61,0.45)]'
+                    : 'border-2 border-dashed border-beni/60 text-beni/40 text-3xl short:text-xl'
+                }`}
+                role="img"
+                aria-label={open ? 'Carimbo Hanko aplicado' : 'Espaço do carimbo Hanko, ainda vazio'}
+              >
+                {open ? '承認' : '印'}
+              </div>
+              <div className={`text-[11px] md:text-xs uppercase tracking-[0.16em] ${open ? 'text-washi' : 'text-beni-soft'}`}>
+                {open ? 'Carimbado pelo responsável' : 'Aguardando o carimbo (Hanko)'}
+              </div>
             </div>
             {decision && (
-              <div className="mt-4 short:mt-2 flex justify-center">
+              <div className="mt-4 short:mt-1.5 flex justify-center">
                 {open ? (
                   <button
                     onClick={revokeGate}
@@ -85,12 +97,18 @@ export const AISecuritySection: React.FC = () => {
                     <Undo2 className="w-4 h-4" /> Desfazer aprovação
                   </button>
                 ) : (
-                  <button
-                    onClick={handleHanko}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-beni hover:bg-beni-soft text-washi text-sm font-semibold"
-                  >
-                    <Stamp className="w-4 h-4" /> Aprovar com Hanko (押印)
-                  </button>
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={handleHanko}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') e.preventDefault();
+                      }}
+                      className="flex items-center justify-center gap-2 text-center lg:whitespace-nowrap px-3 lg:px-6 py-3 short:py-2 bg-beni hover:bg-beni-soft text-washi text-sm lg:text-base short:text-sm font-semibold"
+                    >
+                      <Stamp className="w-5 h-5 shrink-0" /> <span>Aprovar com Hanko <span className="whitespace-nowrap">(押印)</span></span>
+                    </button>
+                    <span className="text-[11px] short:text-[10px] text-washi-dim">Somente o clique aprova • setas e Enter não aprovam</span>
+                  </div>
                 )}
               </div>
             )}
@@ -117,15 +135,15 @@ export const AISecuritySection: React.FC = () => {
           </div>
         </div>
 
-        <div className="text-center max-w-md mx-auto px-4 py-2 bg-sumi-800/85">
-          <p className="text-sm md:text-base text-washi">
+        <div className="text-center max-w-md short:max-w-xl mx-auto px-4 py-2 short:py-1 bg-sumi-800/85">
+          <p className="text-sm md:text-base short:text-sm text-washi">
             {!decision
               ? 'Avançar leva à decisão — mas avançar não aprova.'
               : open
               ? 'Execução autorizada e registrada.'
               : 'A decisão é do responsável: só o clique no Hanko abre o portão.'}
           </p>
-          <p className="mt-1 text-xs text-washi-dim">
+          <p className="mt-1 short:mt-0 text-xs short:text-[11px] text-washi-dim">
             IA assistiva e fluxo de aprovação: recursos propostos do Kizuna Business. No Start, o registro já vale: toda mudança em atividades entra no histórico.
           </p>
         </div>
