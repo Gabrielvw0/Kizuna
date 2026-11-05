@@ -714,6 +714,32 @@ export const WorldStage: React.FC = () => {
     barrier.position.set(0, -0.05, 0);
     gateGroup.add(barrier);
 
+    // Folhas do portão (laca escura, costura vermelha): fechadas cobrem o vão entre as colunas;
+    // com o Hanko recolhem para dentro das colunas, num movimento único e suavizado.
+    const LEAF_W = COL_X;
+    const LEAF_H = 1.3;
+    const leafMat = new THREE.MeshBasicMaterial({ color: 0x15161b, transparent: true, opacity: 0.92, fog: false });
+    const seamMat = new THREE.MeshBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.9, fog: false });
+    const leaves = [-1, 1].map((side) => {
+      const leaf = new THREE.Mesh(new THREE.PlaneGeometry(LEAF_W, LEAF_H), leafMat);
+      const seam = new THREE.Mesh(new THREE.BoxGeometry(0.012, LEAF_H, 0.012), seamMat);
+      // linhas horizontais finas (ritmo de painel), discretas
+      const rails = new THREE.Group();
+      [-0.35, 0.05, 0.45].forEach((y) => {
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(LEAF_W, 0.006, 0.006), new THREE.MeshBasicMaterial({ color: 0x2a2d35, fog: false }));
+        rail.position.y = y;
+        rails.add(rail);
+      });
+      leaf.add(rails);
+      leaf.position.set(side * LEAF_W * 0.5, 0.0, -0.05);
+      seam.position.set(0, 0.0, -0.04);
+      gateGroup.add(leaf, seam);
+      return { side, leaf, seam };
+    });
+    let gateOpenProgress = 0; // 0 fechado • 1 aberto
+    let prevGateOk = false;
+    let gateOpenedAt = -1;
+
     // Luz dirigida ao mecanismo de aprovação (cai de cima, cresce com o carimbo)
     const gateLight = new THREE.Mesh(
       new THREE.PlaneGeometry(1.5, 2.1),
@@ -1132,6 +1158,23 @@ export const WorldStage: React.FC = () => {
         barrier.position.y += ((isOpen ? 0.62 : -0.05) - barrier.position.y) * k;
         barrierMat.opacity += ((isOpen ? 0 : 0.7) - barrierMat.opacity) * k;
         barrier.visible = barrierMat.opacity > 0.01;
+        // folhas: abrem 0,2 s depois da aprovação, em 0,9 s (ease-in-out); fecham em 0,4 s
+        if (isOpen && !prevGateOk) gateOpenedAt = elapsed;
+        prevGateOk = isOpen;
+        if (isOpen) {
+          const tt = Math.min(1, Math.max(0, (elapsed - gateOpenedAt - 0.2) / 0.9));
+          gateOpenProgress = easeInOutCubic(tt);
+        } else {
+          gateOpenProgress = Math.max(0, gateOpenProgress - dt / 0.4);
+        }
+        leaves.forEach(({ side, leaf, seam }) => {
+          const sx = Math.max(0.04, 1 - gateOpenProgress);
+          leaf.scale.x = sx;
+          // a borda externa fica presa à coluna; a interna recua
+          leaf.position.x = side * (COL_X - (LEAF_W * sx) / 2);
+          seam.position.x = side * (COL_X - LEAF_W * sx);
+          (seam.material as THREE.MeshBasicMaterial).opacity = 0.9 * (1 - gateOpenProgress * 0.85);
+        });
         const gl = (gateLight.material as THREE.ShaderMaterial).uniforms.uOpacity;
         gl.value += ((isOpen ? 0.26 : 0.11) - gl.value) * Math.min(1, dt * 2.5);
       }
