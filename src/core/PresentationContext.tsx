@@ -146,8 +146,8 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     metamorphosisFromTo: `Start → Business → Enterprise → Simulador ${scaleStory}`,
     narrativeNode: 'NEGÓCIO',
     kanji: '価',
-    sceneCount: 2,
-    sceneLabels: ['Land & Expand: escopo de cada plano', `Simulador de receita (${scaleStory})`]
+    sceneCount: 4,
+    sceneLabels: ['Start: a equipe', 'Business: departamentos', 'Enterprise: a empresa', `Simulador de receita (${scaleStory})`]
   },
   {
     index: 8,

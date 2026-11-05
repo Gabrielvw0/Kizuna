@@ -262,8 +262,8 @@
       "id": "08",
       "title": "TELA 08 | PLANOS E MODELO DE RECEITA",
       "banca": {
-        "duration": "≈ 90 s • 2 cenas",
-        "speech": "O Kizuna cresce com a confiança. Start, para a equipe; Business, para departamentos — com projetos multiequipe, aprovação Ringi, automação e IA assistiva; Enterprise, para a empresa — governança ampliada e múltiplas unidades. O teste gratuito de até 30 dias é uma proposta, ainda sujeita a validação. [avançar] A receita é recorrente por usuário: com 40 usuários, no Business, são ¥79.200 por mês. Implantação e integrações são cobradas à parte, sob proposta.",
+        "duration": "≈ 90 s • 4 cenas",
+        "speech": "O Kizuna cresce com a confiança. Start, para a equipe. O teste gratuito de até 30 dias é uma proposta, ainda sujeita a validação. [avançar] Business, para departamentos — com projetos multiequipe, aprovação Ringi, automação e IA assistiva. [avançar] Enterprise, para a empresa — governança ampliada e múltiplas unidades. [avançar] A receita é recorrente por usuário: com 40 usuários, no Business, são ¥79.200 por mês. Implantação e integrações são cobradas à parte, sob proposta.",
         "concept": "Land & Expand em três planos (¥980, ¥1.980 e ¥3.500 por usuário/mês, 税抜) e simulador que separa licenças, implantação e integrações.",
         "evidence": "Preços, faixas de usuários e estimativas vêm de pricing.json; o simulador calcula plano × usuários.",
         "premise": "Separar licença recorrente de serviços torna o modelo realista e escalável.",

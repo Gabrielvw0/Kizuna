@@ -313,6 +313,201 @@ function createWaveField(baseRadii: number[], maxR = 3.0) {
   return { group, update, setLit, pulse };
 }
 
+/**
+ * Etapa 8.2 • Estrutura de crescimento da tela 08 (uma composição só, que evolui por cena).
+ * Nível 1 Start (equipe) • 2 Business (departamentos) • 3 Enterprise (empresa) • 4 simulador (visão consolidada).
+ * - piso: anéis concêntricos (equipe → departamentos → empresa) que acendem até o nível;
+ * - núcleo: três plataformas de laca com aro dourado e filete vermelho, ligadas por um eixo;
+ * - colunas de dados que sobem em cada anel (4, 8 e 12), mais altas a cada nível;
+ * - conexões que convergem das colunas para o núcleo, desenhadas progressivamente;
+ * - nível 4: anel de receita com 12 segmentos (1 mês = MRR; 12 meses = ARR).
+ * Tudo por tempo (elapsed/dt), sem rotação contínua. Movimento reduzido: estados finais.
+ */
+function createGrowthStructure() {
+  const group = new THREE.Group();
+  const RADII = [0.6, 1.1, 1.6];
+  const floor = createWaveField(RADII, 2.7);
+  group.add(floor.group);
+
+  const lacquer = new THREE.MeshStandardMaterial({ color: 0x1d1d23, roughness: 0.28, metalness: 0.2 });
+  const gold = new THREE.MeshStandardMaterial({ color: 0xb08a45, roughness: 0.35, metalness: 0.7, emissive: new THREE.Color(0x2a1d08) });
+  const red = new THREE.MeshStandardMaterial({ color: 0xc21d33, roughness: 0.45, metalness: 0.05, emissive: new THREE.Color(0x5a0814) });
+  const key = new THREE.DirectionalLight(0xfff1dc, 1.8);
+  key.position.set(-1.5, 3, 2.5);
+  const fill = new THREE.AmbientLight(0x8a90a0, 0.55);
+  group.add(key, fill);
+
+  const easeOut = (x: number) => 1 - Math.pow(1 - x, 3);
+  type El = { level: number; delay: number; dur: number; p: number; apply: (e: number) => void };
+  const els: El[] = [];
+  const track = (level: number, delay: number, dur: number, apply: (e: number) => void) => {
+    const el = { level, delay, dur, p: 0, apply };
+    els.push(el);
+    apply(0);
+    return el;
+  };
+
+  // Núcleo: três plataformas que sobem uma por nível
+  const TIER_Y = [0.06, 0.42, 0.78];
+  const TIER_R = [0.36, 0.27, 0.18];
+  const spineGeo = new THREE.CylinderGeometry(0.016, 0.016, 1, 16);
+  spineGeo.translate(0, 0.5, 0);
+  const spine = new THREE.Mesh(spineGeo, gold);
+  group.add(spine);
+  const tiers = TIER_Y.map((y, i) => {
+    const tier = new THREE.Group();
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(TIER_R[i], TIER_R[i] * 1.06, 0.06, 64), lacquer);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(TIER_R[i] * 1.0, 0.009, 8, 96), gold);
+    rim.rotation.x = Math.PI / 2;
+    rim.position.y = 0.032;
+    const band = new THREE.Mesh(new THREE.TorusGeometry(TIER_R[i] * 1.07, 0.007, 8, 96), red);
+    band.rotation.x = Math.PI / 2;
+    band.position.y = -0.012;
+    tier.add(disc, rim, band);
+    group.add(tier);
+    return track(i + 1, 0.05, 0.8, (e) => {
+      tier.visible = e > 0.001;
+      tier.scale.set(0.6 + 0.4 * e, Math.max(0.001, e), 0.6 + 0.4 * e);
+      tier.position.y = y - 0.14 * (1 - e);
+    });
+  });
+  // Remate do Enterprise: haste dourada e ponto vermelho no topo
+  const crown = new THREE.Group();
+  const finial = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.02, 0.16, 16), gold);
+  finial.position.y = 0.08;
+  const jewel = new THREE.Mesh(new THREE.SphereGeometry(0.035, 24, 16), red);
+  jewel.position.y = 0.18;
+  crown.add(finial, jewel);
+  crown.position.y = TIER_Y[2] + 0.03;
+  group.add(crown);
+  track(3, 1.1, 0.6, (e) => {
+    crown.visible = e > 0.001;
+    crown.scale.setScalar(Math.max(0.001, e));
+  });
+
+  // Colunas de dados por anel e conexões que convergem para o núcleo
+  const pillarGeo = new THREE.CylinderGeometry(0.006, 0.006, 1, 8);
+  pillarGeo.translate(0, 0.5, 0);
+  const pillarMat = new THREE.MeshBasicMaterial({ color: 0xd9c493, transparent: true, opacity: 0.7, fog: false });
+  const capGeo = new THREE.SphereGeometry(0.022, 16, 12);
+  const capMat = new THREE.MeshBasicMaterial({ color: 0xec4a5c, fog: false });
+  const COUNTS = [4, 8, 12];
+  const BASE_H = [0.22, 0.38, 0.56];
+  const linkMats = COUNTS.map(() => new THREE.LineBasicMaterial({ color: 0xec4a5c, transparent: true, opacity: 0.5, fog: false }));
+  const SEG = 28;
+  COUNTS.forEach((n, ring) => {
+    const r = RADII[ring];
+    const offset = ring * 0.37;
+    for (let k = 0; k < n; k++) {
+      const a = offset + (k / n) * Math.PI * 2;
+      const x = Math.cos(a) * r;
+      const z = Math.sin(a) * r;
+      const h = BASE_H[ring] + 0.09 * Math.abs(Math.sin(k * 1.7 + ring));
+      const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+      pillar.position.set(x, 0, z);
+      const cap = new THREE.Mesh(capGeo, capMat);
+      group.add(pillar, cap);
+      track(ring + 1, 0.3 + k * 0.045, 0.7, (e) => {
+        pillar.visible = e > 0.001;
+        cap.visible = e > 0.001;
+        pillar.scale.set(1, Math.max(0.001, h * e), 1);
+        cap.position.set(x, h * e, z);
+      });
+      // conexão: do topo da coluna até a plataforma do mesmo nível, em arco
+      const to = new THREE.Vector3(0, TIER_Y[ring] + 0.04, 0);
+      const from = new THREE.Vector3(x, h, z);
+      const ctrl = new THREE.Vector3(x * 0.45, Math.max(h, to.y) + 0.22, z * 0.45);
+      const pts = new THREE.QuadraticBezierCurve3(from, ctrl, to).getPoints(SEG);
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const line = new THREE.Line(geo, linkMats[ring]);
+      group.add(line);
+      track(ring + 1, 0.75 + k * 0.035, 0.7, (e) => {
+        line.visible = e > 0.001;
+        geo.setDrawRange(0, Math.max(0, Math.round((SEG + 1) * e)));
+      });
+    }
+  });
+
+  // Anel de receita (nível 4): 12 segmentos = 12 meses; o primeiro é o MRR
+  const REV_R = 2.05;
+  const revMats = Array.from({ length: 12 }, (_, i) =>
+    new THREE.MeshBasicMaterial({ color: i === 0 ? 0xf2eee6 : 0xd7263d, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false, fog: false })
+  );
+  revMats.forEach((m, i) => {
+    const gap = 0.05;
+    const start = Math.PI / 2 + (i / 12) * Math.PI * 2 + gap / 2;
+    const seg = new THREE.Mesh(new THREE.RingGeometry(REV_R, REV_R + 0.07, 24, 1, start, (Math.PI * 2) / 12 - gap), m);
+    seg.rotation.x = -Math.PI / 2;
+    seg.position.y = 0.006;
+    group.add(seg);
+  });
+
+  let level = 0;
+  let changedAt = 0;
+  let revenueAt = -99;
+
+  const setLevel = (next: number, now: number) => {
+    if (next === level) return;
+    if (next === 0) {
+      els.forEach((el) => {
+        el.p = 0;
+        el.apply(0);
+      });
+      revMats.forEach((m) => (m.opacity = 0));
+    } else {
+      floor.setLit(Math.min(3, next) - 1, now);
+      if (next > level && next <= 3) floor.pulse(RADII[next - 1], 1, now);
+      if (next === 4) {
+        revenueAt = now;
+        floor.pulse(1.6, 0.8, now);
+      }
+    }
+    level = next;
+    changedAt = now;
+  };
+
+  const revenuePulse = (strength: number, now: number) => {
+    if (level !== 4) return;
+    revenueAt = now;
+    floor.pulse(0.6, strength, now);
+  };
+
+  const update = (elapsed: number, dt: number, reduced: boolean) => {
+    floor.update(elapsed, dt, reduced);
+    els.forEach((el) => {
+      const on = level >= el.level;
+      let p = el.p;
+      if (reduced) p = on ? 1 : 0;
+      else if (on) {
+        if (p > 0 || elapsed - changedAt >= el.delay) p += dt / el.dur;
+      } else p -= dt / 0.45;
+      p = Math.min(1, Math.max(0, p));
+      if (p !== el.p) {
+        el.p = p;
+        el.apply(on ? easeOut(p) : p * p);
+      }
+    });
+    // eixo do núcleo acompanha a plataforma mais alta já erguida
+    let top = 0;
+    tiers.forEach((t, i) => (top = Math.max(top, (TIER_Y[i] + 0.03) * easeOut(t.p))));
+    spine.visible = top > 0.01;
+    spine.scale.set(1, Math.max(0.001, top), 1);
+    // anel de receita: MRR (1 mês) e depois os outros 11 meses → ARR, no ritmo da conta na tela
+    const t = level === 4 ? (reduced ? 99 : elapsed - revenueAt) : -1;
+    revMats.forEach((m, i) => {
+      let target = 0;
+      if (t >= 0) {
+        const start = i === 0 ? 0.5 : 1.45 + ((i - 1) / 11) * 0.8;
+        target = (i === 0 ? 0.95 : 0.8) * Math.min(1, Math.max(0, (t - start) / 0.3));
+      }
+      m.opacity = t >= 0 ? target : Math.max(0, m.opacity - dt * 3);
+    });
+    linkMats.forEach((m) => (m.opacity = level >= 3 ? 0.62 : 0.5));
+  };
+
+  return { group, setLevel, update, revenuePulse };
+}
+
 /** Impressão do Hanko 承認 em tinta vermelha (fundo transparente) para a placa de washi. */
 function makeSealTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas');
@@ -683,18 +878,16 @@ export const WorldStage: React.FC = () => {
     taskPipelineGroup.add(taskCapsule);
 
     // =========================================================================
-    // 07. MODULAR EXPANSION LATTICE GROUP (SCENE 07: PLANOS)
+    // 07. ESTRUTURA DE CRESCIMENTO (TELA 08: PLANOS E RECEITA) — Etapa 8.2
+    // Uma composição só para as 4 cenas: cenário 6 (Start, Business, Enterprise) e
+    // cenário 12 (simulador). Fica à direita; o texto da tela fica à esquerda.
     // =========================================================================
     const modularScaleGroup = new THREE.Group();
     scene.add(modularScaleGroup);
-
-    // Etapa 8: os cubos saíram. Três anéis finos no piso (equipe → departamentos → empresa)
-    // acendem em sequência, de dentro para fora: a ideia de crescimento dos planos.
-    const planField = createWaveField([0.55, 1.0, 1.45]);
-    modularScaleGroup.add(planField.group);
-    planField.setLit(0, 0); // Start aceso por padrão (a tela confirma o plano ao entrar)
-    // centro do campo sob os anéis da tela (à esquerda)
-    modularScaleGroup.position.set(-0.7, -1.05, -0.6);
+    const growth = createGrowthStructure();
+    modularScaleGroup.add(growth.group);
+    modularScaleGroup.position.set(1.55, -1.05, -0.6);
+    modularScaleGroup.scale.setScalar(0.72);
 
     // =========================================================================
     // 08. ADAPTATION METAMORPHOSIS GROUP (SCENE 08: ADAPTAÇÃO)
@@ -957,17 +1150,6 @@ export const WorldStage: React.FC = () => {
     });
 
     // =========================================================================
-    // 13. VOLUMETRIC FINANCIAL 3D GROUP (SCENE 13: PREÇO)
-    // =========================================================================
-    const financial3DGroup = new THREE.Group();
-    scene.add(financial3DGroup);
-
-    // Etapa 8: as barras genéricas saíram; o piso de ondas acompanha a conta da receita
-    financial3DGroup.position.set(0.4, -1.05, -0.8);
-    const revenueField = createWaveField([]);
-    financial3DGroup.add(revenueField.group);
-
-    // =========================================================================
     // 14. MISSION CONTROL RADAR GROUP (SCENE 14: RISCOS & KPIS)
     // =========================================================================
     const missionControlGroup = new THREE.Group();
@@ -1025,20 +1207,12 @@ export const WorldStage: React.FC = () => {
     // =========================================================================
     let animId: number;
     let clock = new THREE.Clock();
-    // Tela 08 avisa o 3D: plano escolhido (nível 0–2) e mudança no simulador
+    // Tela 08 avisa o 3D quando o número de usuários muda no simulador
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    const planRadii = [0.55, 1.0, 1.45];
-    const onPlan = (e: Event) => {
-      const level = Math.max(0, Math.min(2, Number((e as CustomEvent).detail?.level) || 0));
-      const now = clock.getElapsedTime();
-      planField.setLit(level, now);
-      planField.pulse(planRadii[level], 1, now);
-    };
     const onRevenue = (e: Event) => {
       const strength = Math.max(0.4, Math.min(1, Number((e as CustomEvent).detail?.strength) || 0.6));
-      revenueField.pulse(0.4, strength, clock.getElapsedTime());
+      growth.revenuePulse(strength, clock.getElapsedTime());
     };
-    window.addEventListener('kizuna:plan', onPlan);
     window.addEventListener('kizuna:revenue', onRevenue);
 
     // Começa já no enquadramento da cena atual (sem "deslizar" o globo por baixo do texto)
@@ -1242,9 +1416,16 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       // 7. Modular Expansion Lattice (Scene 07)
       // -----------------------------------------------------------------------
-      modularScaleGroup.visible = sIdx === 6;
-      if (sIdx === 6) {
-        planField.update(elapsed, dt, reducedMotion);
+      // nível da estrutura: 08.1 Start • 08.2 Business • 08.3 Enterprise • 08.4 simulador
+      const growthLevel = sIdx === 6 ? Math.min(3, scIdx + 1) : sIdx === 12 ? 4 : 0;
+      growth.setLevel(growthLevel, elapsed);
+      modularScaleGroup.visible = growthLevel > 0;
+      if (growthLevel > 0) {
+        // em telas 4:3 a estrutura encolhe um pouco para não invadir a coluna de texto
+        const narrowGrowth = camera.aspect < 1.5;
+        modularScaleGroup.scale.setScalar(narrowGrowth ? 0.6 : 0.72);
+        modularScaleGroup.position.x = narrowGrowth ? 1.62 : 1.55;
+        growth.update(elapsed, dt, reducedMotion);
       }
 
       // -----------------------------------------------------------------------
@@ -1350,14 +1531,6 @@ export const WorldStage: React.FC = () => {
       }
 
       // -----------------------------------------------------------------------
-      // 13. Financial Volumetric 3D (Scene 13)
-      // -----------------------------------------------------------------------
-      financial3DGroup.visible = sIdx === 12;
-      if (sIdx === 12) {
-        revenueField.update(elapsed, dt, reducedMotion);
-      }
-
-      // -----------------------------------------------------------------------
       // 14. Mission Control Radar (Scene 14)
       // -----------------------------------------------------------------------
       missionControlGroup.visible = sIdx === 13;
@@ -1376,7 +1549,6 @@ export const WorldStage: React.FC = () => {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('kizuna:plan', onPlan);
       window.removeEventListener('kizuna:revenue', onRevenue);
       renderer.dispose();
       if (container.contains(renderer.domElement)) {

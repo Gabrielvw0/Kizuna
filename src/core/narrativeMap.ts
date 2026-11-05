@@ -80,8 +80,8 @@ export const STAGE_MAP: StageRef[][] = [
   [at(STAGE.ADAPTATION_MORPH, 0), at(STAGE.ADAPTATION_MORPH, 1)],
   // 07 Confiança: 07.1 portão fechado • 07.2 sequência automática do Hanko (sem clique)
   [at(STAGE.VALIDATION_GATE, 1), at(STAGE.VALIDATION_GATE, 2)],
-  // 08 Planos: anéis completos → painel financeiro do simulador
-  [at(STAGE.MODULAR_RINGS, 2), at(STAGE.FINANCIAL, 0)],
+  // 08 Planos: uma estrutura de crescimento — Start, Business, Enterprise (cenário 6) → simulador (cenário 12)
+  [at(STAGE.MODULAR_RINGS, 0), at(STAGE.MODULAR_RINGS, 1), at(STAGE.MODULAR_RINGS, 2), at(STAGE.FINANCIAL, 0)],
   // 09 Entrada (R3) na linha do trem: pilotos → expansão → subsidiária; aquisição (R4)
   [at(STAGE.RAILWAY, 3), at(STAGE.RAILWAY, 5), at(STAGE.RAILWAY, 6), at(STAGE.BROADCAST, 0)],
   // 10 Posicionamento

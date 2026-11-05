@@ -138,17 +138,8 @@
 }
 
 /* ==========================================================================
-   Etapa 8 • Tela 08 — onda que parte do anel escolhido; entrada em sequência
+   Etapa 8 • Tela 08 — entrada em sequência da conta (MRR → × 12 → ARR)
    ========================================================================== */
-@keyframes ringWave {
-  0% { opacity: 0.6; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.55); }
-}
-.ring-wave {
-  transform-origin: 180px 180px;
-  animation: ringWave 1500ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  pointer-events: none;
-}
 @keyframes stepIn {
   0% { opacity: 0; transform: translateY(6px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -157,6 +148,5 @@
   animation: stepIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @media (prefers-reduced-motion: reduce) {
-  .ring-wave { display: none; }
   .step-in { animation: none !important; }
 }

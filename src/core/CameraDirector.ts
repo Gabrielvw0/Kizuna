@@ -139,9 +139,17 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 6: // TELA 07: PLANOS • SISTEMA MODULAR CRESCENDO (LATTICE)
       env.globeVisibility = 0.0;
       env.modularScaleVisibility = 1.0;
-      // Etapa 8: olhar levemente para o piso, onde as ondas de crescimento se espalham
-      pose.pos.set(0, 0.6, 2.9);
-      pose.target.set(0, -0.3, -0.6);
+      // Etapa 8.2: a câmera recua e sobe a cada nível da estrutura de crescimento (à direita)
+      if (sceneIdx <= 0) {
+        pose.pos.set(0.95, -0.12, 1.45);
+        pose.target.set(0.95, -0.85, -0.6);
+      } else if (sceneIdx === 1) {
+        pose.pos.set(0.6, 0.45, 2.5);
+        pose.target.set(0.6, -0.7, -0.6);
+      } else {
+        pose.pos.set(0.4, 0.9, 3.45);
+        pose.target.set(0.45, -0.68, -0.6);
+      }
       break;
 
     case 7: // TELA 08: ADAPTAÇÃO • 7 TRANSFORMAÇÕES DA INTERFACE
@@ -184,8 +192,10 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 12: // TELA 13: PREÇO • PAINEL FINANCEIRO VOLUMÉTRICO VIVO
       env.globeVisibility = 0.0;
       env.financial3DVisibility = 1.0;
-      pose.pos.set(0, 0.6, 2.9);
-      pose.target.set(0, -0.3, -0.6);
+      // Etapa 8.2: visão consolidada da mesma estrutura (cenário 6), com o anel de receita
+      env.modularScaleVisibility = 1.0;
+      pose.pos.set(-0.15, 1.55, 4.5);
+      pose.target.set(0.05, -0.78, -0.6);
       break;
 
     case 13: // TELA 14: RISCOS & KPIS • CENTRO DE COMANDO 4 QUADRANTES
