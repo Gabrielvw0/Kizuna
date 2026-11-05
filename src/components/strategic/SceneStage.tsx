@@ -12,7 +12,13 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
  * Na primeira montagem (entrada na tela) não anima: quem anima é a transição de tela.
  * Movimento reduzido: só opacidade, curta (ver index.css).
  */
-export const SceneStage: React.FC<{ index: number; className?: string; children: React.ReactNode }> = ({ index, className = '', children }) => {
+export const SceneStage: React.FC<{
+  index: number;
+  className?: string;
+  /** a camada da cena ocupa toda a altura do palco (layouts em faixas; opcional, padrão desligado) */
+  fill?: boolean;
+  children: React.ReactNode;
+}> = ({ index, className = '', fill = false, children }) => {
   const last = useRef<{ index: number; node: React.ReactNode }>({ index, node: children });
   const [outgoing, setOutgoing] = useState<{ index: number; node: React.ReactNode; dir: number } | null>(null);
   const [dir, setDir] = useState(0);
@@ -52,7 +58,7 @@ export const SceneStage: React.FC<{ index: number; className?: string; children:
           {outgoing.node}
         </div>
       )}
-      <div key={'in-' + index} className={dir !== 0 ? 'scene-enter' : ''} style={{ '--scene-dir': dir } as React.CSSProperties}>
+      <div key={'in-' + index} className={`${dir !== 0 ? 'scene-enter' : ''}${fill ? ' h-full' : ''}`} style={{ '--scene-dir': dir } as React.CSSProperties}>
         {children}
       </div>
     </div>

@@ -54,7 +54,9 @@ export const Accent: React.FC<{ children: React.ReactNode; tone?: 'beni' | 'kin'
 export const Classification: React.FC<{
   kind: 'fato' | 'externo' | 'proposta' | 'hipotese' | 'projecao' | 'demo' | 'preco';
   children?: React.ReactNode;
-}> = ({ kind, children }) => {
+  /** ajuste opcional de tamanho (padrão: o selo pequeno de sempre) */
+  className?: string;
+}> = ({ kind, children, className = '' }) => {
   const map = {
     fato: ['Fato institucional', 'text-ai-soft border-ai/50'],
     externo: ['Dado externo com fonte', 'text-emerald-300 border-emerald-400/40'],
@@ -66,7 +68,7 @@ export const Classification: React.FC<{
   } as const;
   const [label, cls] = map[kind];
   return (
-    <span className={`inline-block px-2 py-0.5 border text-[10px] md:text-[11px] font-medium uppercase tracking-[0.14em] ${cls}`}>
+    <span className={`inline-block px-2 py-0.5 border text-[10px] md:text-[11px] font-medium uppercase tracking-[0.14em] ${cls} ${className}`}>
       {children ?? label}
     </span>
   );
