@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { usePresentation } from './PresentationContext';
 import { getCameraPoseForSection } from './CameraDirector';
-import { toStage } from './narrativeMap';
+import { toStage, SCREEN } from './narrativeMap';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -1109,64 +1109,174 @@ export const WorldStage: React.FC = () => {
     const gateSnap = { focus: 0, seal: 0, unlock: 0, open: 0, reveal: 0 };
 
     // =========================================================================
-    // 10. RAILWAY EXPANSION TRACK GROUP (SCENE 10: ENTRADA)
+    // 10. ROTA DE ENTRADA (TELA 09, CENAS 1–3) — Etapa 8 • Bloco 1
+    // Percurso no piso com exatamente cinco estações (as mesmas da interface):
+    // plintos de laca com aro dourado; o núcleo acende em beni conforme a estratégia avança.
+    // Uma peça (laca, aro kin, topo beni) percorre o trecho da cena, por tempo (não por quadro).
     // =========================================================================
     const railwayGroup = new THREE.Group();
     scene.add(railwayGroup);
-
-    // Double Track Lines
-    const railPts1 = [new THREE.Vector3(-2.2, -0.4, -0.5), new THREE.Vector3(-1, -0.1, 0), new THREE.Vector3(0.5, 0.2, 0), new THREE.Vector3(2.2, 0.5, -0.3)];
-    const railCurve = new THREE.CatmullRomCurve3(railPts1);
-    const railTube = new THREE.Mesh(
-      new THREE.TubeGeometry(railCurve, 64, 0.015, 8, false),
-      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65 })
-    );
-    railwayGroup.add(railTube);
-
-    // Bullet Train Pod
-    const trainPod = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.08, 0.35, 8, 16),
-      new THREE.MeshBasicMaterial({ color: 0xef4444, wireframe: true })
-    );
-    trainPod.rotation.z = -Math.PI / 6;
-    railwayGroup.add(trainPod);
-
-    // 6 Station Nodes (origem + 5 fases)
-    for (let i = 0; i < 6; i++) {
-      const st = new THREE.Mesh(
-        new THREE.SphereGeometry(0.06, 12, 12),
-        new THREE.MeshBasicMaterial({ color: 0xd4af37 })
-      );
-      const pt = railCurve.getPoint(i / 5);
-      st.position.copy(pt);
-      railwayGroup.add(st);
+    railwayGroup.position.set(0.35, -1.15, -0.5);
+    {
+      const key = new THREE.DirectionalLight(0xfff1dc, 1.6);
+      key.position.set(-1.2, 3, 2.5);
+      railwayGroup.add(key, new THREE.AmbientLight(0x8a90a0, 0.55));
     }
+    const routeCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-2.05, 0, 0.25),
+      new THREE.Vector3(-1.0, 0, 0.08),
+      new THREE.Vector3(0.05, 0, -0.12),
+      new THREE.Vector3(1.1, 0, -0.38),
+      new THREE.Vector3(2.15, 0, -0.65)
+    ]);
+    const ROUTE_SAMPLES = 240;
+    const routePts = routeCurve.getSpacedPoints(ROUTE_SAMPLES);
+    // linha-base (washi discreto) e trecho percorrido (beni), desenhado até a peça
+    const routeBaseMat = new THREE.LineBasicMaterial({ color: 0xf2eee6, transparent: true, opacity: 0.22, fog: false });
+    railwayGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(routePts), routeBaseMat));
+    const routeLitGeo = new THREE.BufferGeometry().setFromPoints(routePts.map((p) => p.clone().setY(0.004)));
+    const routeLitMat = new THREE.LineBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.9, fog: false });
+    railwayGroup.add(new THREE.Line(routeLitGeo, routeLitMat));
+    routeLitGeo.setDrawRange(0, 0);
+
+    const routeLacquer = new THREE.MeshStandardMaterial({ color: 0x1d1d23, roughness: 0.3, metalness: 0.2 });
+    const routeGold = new THREE.MeshStandardMaterial({ color: 0xb08a45, roughness: 0.35, metalness: 0.7, emissive: new THREE.Color(0x2a1d08) });
+    const ROUTE_STATION_T = [0, 0.25, 0.5, 0.75, 1];
+    const ROUTE_GROUP = [0, 0, 1, 1, 2]; // trecho (cena) de cada estação, igual à interface
+    const ROUTE_STOP_T = [0.25, 0.75, 1]; // onde a peça para em cada cena (última estação do trecho)
+    const routeStations = ROUTE_STATION_T.map((t) => {
+      const p = routeCurve.getPointAt(t);
+      const g = new THREE.Group();
+      g.position.copy(p);
+      const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.14, 0.05, 48), routeLacquer);
+      plinth.position.y = 0.025;
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.006, 8, 64), routeGold);
+      rim.rotation.x = Math.PI / 2;
+      rim.position.y = 0.052;
+      const coreMat = new THREE.MeshStandardMaterial({ color: 0x3a3a40, roughness: 0.5, emissive: new THREE.Color(0x000000) });
+      const core = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.012, 32), coreMat);
+      core.position.y = 0.058;
+      // halo da estação atual: anel kin mais largo, rente ao piso
+      const haloMat = new THREE.MeshBasicMaterial({ color: 0xc9a45c, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false, fog: false });
+      const halo = new THREE.Mesh(new THREE.RingGeometry(0.2, 0.215, 64), haloMat);
+      halo.rotation.x = -Math.PI / 2;
+      halo.position.y = 0.003;
+      g.add(plinth, rim, core, halo);
+      railwayGroup.add(g);
+      return { coreMat, haloMat, lit: 0, cur: 0 };
+    });
+    // a peça que avança: base de laca, aro dourado e topo beni
+    const routeMarker = new THREE.Group();
+    {
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.085, 0.07, 48), routeLacquer);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.078, 0.007, 8, 64), routeGold);
+      ring.rotation.x = Math.PI / 2;
+      ring.position.y = 0.035;
+      const top = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.06, 0.06, 0.012, 48),
+        new THREE.MeshStandardMaterial({ color: 0xc21d33, roughness: 0.45, emissive: new THREE.Color(0x5a0814) })
+      );
+      top.position.y = 0.04;
+      routeMarker.add(body, ring, top);
+    }
+    routeMarker.position.y = 0.2;
+    railwayGroup.add(routeMarker);
+    const routeColDim = new THREE.Color(0x3a3a40);
+    const routeColDone = new THREE.Color(0x8e1a28);
+    const routeColCur = new THREE.Color(0xd7263d);
+    const routeEmiCur = new THREE.Color(0x6a0a18);
+    const routeEmiOff = new THREE.Color(0x000000);
+    const routeAnim = { t: 0, from: 0, to: 0, at: 0, dur: 0 };
 
     // =========================================================================
-    // 11. BROADCAST CITY RAYS GROUP (SCENE 11: PROMOÇÃO)
+    // 11. ALCANCE E AQUISIÇÃO (TELA 09, CENA 4) — Etapa 8 • Bloco 1
+    // Três círculos concêntricos no piso (o funil visto de cima): o externo, tracejado, é o interesse;
+    // o do meio, os pilotos; o interno, dourado, os clientes recorrentes, em volta de um núcleo.
+    // Ao entrar: os círculos se desenham de fora para dentro, linhas convergem e o núcleo acende.
+    // Começo, desenvolvimento e conclusão (~2,6 s); depois fica parado. Mov. reduzido: composição estática.
     // =========================================================================
     const broadcastGroup = new THREE.Group();
     scene.add(broadcastGroup);
-
-    const towerSpire = new THREE.Mesh(
-      new THREE.ConeGeometry(0.12, 1.6, 8),
-      new THREE.MeshBasicMaterial({ color: 0xef4444, wireframe: true })
-    );
-    towerSpire.position.set(0, 0.4, 0);
-    broadcastGroup.add(towerSpire);
-
-    // 3 Concentric Emission Rings
-    const emitRings: THREE.Mesh[] = [];
-    for (let i = 0; i < 4; i++) {
-      const r = new THREE.Mesh(
-        new THREE.RingGeometry(0.25 + i * 0.4, 0.28 + i * 0.4, 32),
-        new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.6 - i * 0.12, side: THREE.DoubleSide })
-      );
-      r.position.set(0, 1.2, 0);
-      r.rotation.x = Math.PI / 2;
-      broadcastGroup.add(r);
-      emitRings.push(r);
+    broadcastGroup.position.set(1.7, -1.25, -1.8);
+    {
+      const key = new THREE.DirectionalLight(0xfff1dc, 1.6);
+      key.position.set(-1.2, 3, 2.5);
+      broadcastGroup.add(key, new THREE.AmbientLight(0x8a90a0, 0.55));
     }
+    const circlePts = (r: number) => {
+      const pts: THREE.Vector3[] = [];
+      for (let i = 0; i <= 192; i++) {
+        const a = Math.PI / 2 + (i / 192) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
+      }
+      return pts;
+    };
+    const REACH_R = [2.1, 1.35, 0.62];
+    const reachRings = REACH_R.map((r, i) => {
+      const geo = new THREE.BufferGeometry().setFromPoints(circlePts(r));
+      const mat =
+        i === 0
+          ? new THREE.LineDashedMaterial({ color: 0xf2eee6, transparent: true, opacity: 0.3, dashSize: 0.06, gapSize: 0.05, fog: false })
+          : new THREE.LineBasicMaterial({ color: i === 2 ? 0xc9a45c : 0xf2eee6, transparent: true, opacity: i === 2 ? 0.85 : 0.4, fog: false });
+      const line = new THREE.Line(geo, mat);
+      if (i === 0) line.computeLineDistances();
+      broadcastGroup.add(line);
+      geo.setDrawRange(0, 0);
+      return geo;
+    });
+    // linhas que convergem do círculo externo para o interno
+    const REACH_LINKS = 12;
+    const reachLinkMat = new THREE.LineBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.38, fog: false });
+    const reachLinks = Array.from({ length: REACH_LINKS }, (_, i) => {
+      const a = Math.PI / 2 + (i / REACH_LINKS) * Math.PI * 2 + 0.13;
+      const pts: THREE.Vector3[] = [];
+      for (let k = 0; k <= 24; k++) {
+        const r = REACH_R[0] + (REACH_R[2] - REACH_R[0]) * (k / 24);
+        pts.push(new THREE.Vector3(Math.cos(a) * r, 0.002, Math.sin(a) * r));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      broadcastGroup.add(new THREE.Line(geo, reachLinkMat));
+      geo.setDrawRange(0, 0);
+      return geo;
+    });
+    // núcleo: plataforma de laca com aro kin e topo beni que acende na conclusão
+    // materiais próprios: o esmaecimento de cada cenário não interfere no outro
+    const reachLacquer = routeLacquer.clone();
+    const reachGold = routeGold.clone();
+    const reachCoreTopMat = new THREE.MeshStandardMaterial({ color: 0x5a1520, roughness: 0.45, emissive: new THREE.Color(0x000000) });
+    {
+      const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.26, 0.06, 64), reachLacquer);
+      plinth.position.y = 0.03;
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.007, 8, 96), reachGold);
+      rim.rotation.x = Math.PI / 2;
+      rim.position.y = 0.062;
+      const top = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.012, 64), reachCoreTopMat);
+      top.position.y = 0.066;
+      broadcastGroup.add(plinth, rim, top);
+    }
+    const reachCoreOn = new THREE.Color(0xc21d33);
+    const reachCoreOff = new THREE.Color(0x5a1520);
+    const reachEmiOn = new THREE.Color(0x5a0814);
+    let reachAt = -1;
+
+    // Esmaecimento dos dois cenários da tela 09 (troca 09.3 ↔ 09.4 sem corte seco)
+    const collectFade = (root: THREE.Object3D) => {
+      const list: { m: THREE.Material; base: number }[] = [];
+      root.traverse((o) => {
+        const mm = (o as THREE.Mesh).material as THREE.Material | THREE.Material[] | undefined;
+        if (!mm) return;
+        (Array.isArray(mm) ? mm : [mm]).forEach((m) => {
+          if (list.some((x) => x.m === m)) return;
+          m.transparent = true;
+          list.push({ m, base: m.opacity });
+        });
+      });
+      return list;
+    };
+    const routeFadeMats = collectFade(railwayGroup);
+    const reachFadeMats = collectFade(broadcastGroup);
+    const entryFade = { route: 0, reach: 0 };
+    const applyFade = (list: { m: THREE.Material; base: number }[], f: number) => list.forEach((x) => (x.m.opacity = x.base * f));
 
     // =========================================================================
     // 12. COMPETITIVE CONSTELLATION 3D (SCENE 12: CONCORRÊNCIA)
@@ -1627,24 +1737,72 @@ export const WorldStage: React.FC = () => {
       }
 
       // -----------------------------------------------------------------------
-      // 10. Railway Expansion (Scene 10)
+      // 10–11. Tela 09: rota de entrada (cenário 9) e alcance (cenário 10) — Etapa 8 • Bloco 1
+      // Tudo por tempo; sem ciclos. Os dois cenários se esmaecem entre si na troca 09.3 ↔ 09.4.
       // -----------------------------------------------------------------------
-      railwayGroup.visible = sIdx === 9;
-      if (sIdx === 9) {
-        // cena 0 = canais (trem na origem); cenas 1..6 = estações 01..06
-        const trainTargetPt = railCurve.getPoint(Math.min(1.0, Math.max(0, (scIdx - 1) / 5)));
-        trainPod.position.lerp(trainTargetPt, 0.08);
+      const onEntry = currentIndex === SCREEN.ENTRY;
+      const routeOn = sIdx === 9;
+      const reachOn = sIdx === 10;
+      if (!onEntry) {
+        // fora da tela 09: nada residual; a próxima entrada recomeça do início da rota
+        entryFade.route = 0;
+        entryFade.reach = 0;
+        routeAnim.t = routeAnim.from = routeAnim.to = 0;
+        reachAt = -1;
+      } else {
+        const fr = dt / (reducedMotion ? 0.3 : 0.6);
+        entryFade.route = Math.min(1, Math.max(0, entryFade.route + (routeOn ? fr : -fr)));
+        entryFade.reach = Math.min(1, Math.max(0, entryFade.reach + (reachOn ? fr : -fr)));
       }
 
-      // -----------------------------------------------------------------------
-      // 11. Broadcast Waves (Scene 11)
-      // -----------------------------------------------------------------------
-      broadcastGroup.visible = sIdx === 10;
-      if (sIdx === 10) {
-        emitRings.forEach((r, i) => {
-          const s = 1 + ((elapsed * 0.8 + i * 0.3) % 2.5);
-          r.scale.set(s, s, s);
+      railwayGroup.visible = entryFade.route > 0.001;
+      // em telas 4:3 os dois cenários encolhem um pouco (mesma regra das telas 07 e 08)
+      const narrowEntry = camera.aspect < 1.5;
+      railwayGroup.scale.setScalar(narrowEntry ? 0.8 : 1);
+      broadcastGroup.scale.setScalar(narrowEntry ? 0.68 : 0.85);
+      if (railwayGroup.visible) {
+        applyFade(routeFadeMats, entryFade.route);
+        const seg = Math.min(2, Math.max(0, scIdx));
+        const goal = ROUTE_STOP_T[seg];
+        if (routeOn && goal !== routeAnim.to) {
+          routeAnim.from = routeAnim.t;
+          routeAnim.to = goal;
+          routeAnim.at = elapsed;
+          // movimento reduzido: a peça já está no trecho, sem deslocamento
+          routeAnim.dur = reducedMotion ? 0 : 0.7 + 0.9 * Math.abs(goal - routeAnim.from);
+        }
+        const p = routeAnim.dur > 0 ? Math.min(1, (elapsed - routeAnim.at) / routeAnim.dur) : 1;
+        routeAnim.t = routeAnim.from + (routeAnim.to - routeAnim.from) * easeInOutCubic(p);
+        const mp = routeCurve.getPointAt(routeAnim.t);
+        routeMarker.position.set(mp.x, 0.13 + (routeAnim.dur > 0 ? 0.06 * Math.sin(Math.PI * p) : 0), mp.z);
+        routeLitGeo.setDrawRange(0, Math.round(routeAnim.t * ROUTE_SAMPLES) + 1);
+        const k = Math.min(1, dt * (reducedMotion ? 8 : 4));
+        routeStations.forEach((st, i) => {
+          const reached = routeAnim.t >= ROUTE_STATION_T[i] - 0.01 ? 1 : 0;
+          const current = reached && ROUTE_GROUP[i] === seg ? 1 : 0;
+          st.lit += (reached - st.lit) * k;
+          st.cur += (current - st.cur) * k;
+          st.coreMat.color.copy(routeColDim).lerp(routeColDone, st.lit).lerp(routeColCur, st.cur);
+          st.coreMat.emissive.copy(routeEmiOff).lerp(routeEmiCur, st.cur);
+          st.haloMat.opacity = 0.8 * st.cur * entryFade.route;
         });
+      }
+
+      if (reachOn && reachAt < 0) reachAt = elapsed;
+      if (!reachOn && entryFade.reach <= 0.001) reachAt = -1; // voltar a entrar na 09.4 refaz a composição
+      broadcastGroup.visible = entryFade.reach > 0.001;
+      if (broadcastGroup.visible) {
+        applyFade(reachFadeMats, entryFade.reach);
+        const t = reducedMotion ? 99 : elapsed - Math.max(0, reachAt);
+        const segT = (a: number, b: number) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+        // 1. os círculos se desenham de fora para dentro (interesse → pilotos → clientes)
+        reachRings.forEach((g, i) => g.setDrawRange(0, Math.round(193 * easeInOutCubic(segT(0.15 + i * 0.35, 1.05 + i * 0.35)))));
+        // 2. linhas convergem do alcance para o centro
+        reachLinks.forEach((g, i) => g.setDrawRange(0, Math.round(25 * easeInOutCubic(segT(1.2 + i * 0.04, 1.8 + i * 0.04)))));
+        // 3. conclusão: o núcleo acende e a composição fica parada
+        const glow = easeInOutCubic(segT(1.9, 2.6));
+        reachCoreTopMat.color.copy(reachCoreOff).lerp(reachCoreOn, glow);
+        reachCoreTopMat.emissive.copy(routeEmiOff).lerp(reachEmiOn, glow);
       }
 
       // -----------------------------------------------------------------------

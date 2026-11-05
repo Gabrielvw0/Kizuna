@@ -82,8 +82,8 @@ export const STAGE_MAP: StageRef[][] = [
   [at(STAGE.VALIDATION_GATE, 1), at(STAGE.VALIDATION_GATE, 2)],
   // 08 Planos: uma estrutura de crescimento — Start, Business, Enterprise (cenário 6) → simulador (cenário 12)
   [at(STAGE.MODULAR_RINGS, 0), at(STAGE.MODULAR_RINGS, 1), at(STAGE.MODULAR_RINGS, 2), at(STAGE.FINANCIAL, 0)],
-  // 09 Entrada (R3) na linha do trem: pilotos → expansão → subsidiária; aquisição (R4)
-  [at(STAGE.RAILWAY, 3), at(STAGE.RAILWAY, 5), at(STAGE.RAILWAY, 6), at(STAGE.BROADCAST, 0)],
+  // 09 Entrada (R3) na rota: um passo por trecho (parceiro e pilotos → referências e expansão → subsidiária); aquisição (R4)
+  [at(STAGE.RAILWAY, 0), at(STAGE.RAILWAY, 1), at(STAGE.RAILWAY, 2), at(STAGE.BROADCAST, 0)],
   // 10 Posicionamento
   [at(STAGE.CONSTELLATION, 0), at(STAGE.CONSTELLATION, 1)],
   // 11 Riscos e 12 meses
