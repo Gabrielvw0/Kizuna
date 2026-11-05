@@ -155,8 +155,14 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 7: // TELA 08: ADAPTAÇÃO • 7 TRANSFORMAÇÕES DA INTERFACE
       env.globeVisibility = 0.0;
       env.adaptationMorphVisibility = 1.0;
-      pose.pos.set(0.1, 0, 2.55);
-      pose.target.set(0, 0, 0);
+      // Etapa 8 • transições: 06.1 diante da camada de comunicação; 06.2 atravessa para a de decisão
+      if (sceneIdx <= 0) {
+        pose.pos.set(0.1, 0, 2.55);
+        pose.target.set(0, 0, 0);
+      } else {
+        pose.pos.set(0.2, 0.05, -2.3);
+        pose.target.set(0.15, 0, -6.5);
+      }
       break;
 
     case 8: // TELA 09: CONFIANÇA • COFRE / PORTÃO VERMELHO DE VALIDAÇÃO
@@ -164,8 +170,14 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
       env.gateVisibility = 1.0;
       // Etapa 8: câmera afastada — os pilares caem nos vãos entre as três colunas da tela
       // e o portão (deslocado para baixo em WorldStage) emoldura a decisão no centro
-      pose.pos.set(0, 0.05, 6.0);
-      pose.target.set(0, 0, 0);
+      // 07.2: antes do Hanko, a câmera se aproxima um pouco e sobe para a placa
+      if (sceneIdx >= 2) {
+        pose.pos.set(0, 0.2, 5.82);
+        pose.target.set(0, 0.08, 0);
+      } else {
+        pose.pos.set(0, 0.05, 6.0);
+        pose.target.set(0, 0, 0);
+      }
       break;
 
     case 9: // TELA 10: ENTRADA NO MERCADO • LINHA FERROVIÁRIA METROVIÁRIA

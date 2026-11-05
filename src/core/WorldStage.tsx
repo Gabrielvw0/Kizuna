@@ -477,10 +477,10 @@ function createGrowthStructure() {
     els.forEach((el) => {
       const on = level >= el.level;
       let p = el.p;
-      if (reduced) p = on ? 1 : 0;
-      else if (on) {
-        if (p > 0 || elapsed - changedAt >= el.delay) p += dt / el.dur;
-      } else p -= dt / 0.45;
+      if (on) {
+        if (reduced) p += dt / 0.3;
+        else if (p > 0 || elapsed - changedAt >= el.delay) p += dt / el.dur;
+      } else p -= dt / (reduced ? 0.25 : 0.45);
       p = Math.min(1, Math.max(0, p));
       if (p !== el.p) {
         el.p = p;
@@ -500,7 +500,9 @@ function createGrowthStructure() {
         const start = i === 0 ? 0.5 : 1.45 + ((i - 1) / 11) * 0.8;
         target = (i === 0 ? 0.95 : 0.8) * Math.min(1, Math.max(0, (t - start) / 0.3));
       }
-      m.opacity = t >= 0 ? target : Math.max(0, m.opacity - dt * 3);
+      if (t < 0) m.opacity = Math.max(0, m.opacity - dt * 3);
+      else if (reduced) m.opacity += (target - m.opacity) * Math.min(1, dt * 8);
+      else m.opacity = target;
     });
     linkMats.forEach((m) => (m.opacity = level >= 3 ? 0.62 : 0.5));
   };
@@ -894,6 +896,61 @@ export const WorldStage: React.FC = () => {
     // =========================================================================
     const adaptationMorphGroup = new THREE.Group();
     scene.add(adaptationMorphGroup);
+    // Etapa 8 • transições: duas camadas de treliça kumiko em profundidade. Cena 06.1 ilumina a da frente
+    // (comunicação: idioma e formatos); na 06.2 a câmera atravessa para a de trás (decisão e conformidade),
+    // que tem o detalhe vermelho. Linhas finas e discretas, atrás do texto.
+    const makeKumiko = (z: number, w: number, h: number, cols: number, rows: number) => {
+      const g = new THREE.Group();
+      const pts: number[] = [];
+      const seg = (x1: number, y1: number, x2: number, y2: number) => pts.push(x1, y1, 0, x2, y2, 0);
+      for (let i = 0; i <= cols; i++) seg(-w / 2 + (i * w) / cols, -h / 2, -w / 2 + (i * w) / cols, h / 2);
+      for (let j = 0; j <= rows; j++) seg(-w / 2, -h / 2 + (j * h) / rows, w / 2, -h / 2 + (j * h) / rows);
+      // losangos em células alternadas (padrão de treliça)
+      const cw = w / cols;
+      const ch = h / rows;
+      for (let i = 0; i < cols; i++)
+        for (let j = 0; j < rows; j++) {
+          if ((i + j) % 2) continue;
+          const cx = -w / 2 + (i + 0.5) * cw;
+          const cy = -h / 2 + (j + 0.5) * ch;
+          seg(cx, cy + ch / 2, cx + cw / 2, cy);
+          seg(cx + cw / 2, cy, cx, cy - ch / 2);
+          seg(cx, cy - ch / 2, cx - cw / 2, cy);
+          seg(cx - cw / 2, cy, cx, cy + ch / 2);
+        }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+      const mat = new THREE.LineBasicMaterial({ color: 0xd9c493, transparent: true, opacity: 0, fog: false, depthWrite: false });
+      g.add(new THREE.LineSegments(geo, mat));
+      const glowMat = new THREE.ShaderMaterial({
+        uniforms: { uOpacity: { value: 0 } },
+        vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+        fragmentShader: `uniform float uOpacity; varying vec2 vUv; void main(){ vec2 c = vUv - 0.5; float a = smoothstep(0.55, 0.0, length(c * vec2(1.0, 1.4))); gl_FragColor = vec4(1.0, 0.9, 0.76, 1.0) * a * uOpacity; }`,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        fog: false
+      });
+      const glow = new THREE.Mesh(new THREE.PlaneGeometry(w * 1.1, h * 1.1), glowMat);
+      glow.position.z = -0.08;
+      g.add(glow);
+      g.position.set(0.5, 0, z);
+      adaptationMorphGroup.add(g);
+      return { mat, glowMat };
+    };
+    const kumikoFront = makeKumiko(-1.4, 5.4, 3.2, 12, 7);
+    const kumikoBack = makeKumiko(-4.8, 6.4, 3.8, 12, 7);
+    // detalhe vermelho da camada de decisão: um quadro de selo no alto, à direita
+    const kumikoSealMat = new THREE.LineBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0, fog: false, depthWrite: false });
+    {
+      const s = 0.36;
+      const p = [-s, -s, 0, s, -s, 0, s, -s, 0, s, s, 0, s, s, 0, -s, s, 0, -s, s, 0, -s, -s, 0];
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(p, 3));
+      const seal = new THREE.LineSegments(geo, kumikoSealMat);
+      seal.position.set(1.55, 0.7, -4.75);
+      adaptationMorphGroup.add(seal);
+    }
 
     // Etapa 8: a moldura aramada (linha diagonal sobre o conteúdo) foi removida; o cenário fica limpo.
 
@@ -1048,6 +1105,8 @@ export const WorldStage: React.FC = () => {
 
     let gateSceneSeen = -1;
     let gateSceneAt = 0;
+    // último estado aberto (para fechar o portal com animação ao voltar à 07.1)
+    const gateSnap = { focus: 0, seal: 0, unlock: 0, open: 0, reveal: 0 };
 
     // =========================================================================
     // 10. RAILWAY EXPANSION TRACK GROUP (SCENE 10: ENTRADA)
@@ -1227,6 +1286,17 @@ export const WorldStage: React.FC = () => {
     const currentPos = initialShot.pos.clone();
     const currentTarget = initialShot.target.clone();
     let lastElapsed = 0;
+    // Tomada de câmera entre CENAS da mesma tela: tween com easing (acelera e desacelera) a partir de onde
+    // a câmera está. Entre TELAS continua a aproximação exponencial já aprovada.
+    const camShot = {
+      screen: stateRef.current.currentIndex,
+      scene: stateRef.current.sceneIndex,
+      tween: false,
+      at: 0,
+      dur: 1.0,
+      fromPos: new THREE.Vector3(),
+      fromTarget: new THREE.Vector3()
+    };
 
     // Orientação do globo: tomadas com duração e suavização, sem rotação infinita.
     // Tela 01.1: visão ampla nas Américas → passa lentamente pela Europa, África e Índia (presença da Globant).
@@ -1287,8 +1357,32 @@ export const WorldStage: React.FC = () => {
       // por tempo (não por quadro): mesmo ritmo em 60 ou 30 fps; 2,75/s ≈ o antigo 0,045 por quadro a 60 fps
       const camK = 1 - Math.exp(-dt * (sIdx === 0 || sIdx === 14 ? 0.9 : 2.75));
       const framed = sIdx === 0 ? frameGlobePose(pose, camera.aspect) : pose;
-      currentPos.lerp(framed.pos, camK);
-      currentTarget.lerp(framed.target, camK);
+      if (currentIndex !== camShot.screen) {
+        // (A) troca de tela: comportamento existente
+        camShot.screen = currentIndex;
+        camShot.scene = sceneIndex;
+        camShot.tween = false;
+      } else if (sceneIndex !== camShot.scene) {
+        // (B) troca de cena na mesma tela: nova tomada (o globo mantém a aproximação lenta própria)
+        camShot.scene = sceneIndex;
+        if (sIdx !== 0 && sIdx !== 14) {
+          camShot.fromPos.copy(currentPos);
+          camShot.fromTarget.copy(currentTarget);
+          camShot.at = elapsed;
+          camShot.dur = reducedMotion ? 0.8 : 1.0;
+          camShot.tween = true;
+        }
+      }
+      if (camShot.tween) {
+        const p = Math.min(1, (elapsed - camShot.at) / camShot.dur);
+        const e = easeInOutCubic(p);
+        currentPos.lerpVectors(camShot.fromPos, framed.pos, e);
+        currentTarget.lerpVectors(camShot.fromTarget, framed.target, e);
+        if (p >= 1) camShot.tween = false;
+      } else {
+        currentPos.lerp(framed.pos, camK);
+        currentTarget.lerp(framed.target, camK);
+      }
       camera.position.copy(currentPos);
       camera.lookAt(currentTarget);
 
@@ -1433,6 +1527,20 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       adaptationMorphGroup.visible = sIdx === 7;
       if (sIdx === 7) {
+        // a luz acompanha a cena: a camada ativa acende, a outra recua (por tempo; mov. reduzido = mais curto)
+        const k = 1 - Math.exp(-dt * (reducedMotion ? 7 : 2.4));
+        const front = scIdx === 0;
+        kumikoFront.mat.opacity += ((front ? 0.22 : 0.05) - kumikoFront.mat.opacity) * k;
+        kumikoFront.glowMat.uniforms.uOpacity.value += ((front ? 0.09 : 0.0) - kumikoFront.glowMat.uniforms.uOpacity.value) * k;
+        kumikoBack.mat.opacity += ((front ? 0.07 : 0.18) - kumikoBack.mat.opacity) * k;
+        kumikoBack.glowMat.uniforms.uOpacity.value += ((front ? 0.015 : 0.1) - kumikoBack.glowMat.uniforms.uOpacity.value) * k;
+        kumikoSealMat.opacity += ((front ? 0.12 : 0.8) - kumikoSealMat.opacity) * k;
+      } else {
+        kumikoFront.mat.opacity = 0;
+        kumikoFront.glowMat.uniforms.uOpacity.value = 0;
+        kumikoBack.mat.opacity = 0;
+        kumikoBack.glowMat.uniforms.uOpacity.value = 0;
+        kumikoSealMat.opacity = 0;
       }
 
       // -----------------------------------------------------------------------
@@ -1447,15 +1555,17 @@ export const WorldStage: React.FC = () => {
           gateSceneSeen = scIdx;
           gateSceneAt = elapsed;
         }
-        const t = scIdx === 2 ? (reducedMotion ? 99 : elapsed - gateSceneAt) : -1;
+        const tr = elapsed - gateSceneAt;
+        // 07.2: a câmera ajusta o enquadramento primeiro (GATE_LEAD) e só então o Hanko entra.
+        // Movimento reduzido: sem o Hanko em movimento; selo, trava, abertura e luz em ~0,6 s.
+        const GATE_LEAD = 0.45;
+        const t = scIdx === 2 ? (reducedMotion ? (tr <= 0.1 ? -1 : 1.05 + (tr - 0.1) * 4.3) : tr - GATE_LEAD) : -1;
         const seg = (a: number, b: number) => Math.min(1, Math.max(0, (t - a) / (b - a)));
         const easeOut = (x: number) => 1 - Math.pow(1 - x, 3);
         const easeIn = (x: number) => x * x * x;
 
         // 1. mudança breve de iluminação: o ambiente baixa, a luz-chave foca a placa
-        const focus = seg(0, 0.6);
-        portalFill.intensity = 0.6 - 0.2 * focus;
-        portalKey.intensity = 2.0 + 0.8 * focus;
+        let focus = seg(0, 0.6);
 
         // 2. o Hanko surge de frente, 3. desce e carimba, recua e some
         const appear = easeOut(seg(0.35, 0.8));
@@ -1465,7 +1575,7 @@ export const WorldStage: React.FC = () => {
         hz = hz - (1.0 - 0.075) * press; // → encosta na placa
         hz = hz + (1.0 - 0.075) * retract; // volta
         hanko.position.z = hz;
-        hanko.visible = t > 0.3 && t < 1.8;
+        hanko.visible = !reducedMotion && t > 0.3 && t < 1.8;
         const hOpacity = appear * (1 - retract);
         hankoMats.forEach((m) => (m.opacity = hOpacity));
         // impacto: leve compressão e um pulso de luz quente (sem flash)
@@ -1473,15 +1583,30 @@ export const WorldStage: React.FC = () => {
         const bell = impact > 0 && impact < 1 ? Math.sin(impact * Math.PI) : 0;
         hanko.scale.set(1 + 0.04 * bell, 1 - 0.06 * bell, 1 + 0.04 * bell);
         portalPoint.intensity = 2.2 * bell;
-        sealMat.opacity = seg(1.05, 1.35);
+        let seal = seg(1.05, 1.35);
+        let unlock = easeOut(seg(1.75, 2.15));
+        let open = easeInOutCubic(seg(2.15, 3.35));
+        let reveal = easeOut(seg(2.3, 3.6));
+        if (scIdx === 2) {
+          Object.assign(gateSnap, { focus, seal, unlock, open, reveal });
+        } else {
+          // voltar à 07.1: o portal fecha (não salta) — a luz recolhe, os painéis voltam, a trava fecha
+          const c = 1 - easeInOutCubic(Math.min(1, tr / (reducedMotion ? 0.4 : 0.9)));
+          focus = gateSnap.focus * c;
+          seal = gateSnap.seal * c;
+          unlock = gateSnap.unlock * c;
+          open = gateSnap.open * c;
+          reveal = gateSnap.reveal * c;
+        }
+        portalFill.intensity = 0.6 - 0.2 * focus;
+        portalKey.intensity = 2.0 + 0.8 * focus;
+        sealMat.opacity = seal;
 
         // 4. a trava gira e destrava
-        const unlock = easeOut(seg(1.75, 2.15));
         latch.rotation.z = (Math.PI / 2) * unlock;
         lockDisc.rotation.y = (Math.PI / 2) * unlock;
 
         // 5. os painéis deslizam para os montantes (recolhem por trás deles)
-        const open = easeInOutCubic(seg(2.15, 3.35));
         const sx = 1 - 0.88 * open;
         shojiL.scale.x = sx;
         shojiR.scale.x = sx;
@@ -1492,13 +1617,13 @@ export const WorldStage: React.FC = () => {
         seam.visible = open < 0.02;
 
         // 6. a luz atravessa o portal e revela o espaço do outro lado
-        const reveal = easeOut(seg(2.3, 3.6));
         // fechado: luz contida atrás do papel; aberto: a luz atravessa
         beyondMat.uniforms.uOpacity.value = 0.24 + 0.55 * reveal;
         pathMat.opacity = 0.32 * reveal;
         washiMat.opacity = 0.22 + 0.12 * reveal;
       } else {
         gateSceneSeen = -1;
+        Object.assign(gateSnap, { focus: 0, seal: 0, unlock: 0, open: 0, reveal: 0 });
       }
 
       // -----------------------------------------------------------------------
