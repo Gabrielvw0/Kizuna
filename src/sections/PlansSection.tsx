@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Check, Layers, Wrench, Plug, Users } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
 import { PRICING, PlanId, getPlan, planForUsers, yen } from '../data/pricing';
@@ -8,6 +8,39 @@ const PLAN_IDS: PlanId[] = ['start', 'business', 'enterprise'];
 const RING_RADIUS: Record<PlanId, number> = { start: 62, business: 112, enterprise: 162 };
 const RING_LABEL: Record<PlanId, string> = { start: 'Equipe', business: 'Departamentos', enterprise: 'Empresa' };
 const yenJp = (n: number) => `¥${n.toLocaleString('ja-JP')}`;
+
+const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * Contagem por tempo (não por quadro) até o valor exato. Sempre termina no alvo;
+ * com movimento reduzido mostra o valor direto.
+ */
+function useCountUp(target: number, delayMs: number, durationMs: number) {
+  const [value, setValue] = useState(target);
+  const raf = useRef<number | null>(null);
+  useEffect(() => {
+    if (reducedMotion()) {
+      setValue(target);
+      return;
+    }
+    const start = performance.now() + delayMs;
+    setValue(0);
+    const tick = () => {
+      const t = Math.min(1, Math.max(0, (performance.now() - start) / durationMs));
+      const e = 1 - Math.pow(1 - t, 3);
+      setValue(t >= 1 ? target : Math.round(target * e));
+      if (t < 1) raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    // rede de segurança: se os quadros pararem, o valor final aparece mesmo assim
+    const done = window.setTimeout(() => setValue(target), delayMs + durationMs + 200);
+    return () => {
+      if (raf.current) cancelAnimationFrame(raf.current);
+      window.clearTimeout(done);
+    };
+  }, [target, delayMs, durationMs]);
+  return value;
+}
 
 /**
  * Tela 08 • Planos e modelo de receita.
@@ -25,6 +58,17 @@ export const PlansSection: React.FC = () => {
   const simPlanId = planForUsers(users);
   const simPlan = getPlan(simPlanId);
   const monthly = simPlan.priceMonthly * users;
+  // ordem da conta: usuários (0) → preço (0,25 s) → MRR (0,5 s) → × 12 (1,25 s) → ARR (1,45 s)
+  const mrrShown = useCountUp(scene === 1 ? monthly : 0, 500, 700);
+  const arrShown = useCountUp(scene === 1 ? monthly * 12 : 0, 1450, 800);
+
+  // O 3D acompanha: plano escolhido (onda a partir do anel) e mudanças no simulador
+  useEffect(() => {
+    if (scene === 0) window.dispatchEvent(new CustomEvent('kizuna:plan', { detail: { level: PLAN_IDS.indexOf(planId) } }));
+  }, [planId, scene]);
+  useEffect(() => {
+    if (scene === 1) window.dispatchEvent(new CustomEvent('kizuna:revenue', { detail: { strength: Math.min(1, 0.4 + users / 160) } }));
+  }, [users, scene]);
   const { implementation, integration } = simPlan.estimates;
 
   return (
@@ -107,6 +151,17 @@ export const PlansSection: React.FC = () => {
                     </g>
                   );
                 })}
+                <circle
+                  key={'wave-' + planId}
+                  className="ring-wave"
+                  cx="180"
+                  cy="180"
+                  r={RING_RADIUS[planId]}
+                  fill="none"
+                  stroke="#EC4A5C"
+                  strokeWidth={1.5}
+                  style={{ animationDelay: `${activeLevel * 160 + 120}ms` }}
+                />
               </svg>
               <p className="text-[11px] text-washi-dim short:hidden short:lg:block">Toque em um anel para ver o escopo do plano.</p>
             </div>
@@ -172,22 +227,31 @@ export const PlansSection: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-3 md:gap-6 border-y border-washi/15 py-4 short:py-3">
               <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-washi-dim">Receita mensal (MRR)</div>
-                <div className="mt-1 text-sm md:text-base text-washi-muted tabular-nums">
-                  {users} usuários × {yen(simPlan.priceMonthly)}
+                <div key={'f' + users} className="mt-1 text-sm md:text-base text-washi-muted tabular-nums">
+                  <span className="step-in inline-block">{users} usuários</span>{' '}
+                  <span className="step-in inline-block" style={{ animationDelay: '250ms' }}>
+                    × {yen(simPlan.priceMonthly)}
+                  </span>
                 </div>
-                <div key={'m' + monthly} className="font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-washi tabular-nums animate-fadeIn">
-                  {yenJp(monthly)}
+                <div
+                  className="font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-washi tabular-nums"
+                  aria-label={yenJp(monthly)}
+                >
+                  {yenJp(mrrShown)}
                 </div>
               </div>
-              <div className="hidden md:flex flex-col items-center pb-3 text-washi-dim" aria-hidden>
+              <div key={'x' + users} className="hidden md:flex flex-col items-center pb-3 text-washi-dim step-in" style={{ animationDelay: '1250ms' }} aria-hidden>
                 <span className="text-sm tabular-nums">× 12</span>
                 <span className="text-2xl leading-none">→</span>
               </div>
               <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-washi-dim">Receita anual (ARR)</div>
                 <div className="mt-1 text-sm md:text-base text-washi-muted">{PRICING.annualRule}</div>
-                <div key={'a' + monthly} className="font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-beni-soft tabular-nums animate-fadeIn">
-                  {yenJp(monthly * 12)}
+                <div
+                  className="font-display font-semibold text-4xl md:text-5xl lg:text-6xl short:text-4xl text-beni-soft tabular-nums"
+                  aria-label={yenJp(monthly * 12)}
+                >
+                  {yenJp(arrShown)}
                 </div>
               </div>
             </div>
