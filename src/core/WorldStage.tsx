@@ -177,6 +177,142 @@ function frameGlobePose(pose: { pos: THREE.Vector3; target: THREE.Vector3 }, asp
   return { pos, target };
 }
 
+/**
+ * Etapa 8 • Campo de ondas no piso (telas 08.1 e 08.2): crescimento como linguagem visual.
+ * - linhas de expansão radiais, que esmaecem com a distância;
+ * - anéis-base (equipe → departamentos → empresa) que acendem até o nível escolhido;
+ * - ondas ambientais lentas (uma a cada ~5 s, vida de ~10 s), sem girar nada;
+ * - pulsos: uma onda mais clara parte de um raio quando o apresentador escolhe algo;
+ * - campo de luz suave no centro, que respira devagar e acende com os pulsos.
+ * Tudo baseado em tempo (elapsed/dt), não em quadros. Com movimento reduzido: sem ondas.
+ */
+function createWaveField(baseRadii: number[], maxR = 3.0) {
+  const group = new THREE.Group();
+  const unitCircle = (() => {
+    const pts: THREE.Vector3[] = [];
+    for (let i = 0; i <= 160; i++) {
+      const a = (i / 160) * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a), 0, Math.sin(a)));
+    }
+    return new THREE.BufferGeometry().setFromPoints(pts);
+  })();
+  const ring = (color: number, opacity: number) => {
+    const m = new THREE.Line(unitCircle, new THREE.LineBasicMaterial({ color, transparent: true, opacity, fog: false }));
+    group.add(m);
+    return m;
+  };
+
+  // linhas radiais (arquitetura do piso)
+  const radialMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.55, fog: false });
+  const near = new THREE.Color(0x3a404c);
+  const far = new THREE.Color(0x0b0b0d);
+  for (let i = 0; i < 36; i++) {
+    const a = (i / 36) * Math.PI * 2;
+    const g = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(Math.cos(a) * 0.3, 0, Math.sin(a) * 0.3),
+      new THREE.Vector3(Math.cos(a) * maxR, 0, Math.sin(a) * maxR)
+    ]);
+    g.setAttribute('color', new THREE.Float32BufferAttribute([near.r, near.g, near.b, far.r, far.g, far.b], 3));
+    group.add(new THREE.Line(g, radialMat));
+  }
+
+  // campo de luz central
+  const lightMat = new THREE.ShaderMaterial({
+    uniforms: { uOpacity: { value: 0.05 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+    fragmentShader: `uniform float uOpacity; varying vec2 vUv; void main(){ float d = distance(vUv, vec2(0.5)); float a = smoothstep(0.5, 0.0, d); gl_FragColor = vec4(0.95, 0.92, 0.86, 1.0) * a * a * uOpacity; }`,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: false
+  });
+  const lightField = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 4.2), lightMat);
+  lightField.rotation.x = -Math.PI / 2;
+  lightField.position.y = -0.002;
+  group.add(lightField);
+
+  // anéis-base
+  const bases = baseRadii.map((r) => {
+    const m = ring(0xf2eee6, 0.1);
+    m.scale.set(r, 1, r);
+    return { mesh: m, litAt: Number.POSITIVE_INFINITY, lit: false };
+  });
+
+  // ondas ambientais e pulsos (pool fixo, sem criar objetos durante a apresentação)
+  const ambient = Array.from({ length: 3 }, (_, i) => ({ mesh: ring(0xf2eee6, 0), born: -i * 5 }));
+  const pulses = Array.from({ length: 3 }, () => ({ mesh: ring(0xec4a5c, 0), born: -99, from: 0.5, strength: 0 }));
+  let nextPulse = 0;
+  let lastAmbient = -99;
+  let boost = 0;
+
+  const setLit = (level: number, now: number) => {
+    bases.forEach((b, i) => {
+      const on = i <= level;
+      // acende de dentro para fora (160 ms por anel); apaga de fora para dentro
+      b.litAt = now + (on ? i * 0.16 : (bases.length - 1 - i) * 0.09);
+      b.lit = on;
+    });
+  };
+  const pulse = (from: number, strength: number, now: number) => {
+    const p = pulses[nextPulse];
+    nextPulse = (nextPulse + 1) % pulses.length;
+    p.born = now;
+    p.from = from;
+    p.strength = strength;
+    boost = Math.max(boost, 0.06 * strength);
+  };
+
+  const update = (elapsed: number, dt: number, reduced: boolean) => {
+    // anéis-base: opacidade alvo depende de estarem acesos (com o atraso de cada um)
+    bases.forEach((b) => {
+      const target = elapsed >= b.litAt ? (b.lit ? 0.5 : 0.1) : (b.mesh.material as THREE.LineBasicMaterial).opacity > 0.3 ? 0.5 : 0.1;
+      const mat = b.mesh.material as THREE.LineBasicMaterial;
+      mat.opacity += (target - mat.opacity) * Math.min(1, dt * 5);
+      mat.color.setHex(b.lit ? 0xec4a5c : 0xf2eee6);
+    });
+    // campo de luz: respiração lenta (~9 s) + reforço dos pulsos
+    boost = Math.max(0, boost - dt * 0.03);
+    lightMat.uniforms.uOpacity.value = 0.045 + (reduced ? 0 : Math.sin(elapsed * 0.7) * 0.012) + boost;
+    if (reduced) {
+      ambient.forEach((a) => ((a.mesh.material as THREE.LineBasicMaterial).opacity = 0));
+      pulses.forEach((p) => ((p.mesh.material as THREE.LineBasicMaterial).opacity = 0));
+      return;
+    }
+    // ondas ambientais: nascem a cada 5 s, crescem devagar e somem
+    if (elapsed - lastAmbient > 5) {
+      lastAmbient = elapsed;
+      const a = ambient.reduce((o, x) => (x.born < o.born ? x : o));
+      a.born = elapsed;
+    }
+    ambient.forEach((a) => {
+      const t = (elapsed - a.born) / 10;
+      const mat = a.mesh.material as THREE.LineBasicMaterial;
+      if (t < 0 || t > 1) {
+        mat.opacity = 0;
+        return;
+      }
+      const r = 0.35 + (maxR - 0.35) * (1 - Math.pow(1 - t, 2));
+      a.mesh.scale.set(r, 1, r);
+      mat.opacity = Math.sin(t * Math.PI) * 0.16;
+    });
+    // pulsos: onda clara a partir do raio escolhido (2,4 s)
+    pulses.forEach((p) => {
+      const t = (elapsed - p.born) / 2.4;
+      const mat = p.mesh.material as THREE.LineBasicMaterial;
+      if (t < 0 || t > 1) {
+        mat.opacity = 0;
+        return;
+      }
+      const e = 1 - Math.pow(1 - t, 3);
+      const r = p.from + (maxR - p.from) * e;
+      p.mesh.scale.set(r, 1, r);
+      mat.opacity = (1 - t) * 0.55 * p.strength;
+    });
+  };
+
+  return { group, update, setLit, pulse };
+}
+
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 export const WorldStage: React.FC = () => {
@@ -519,17 +655,11 @@ export const WorldStage: React.FC = () => {
 
     // Etapa 8: os cubos saíram. Três anéis finos no piso (equipe → departamentos → empresa)
     // acendem em sequência, de dentro para fora: a ideia de crescimento dos planos.
-    const growthRings: THREE.Mesh[] = [];
-    [0.55, 1.0, 1.45].forEach((r) => {
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(r, 0.006, 8, 128),
-        new THREE.MeshBasicMaterial({ color: 0xf2eee6, transparent: true, opacity: 0.12, fog: false })
-      );
-      ring.rotation.x = Math.PI / 2;
-      modularScaleGroup.add(ring);
-      growthRings.push(ring);
-    });
-    modularScaleGroup.position.set(0, -1.05, -0.6);
+    const planField = createWaveField([0.55, 1.0, 1.45]);
+    modularScaleGroup.add(planField.group);
+    planField.setLit(0, 0); // Start aceso por padrão (a tela confirma o plano ao entrar)
+    // centro do campo sob os anéis da tela (à esquerda)
+    modularScaleGroup.position.set(-0.7, -1.05, -0.6);
 
     // =========================================================================
     // 08. ADAPTATION METAMORPHOSIS GROUP (SCENE 08: ADAPTAÇÃO)
@@ -551,15 +681,15 @@ export const WorldStage: React.FC = () => {
     // vermelha (shimaki) e travessa (nuki); o painel central de aprovação é o da tela.
     // Fechado: uma barreira fina atravessa o vão. Aprovado pelo Hanko: a barreira sobe e some,
     // e as colunas continuam como moldura.
-    const toriiRed = new THREE.MeshBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.85, fog: false });
+    const toriiRed = new THREE.MeshBasicMaterial({ color: 0xc41f35, transparent: true, opacity: 0.82, fog: false });
     const toriiDark = new THREE.MeshBasicMaterial({ color: 0x1a1c22, fog: false });
     const COL_X = 1.1;
     [-COL_X, COL_X].forEach((x) => {
-      const col = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.05, 1.9, 24), toriiRed);
+      const col = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.04, 1.9, 24), toriiRed);
       col.position.set(x, 0, 0);
       gateGroup.add(col);
     });
-    const shimaki = new THREE.Mesh(new THREE.BoxGeometry(2.62, 0.055, 0.09), toriiRed);
+    const shimaki = new THREE.Mesh(new THREE.BoxGeometry(2.62, 0.045, 0.08), toriiRed);
     shimaki.position.set(0, 0.97, 0);
     const kasagi = new THREE.Mesh(new THREE.BoxGeometry(2.86, 0.07, 0.11), toriiDark);
     kasagi.position.set(0, 1.035, 0);
@@ -570,7 +700,7 @@ export const WorldStage: React.FC = () => {
       tip.rotation.z = side * 0.18;
       gateGroup.add(tip);
     });
-    const nuki = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.04, 0.07), toriiRed);
+    const nuki = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.03, 0.06), toriiRed);
     nuki.position.set(0, 0.72, 0);
     // o painel central de aprovação é o painel da própria tela, pendurado sob as vigas
     gateGroup.add(shimaki, kasagi, nuki);
@@ -583,6 +713,14 @@ export const WorldStage: React.FC = () => {
     barrier.rotation.z = Math.PI / 2;
     barrier.position.set(0, -0.05, 0);
     gateGroup.add(barrier);
+
+    // Luz dirigida ao mecanismo de aprovação (cai de cima, cresce com o carimbo)
+    const gateLight = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.5, 2.1),
+      new THREE.ShaderMaterial({ ...beamShader, uniforms: { uOpacity: { value: 0.0 } }, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })
+    );
+    gateLight.position.set(0, 0.05, -0.2);
+    gateGroup.add(gateLight);
 
     // =========================================================================
     // 10. RAILWAY EXPANSION TRACK GROUP (SCENE 10: ENTRADA)
@@ -690,23 +828,10 @@ export const WorldStage: React.FC = () => {
     const financial3DGroup = new THREE.Group();
     scene.add(financial3DGroup);
 
-    // Etapa 8: barras recuadas para o fundo (não atravessam os números da tela)
-    financial3DGroup.position.set(0.6, -0.2, -3);
-    const finBars: THREE.Mesh[] = [];
-    const barValues = [0.4, 0.7, 1.1, 1.6, 2.2];
-    for (let i = 0; i < 5; i++) {
-      const bGeo = new THREE.CylinderGeometry(0.08, 0.08, barValues[i], 16);
-      const bMat = new THREE.MeshBasicMaterial({
-        color: i === 4 ? 0xf2eee6 : 0x5c6474,
-        wireframe: true,
-        transparent: true,
-        opacity: i === 4 ? 0.12 : 0.08
-      });
-      const bar = new THREE.Mesh(bGeo, bMat);
-      bar.position.set(-1.0 + i * 0.5, -0.8 + barValues[i] / 2, 0);
-      financial3DGroup.add(bar);
-      finBars.push(bar);
-    }
+    // Etapa 8: as barras genéricas saíram; o piso de ondas acompanha a conta da receita
+    financial3DGroup.position.set(0.4, -1.05, -0.8);
+    const revenueField = createWaveField([]);
+    financial3DGroup.add(revenueField.group);
 
     // =========================================================================
     // 14. MISSION CONTROL RADAR GROUP (SCENE 14: RISCOS & KPIS)
@@ -766,6 +891,22 @@ export const WorldStage: React.FC = () => {
     // =========================================================================
     let animId: number;
     let clock = new THREE.Clock();
+    // Tela 08 avisa o 3D: plano escolhido (nível 0–2) e mudança no simulador
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const planRadii = [0.55, 1.0, 1.45];
+    const onPlan = (e: Event) => {
+      const level = Math.max(0, Math.min(2, Number((e as CustomEvent).detail?.level) || 0));
+      const now = clock.getElapsedTime();
+      planField.setLit(level, now);
+      planField.pulse(planRadii[level], 1, now);
+    };
+    const onRevenue = (e: Event) => {
+      const strength = Math.max(0.4, Math.min(1, Number((e as CustomEvent).detail?.strength) || 0.6));
+      revenueField.pulse(0.4, strength, clock.getElapsedTime());
+    };
+    window.addEventListener('kizuna:plan', onPlan);
+    window.addEventListener('kizuna:revenue', onRevenue);
+
     // Começa já no enquadramento da cena atual (sem "deslizar" o globo por baixo do texto)
     const initialShot = (() => {
       const { currentIndex: ci, sceneIndex: si } = stateRef.current;
@@ -969,12 +1110,7 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       modularScaleGroup.visible = sIdx === 6;
       if (sIdx === 6) {
-        // onda lenta de dentro para fora (≈ 4,5 s por ciclo), sem girar nem mudar de lugar
-        growthRings.forEach((ring, i) => {
-          const phase = (elapsed * 0.22 - i * 0.18) % 1;
-          const glow = Math.max(0, Math.sin(Math.max(0, phase) * Math.PI));
-          (ring.material as THREE.MeshBasicMaterial).opacity = 0.1 + glow * 0.28;
-        });
+        planField.update(elapsed, dt, reducedMotion);
       }
 
       // -----------------------------------------------------------------------
@@ -996,6 +1132,8 @@ export const WorldStage: React.FC = () => {
         barrier.position.y += ((isOpen ? 0.62 : -0.05) - barrier.position.y) * k;
         barrierMat.opacity += ((isOpen ? 0 : 0.7) - barrierMat.opacity) * k;
         barrier.visible = barrierMat.opacity > 0.01;
+        const gl = (gateLight.material as THREE.ShaderMaterial).uniforms.uOpacity;
+        gl.value += ((isOpen ? 0.26 : 0.11) - gl.value) * Math.min(1, dt * 2.5);
       }
 
       // -----------------------------------------------------------------------
@@ -1032,9 +1170,7 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       financial3DGroup.visible = sIdx === 12;
       if (sIdx === 12) {
-        finBars.forEach((b, i) => {
-          b.rotation.y += 0.01;
-        });
+        revenueField.update(elapsed, dt, reducedMotion);
       }
 
       // -----------------------------------------------------------------------
@@ -1056,6 +1192,8 @@ export const WorldStage: React.FC = () => {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('kizuna:plan', onPlan);
+      window.removeEventListener('kizuna:revenue', onRevenue);
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);

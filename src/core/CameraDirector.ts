@@ -139,8 +139,9 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 6: // TELA 07: PLANOS • SISTEMA MODULAR CRESCENDO (LATTICE)
       env.globeVisibility = 0.0;
       env.modularScaleVisibility = 1.0;
-      pose.pos.set(0, 0, 2.8 - sceneIdx * 0.25);
-      pose.target.set(0, 0, 0);
+      // Etapa 8: olhar levemente para o piso, onde as ondas de crescimento se espalham
+      pose.pos.set(0, 0.6, 2.9);
+      pose.target.set(0, -0.3, -0.6);
       break;
 
     case 7: // TELA 08: ADAPTAÇÃO • 7 TRANSFORMAÇÕES DA INTERFACE
@@ -183,8 +184,8 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 12: // TELA 13: PREÇO • PAINEL FINANCEIRO VOLUMÉTRICO VIVO
       env.globeVisibility = 0.0;
       env.financial3DVisibility = 1.0;
-      pose.pos.set(0, 0, 2.6);
-      pose.target.set(0, 0, 0);
+      pose.pos.set(0, 0.6, 2.9);
+      pose.target.set(0, -0.3, -0.6);
       break;
 
     case 13: // TELA 14: RISCOS & KPIS • CENTRO DE COMANDO 4 QUADRANTES
