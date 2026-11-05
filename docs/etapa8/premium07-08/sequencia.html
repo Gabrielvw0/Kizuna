@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kizuna — sequência das telas 07 e 08</title>
+<style>
+  :root { --bg:#0B0B0D; --fg:#F2EEE6; --muted:#B9B3A8; --red:#D7263D; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 Inter, system-ui, sans-serif; }
+  main { max-width:1200px; margin:0 auto; padding:20px 16px 48px; }
+  h1 { font-family:"Noto Serif JP", Georgia, serif; font-weight:600; font-size:24px; margin:0 0 4px; }
+  p.note { color:var(--muted); margin:0 0 14px; font-size:13px; max-width:880px; }
+  .stage { position:relative; border:1px solid #222; background:#000; }
+  .stage img { width:100%; height:auto; display:block; }
+  .bar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:10px; }
+  .cap { flex:1 1 300px; min-width:0; font-size:14px; }
+  .cap b { color:var(--red); font-weight:600; margin-right:6px; }
+  button { background:#16161a; color:var(--fg); border:1px solid #333; padding:6px 12px; font:inherit; font-size:13px; cursor:pointer; }
+  button:hover { border-color:#666; }
+  .track { display:flex; gap:3px; margin-top:10px; }
+  .track span { flex:1; height:3px; background:#2a2a2e; cursor:pointer; }
+  .track span.on { background:var(--red); }
+  .track span.sep { flex:0 0 10px; background:transparent; cursor:default; }
+  @media (prefers-reduced-motion: reduce) { .stage img { transition:none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Sequência das telas 07 e 08</h1>
+  <p class="note">Quadros reais do aplicativo, capturados em 1440 × 900 nos instantes indicados e tocados aqui com a duração aproximada de cada etapa. Não é uma gravação de vídeo da tela: o painel de navegador usado nos testes não reproduz animações em tempo real, então cada momento foi fixado (relógio do 3D e animações CSS posicionados no tempo exato) e fotografado. O clique no Hanko foi um clique real de mouse.</p>
+  <div class="stage"><img id="img" alt="" src="seq/01.jpg"></div>
+  <div class="track" id="track"></div>
+  <div class="bar">
+    <div class="cap" id="cap"></div>
+    <button id="prev" aria-label="Quadro anterior">←</button>
+    <button id="play">Pausar</button>
+    <button id="next" aria-label="Próximo quadro">→</button>
+  </div>
+</main>
+<script>
+const F = [
+  ['01', 2200, '07.1', 'A decisão está nas mãos do responsável: portão fechado, Hanko aguardando.'],
+  ['02', 1400, '07.1', 'Cursor sobre o selo: ele se eleva levemente e acende.'],
+  ['03', 400, '07.1 • 0,17 s', 'Clique no próprio selo: ele começa a erguer.'],
+  ['04', 400, '07.1 • 0,33 s', 'O selo no alto do arco.'],
+  ['05', 450, '07.1 • 0,50 s', 'Impacto: o selo toca o nicho.'],
+  ['06', 600, '07.1 • 0,68 s', 'A tinta 承認 aparece; o selo sai. A decisão é registrada.'],
+  ['07', 600, '07.1 • 0,95 s', 'Execução e registro começam a acender.'],
+  ['08', 700, '07.1 • 1,25 s', 'As folhas do portão recolhem para dentro das colunas.'],
+  ['09', 800, '07.1 • 1,60 s', 'Portão aberto.'],
+  ['10', 2600, '07.2', 'A decisão foi registrada: selo aplicado, mudança autorizada, registro com responsável e data.'],
+  ['11', 2000, '08.1', 'Planos: Start aceso; o piso tem ondas lentas de expansão.'],
+  ['12', 450, '08.1 • Business 0,18 s', 'Business escolhido: os anéis acendem de dentro para fora; o escopo começa a entrar.'],
+  ['13', 1300, '08.1 • Business 0,6 s', 'Start + Business acesos; a onda parte do anel escolhido.'],
+  ['14', 900, '08.1 • Enterprise 0,7 s', 'Enterprise: a onda percorre o anel externo e o piso.'],
+  ['15', 2000, '08.1 • Enterprise', 'Os três anéis acesos; escopo do Enterprise.'],
+  ['16', 600, '08.2 • 0,12 s', 'Receita: primeiro a quantidade de usuários.'],
+  ['17', 600, '08.2 • 0,42 s', 'Depois, o preço por usuário.'],
+  ['18', 600, '08.2 • 0,85 s', 'A receita mensal (MRR) é contada.'],
+  ['19', 700, '08.2 • 1,4 s', 'MRR = ¥79.200; aparece o × 12.'],
+  ['20', 600, '08.2 • 1,9 s', 'A receita anual (ARR) é contada.'],
+  ['21', 3000, '08.2', 'ARR = ¥950.400. Recorrente separado do que é cobrado à parte, sob proposta.']
+];
+const img = document.getElementById('img'), cap = document.getElementById('cap'), track = document.getElementById('track');
+F.forEach(([, , , ], i) => {
+  if (i === 10 || i === 15) { const s = document.createElement('span'); s.className = 'sep'; track.appendChild(s); }
+  const s = document.createElement('span'); s.onclick = () => show(i, true); track.appendChild(s);
+});
+const marks = [...track.querySelectorAll('span:not(.sep)')];
+F.forEach(([n]) => { const p = new Image(); p.src = 'seq/' + n + '.jpg'; });
+let i = 0, timer = null, playing = true;
+function show(k, manual) {
+  i = (k + F.length) % F.length;
+  img.src = 'seq/' + F[i][0] + '.jpg';
+  img.alt = F[i][3];
+  cap.innerHTML = '<b>' + F[i][2] + '</b>' + F[i][3];
+  marks.forEach((m, j) => m.classList.toggle('on', j <= i));
+  clearTimeout(timer);
+  if (playing && !manual) timer = setTimeout(() => show(i + 1), F[i][1]);
+  if (manual && playing) timer = setTimeout(() => show(i + 1), F[i][1]);
+}
+document.getElementById('play').onclick = (e) => { playing = !playing; e.target.textContent = playing ? 'Pausar' : 'Tocar'; show(i, true); if (!playing) clearTimeout(timer); };
+document.getElementById('prev').onclick = () => show(i - 1, true);
+document.getElementById('next').onclick = () => show(i + 1, true);
+show(0);
+</script>
+</body>
+</html>
