@@ -78,7 +78,7 @@ export const STAGE_MAP: StageRef[][] = [
   ],
   // 06 Adaptação (R2)
   [at(STAGE.ADAPTATION_MORPH, 0), at(STAGE.ADAPTATION_MORPH, 1)],
-  // 07 Confiança: portão (abre só com o Hanko, via gateApproved)
+  // 07 Confiança: 07.1 portão fechado • 07.2 sequência automática do Hanko (sem clique)
   [at(STAGE.VALIDATION_GATE, 1), at(STAGE.VALIDATION_GATE, 2)],
   // 08 Planos: anéis completos → painel financeiro do simulador
   [at(STAGE.MODULAR_RINGS, 2), at(STAGE.FINANCIAL, 0)],

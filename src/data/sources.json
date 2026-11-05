@@ -228,9 +228,9 @@
       "title": "TELA 07 | CONFIANÇA — A IA propõe. O humano valida. O sistema registra.",
       "banca": {
         "duration": "≈ 60 s • 2 cenas",
-        "speech": "A automação acelera, mas decisões relevantes passam por um responsável. Aqui a proposta para no portão fechado. [avançar] Avançar não aprova: só o clique no Hanko abre o portão, executa e registra quem decidiu e quando. A IA assistiva e o fluxo de aprovação são recursos propostos do Business; no Start, o registro de cada mudança já existe.",
+        "speech": "A automação acelera, mas decisões relevantes passam por um responsável. Aqui a proposta para no portão fechado. [avançar] Na demonstração, o responsável aplica o Hanko: só então o portão abre, a mudança é executada e o sistema registra quem decidiu e quando. A IA assistiva e o fluxo de aprovação são recursos propostos do Business; no Start, o registro de cada mudança já existe.",
         "concept": "Validação humana explícita antes da execução e trilha de auditoria depois dela.",
-        "evidence": "Demonstração do portão: a navegação nunca aprova; só o clique no Hanko abre o portão (também no 3D). A proposta exibida é um exemplo fictício.",
+        "evidence": "Demonstração do portão: na cena 1 o portão fica fechado; na cena 2 a aplicação do Hanko é encenada automaticamente, seguida da abertura, da execução e do registro. A proposta exibida é um exemplo fictício.",
         "premise": "Premissa do projeto: no ambiente corporativo japonês, automação é mais bem aceita com supervisão humana explícita e rastro auditável.",
         "risk": "Decisões automatizadas em caixa-preta gerarem desconfiança.",
         "response": "Nada é executado sem o aval formal de um responsável, e a decisão fica registrada.",

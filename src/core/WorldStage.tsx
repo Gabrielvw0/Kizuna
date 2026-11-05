@@ -313,14 +313,49 @@ function createWaveField(baseRadii: number[], maxR = 3.0) {
   return { group, update, setLit, pulse };
 }
 
+/** Impressão do Hanko 承認 em tinta vermelha (fundo transparente) para a placa de washi. */
+function makeSealTexture(): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 256;
+  const ctx = c.getContext('2d')!;
+  const draw = () => {
+    ctx.clearRect(0, 0, 256, 256);
+    ctx.strokeStyle = '#b8142a';
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    const r = 26;
+    ctx.moveTo(24 + r, 24);
+    ctx.arcTo(232, 24, 232, 232, r);
+    ctx.arcTo(232, 232, 24, 232, r);
+    ctx.arcTo(24, 232, 24, 24, r);
+    ctx.arcTo(24, 24, 232, 24, r);
+    ctx.stroke();
+    ctx.fillStyle = '#b8142a';
+    ctx.font = '700 92px "Noto Serif JP", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('承', 128, 84);
+    ctx.fillText('認', 128, 176);
+  };
+  draw();
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  document.fonts?.ready.then(() => {
+    draw();
+    tex.needsUpdate = true;
+  });
+  return tex;
+}
+
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 export const WorldStage: React.FC = () => {
-  const { currentIndex, sceneIndex, safeMode, gateApproved } = usePresentation();
+  const { currentIndex, sceneIndex, safeMode } = usePresentation();
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const stateRef = useRef({ currentIndex, sceneIndex, gateApproved });
-  stateRef.current = { currentIndex, sceneIndex, gateApproved };
+  const stateRef = useRef({ currentIndex, sceneIndex });
+  stateRef.current = { currentIndex, sceneIndex };
 
   useEffect(() => {
     if (safeMode) return;
@@ -672,81 +707,154 @@ export const WorldStage: React.FC = () => {
     // Etapa 8: disco vermelho decorativo removido (o vermelho fica para o que tem função)
 
     // =========================================================================
-    // 09. SECURITY RED GATE & VAULT GROUP (SCENE 09: CONFIANÇA)
+    // 09. PORTAL DE APROVAÇÃO (TELA 07) — Etapa 8.2
+    // Peça arquitetônica: montantes de laca preta com capitéis em dourado envelhecido,
+    // lintel com faixa vermelha, placa de washi para o Hanko, dois painéis shoji deslizantes
+    // com trava dourada na emenda e, atrás, um espaço iluminado revelado ao abrir.
+    // Cena 07.1: fechado. Cena 07.2: sequência automática (ver animate).
     // =========================================================================
     const gateGroup = new THREE.Group();
     scene.add(gateGroup);
+    gateGroup.position.y = -0.5;
 
-    // Etapa 8: torii estilizado — duas colunas finas, viga superior escura (kasagi) sobre viga
-    // vermelha (shimaki) e travessa (nuki); o painel central de aprovação é o da tela.
-    // Fechado: uma barreira fina atravessa o vão. Aprovado pelo Hanko: a barreira sobe e some,
-    // e as colunas continuam como moldura.
-    const toriiRed = new THREE.MeshBasicMaterial({ color: 0xc41f35, transparent: true, opacity: 0.82, fog: false });
-    const toriiDark = new THREE.MeshBasicMaterial({ color: 0x1a1c22, fog: false });
-    const COL_X = 1.1;
-    [-COL_X, COL_X].forEach((x) => {
-      const col = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.04, 1.9, 24), toriiRed);
-      col.position.set(x, 0, 0);
-      gateGroup.add(col);
+    const lacquer = new THREE.MeshStandardMaterial({ color: 0x1b1b21, roughness: 0.26, metalness: 0.2 });
+    const lacquerSoft = new THREE.MeshStandardMaterial({ color: 0x1a1a1f, roughness: 0.45, metalness: 0.1 });
+    const kizunaRed = new THREE.MeshStandardMaterial({ color: 0xb3182c, roughness: 0.5, metalness: 0.05 });
+    const agedGold = new THREE.MeshStandardMaterial({ color: 0xb08a45, roughness: 0.35, metalness: 0.7, emissive: new THREE.Color(0x2a1d08) });
+    const box = (w: number, h: number, d: number, m: THREE.Material, x = 0, y = 0, z = 0) => {
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+      mesh.position.set(x, y, z);
+      return mesh;
+    };
+
+    // luzes do portal (só existem quando o portal está visível)
+    const portalKey = new THREE.DirectionalLight(0xfff1dc, 2.0);
+    portalKey.position.set(0.6, 2.6, 3.2);
+    const portalFill = new THREE.AmbientLight(0x9098aa, 0.6);
+    const portalPoint = new THREE.PointLight(0xffe2c4, 0, 3, 2); // pulso do carimbo
+    portalPoint.position.set(0, 0.8, 0.6);
+    gateGroup.add(portalKey, portalFill, portalPoint);
+
+    const POST_X = 1.0;
+    [-1, 1].forEach((s) => {
+      gateGroup.add(box(0.11, 2.05, 0.11, lacquer, s * POST_X, 0, 0.04));
+      gateGroup.add(box(0.15, 0.05, 0.15, agedGold, s * POST_X, -1.0, 0.04)); // base
+      gateGroup.add(box(0.15, 0.05, 0.15, agedGold, s * POST_X, 0.98, 0.04)); // capitel
+      gateGroup.add(box(0.018, 1.86, 0.004, kizunaRed, s * POST_X, -0.02, 0.1)); // filete vermelho
     });
-    const shimaki = new THREE.Mesh(new THREE.BoxGeometry(2.62, 0.045, 0.08), toriiRed);
-    shimaki.position.set(0, 0.97, 0);
-    const kasagi = new THREE.Mesh(new THREE.BoxGeometry(2.86, 0.07, 0.11), toriiDark);
-    kasagi.position.set(0, 1.035, 0);
-    // pontas levemente erguidas da viga superior
-    [-1, 1].forEach((side) => {
-      const tip = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.06, 0.11), toriiDark);
-      tip.position.set(side * 1.48, 1.065, 0);
-      tip.rotation.z = side * 0.18;
-      gateGroup.add(tip);
-    });
-    const nuki = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.03, 0.06), toriiRed);
-    nuki.position.set(0, 0.72, 0);
-    // o painel central de aprovação é o painel da própria tela, pendurado sob as vigas
-    gateGroup.add(shimaki, kasagi, nuki);
-    // Etapa 8: o portão desce para ficar abaixo do título e emoldurar a decisão no centro
-    gateGroup.position.y = -0.52;
+    gateGroup.add(box(2.6, 0.09, 0.17, lacquer, 0, 1.12, 0.04)); // lintel (kasagi)
+    gateGroup.add(box(2.4, 0.05, 0.13, kizunaRed, 0, 1.045, 0.04)); // faixa vermelha
+    [-1, 1].forEach((s) => gateGroup.add(box(0.07, 0.11, 0.18, agedGold, s * 1.31, 1.12, 0.04)));
+    gateGroup.add(box(2.0, 0.05, 0.09, lacquerSoft, 0, 0.6, 0.0)); // trilho superior dos shoji
+    gateGroup.add(box(2.2, 0.06, 0.2, lacquer, 0, -1.0, 0.02)); // soleira
 
-    // Barreira única (fechado) — sobe e some quando o Hanko aprova
-    const barrierMat = new THREE.MeshBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.7, fog: false });
-    const barrier = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, COL_X * 2, 12), barrierMat);
-    barrier.rotation.z = Math.PI / 2;
-    barrier.position.set(0, -0.05, 0);
-    gateGroup.add(barrier);
-
-    // Folhas do portão (laca escura, costura vermelha): fechadas cobrem o vão entre as colunas;
-    // com o Hanko recolhem para dentro das colunas, num movimento único e suavizado.
-    const LEAF_W = COL_X;
-    const LEAF_H = 1.3;
-    const leafMat = new THREE.MeshBasicMaterial({ color: 0x15161b, transparent: true, opacity: 0.92, fog: false });
-    const seamMat = new THREE.MeshBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.9, fog: false });
-    const leaves = [-1, 1].map((side) => {
-      const leaf = new THREE.Mesh(new THREE.PlaneGeometry(LEAF_W, LEAF_H), leafMat);
-      const seam = new THREE.Mesh(new THREE.BoxGeometry(0.012, LEAF_H, 0.012), seamMat);
-      // linhas horizontais finas (ritmo de painel), discretas
-      const rails = new THREE.Group();
-      [-0.35, 0.05, 0.45].forEach((y) => {
-        const rail = new THREE.Mesh(new THREE.BoxGeometry(LEAF_W, 0.006, 0.006), new THREE.MeshBasicMaterial({ color: 0x2a2d35, fog: false }));
-        rail.position.y = y;
-        rails.add(rail);
-      });
-      leaf.add(rails);
-      leaf.position.set(side * LEAF_W * 0.5, 0.0, -0.05);
-      seam.position.set(0, 0.0, -0.04);
-      gateGroup.add(leaf, seam);
-      return { side, leaf, seam };
-    });
-    let gateOpenProgress = 0; // 0 fechado • 1 aberto
-    let prevGateOk = false;
-    let gateOpenedAt = -1;
-
-    // Luz dirigida ao mecanismo de aprovação (cai de cima, cresce com o carimbo)
-    const gateLight = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.5, 2.1),
-      new THREE.ShaderMaterial({ ...beamShader, uniforms: { uOpacity: { value: 0.0 } }, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })
+    // Placa do Hanko: moldura de laca, borda dourada, centro de washi
+    const plaqueY = 0.82;
+    gateGroup.add(box(0.38, 0.3, 0.05, lacquer, 0, plaqueY, 0.04));
+    const plaqueEdge = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(0.38, 0.3, 0.05)),
+      new THREE.LineBasicMaterial({ color: 0xb8954f })
     );
-    gateLight.position.set(0, 0.05, -0.2);
-    gateGroup.add(gateLight);
+    plaqueEdge.position.set(0, plaqueY, 0.04);
+    gateGroup.add(plaqueEdge);
+    const washiFace = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.28, 0.22),
+      new THREE.MeshStandardMaterial({ color: 0xece2cf, roughness: 0.9, metalness: 0, emissive: new THREE.Color(0x6a5f4c) })
+    );
+    washiFace.position.set(0, plaqueY, 0.067);
+    gateGroup.add(washiFace);
+    const sealMat = new THREE.MeshBasicMaterial({ map: makeSealTexture(), transparent: true, opacity: 0, depthWrite: false });
+    const sealMark = new THREE.Mesh(new THREE.PlaneGeometry(0.19, 0.19), sealMat);
+    sealMark.position.set(0, plaqueY, 0.069);
+    sealMark.rotation.z = -0.06;
+    gateGroup.add(sealMark);
+
+    // Painéis shoji (moldura de laca, kumiko, papel washi translúcido)
+    const PANEL_W = 0.96;
+    const PANEL_H = 1.52;
+    const PANEL_Y = -0.18;
+    const washiMat = new THREE.MeshBasicMaterial({ color: 0xf6e3c2, transparent: true, opacity: 0.22, depthWrite: false });
+    const kumikoMat = new THREE.MeshStandardMaterial({ color: 0x2b2620, roughness: 0.6, metalness: 0.2 });
+    const makeShoji = () => {
+      const g = new THREE.Group();
+      g.add(new THREE.Mesh(new THREE.PlaneGeometry(PANEL_W - 0.04, PANEL_H - 0.04), washiMat));
+      g.add(box(PANEL_W, 0.04, 0.05, lacquer, 0, PANEL_H / 2, 0));
+      g.add(box(PANEL_W, 0.04, 0.05, lacquer, 0, -PANEL_H / 2, 0));
+      g.add(box(0.04, PANEL_H, 0.05, lacquer, -PANEL_W / 2, 0, 0));
+      g.add(box(0.04, PANEL_H, 0.05, lacquer, PANEL_W / 2, 0, 0));
+      [-0.27, 0, 0.27].forEach((x) => g.add(box(0.012, PANEL_H, 0.02, kumikoMat, x, 0, 0.01)));
+      [-0.5, -0.17, 0.17, 0.5].forEach((y) => g.add(box(PANEL_W, 0.012, 0.02, kumikoMat, 0, y, 0.01)));
+      return g;
+    };
+    const shojiL = makeShoji();
+    const shojiR = makeShoji();
+    shojiL.position.set(-PANEL_W / 2, PANEL_Y, 0);
+    shojiR.position.set(PANEL_W / 2, PANEL_Y, 0);
+    gateGroup.add(shojiL, shojiR);
+    // costura vermelha entre os painéis
+    const seam = box(0.012, PANEL_H, 0.06, kizunaRed, 0, PANEL_Y, 0.01);
+    gateGroup.add(seam);
+
+    // Trava dourada na emenda: disco com centro vermelho e lingueta horizontal
+    const lockGroup = new THREE.Group();
+    const lockDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.025, 40), agedGold);
+    lockDisc.rotation.x = Math.PI / 2;
+    const lockCore = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 32), kizunaRed);
+    lockCore.rotation.x = Math.PI / 2;
+    lockCore.position.z = 0.006;
+    const latch = box(0.24, 0.03, 0.03, agedGold, 0, 0, 0.02);
+    lockGroup.add(lockDisc, lockCore, latch);
+    lockGroup.position.set(0, PANEL_Y + 0.05, 0.05);
+    gateGroup.add(lockGroup);
+
+    // Espaço do outro lado: luz quente e um caminho que segue para o fundo
+    const beyondMat = new THREE.ShaderMaterial({
+      uniforms: { uOpacity: { value: 0.24 } },
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+      fragmentShader: `uniform float uOpacity; varying vec2 vUv; void main(){ vec2 c = vUv - vec2(0.5, 0.42); float d = length(c * vec2(1.0, 0.8)); float a = smoothstep(0.62, 0.0, d); gl_FragColor = vec4(1.0, 0.93, 0.82, 1.0) * a * uOpacity; }`,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false
+    });
+    const beyond = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 2.1), beyondMat);
+    beyond.position.set(0, -0.05, -0.55);
+    gateGroup.add(beyond);
+    const pathMat = new THREE.LineBasicMaterial({ color: 0xe9dcc4, transparent: true, opacity: 0, fog: false });
+    [-0.5, 0, 0.5].forEach((x) => {
+      const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x, -0.97, -0.1), new THREE.Vector3(x * 0.25, -0.97, -4.5)]);
+      gateGroup.add(new THREE.Line(g, pathMat));
+    });
+    for (let i = 0; i < 6; i++) {
+      const z = -0.6 - i * 0.7;
+      const w = 1.1 - i * 0.12;
+      const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-w / 2, -0.97, z), new THREE.Vector3(w / 2, -0.97, z)]);
+      gateGroup.add(new THREE.Line(g, pathMat));
+    }
+
+    // O Hanko: cabo de laca, base e face vermelha; aproxima-se de frente e carimba a placa
+    const hanko = new THREE.Group();
+    const hankoMats: THREE.MeshStandardMaterial[] = [];
+    const hm = (m: THREE.MeshStandardMaterial) => {
+      const c = m.clone();
+      c.transparent = true;
+      c.opacity = 0;
+      hankoMats.push(c);
+      return c;
+    };
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.065, 0.26, 32), hm(lacquer));
+    handle.position.y = 0.17;
+    const block = box(0.2, 0.09, 0.2, hm(lacquer), 0, 0, 0);
+    const face = box(0.18, 0.014, 0.18, hm(kizunaRed), 0, -0.05, 0);
+    const ring = box(0.205, 0.012, 0.205, hm(agedGold), 0, 0.05, 0);
+    hanko.add(handle, block, face, ring);
+    hanko.rotation.x = -Math.PI / 2; // face voltada para a placa (−z)
+    hanko.position.set(0, plaqueY, 1.4);
+    hanko.visible = false;
+    gateGroup.add(hanko);
+
+    let gateSceneSeen = -1;
+    let gateSceneAt = 0;
 
     // =========================================================================
     // 10. RAILWAY EXPANSION TRACK GROUP (SCENE 10: ENTRADA)
@@ -994,7 +1102,7 @@ export const WorldStage: React.FC = () => {
       const elapsed = clock.getElapsedTime();
 
       // Tela narrativa → cenário técnico (ver narrativeMap.ts)
-      const { currentIndex, sceneIndex, gateApproved: gateOk } = stateRef.current;
+      const { currentIndex, sceneIndex } = stateRef.current;
       const { stage: sIdx, scene: scIdx } = toStage(currentIndex, sceneIndex);
       const { pose, env } = getCameraPoseForSection(sIdx, scIdx);
 
@@ -1151,32 +1259,65 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       gateGroup.visible = sIdx === 8;
       if (sIdx === 8) {
-        // em telas 4:3 o portão estreita um pouco para os pilares continuarem nos vãos entre as colunas
+        // em telas 4:3 o portal estreita um pouco para os montantes ficarem nos vãos entre as colunas
         gateGroup.scale.x = camera.aspect < 1.5 ? 0.86 : 1;
-        const isOpen = gateOk;
-        const k = Math.min(1, dt * 4);
-        barrier.position.y += ((isOpen ? 0.62 : -0.05) - barrier.position.y) * k;
-        barrierMat.opacity += ((isOpen ? 0 : 0.7) - barrierMat.opacity) * k;
-        barrier.visible = barrierMat.opacity > 0.01;
-        // folhas: abrem 0,2 s depois da aprovação, em 0,9 s (ease-in-out); fecham em 0,4 s
-        if (isOpen && !prevGateOk) gateOpenedAt = elapsed;
-        prevGateOk = isOpen;
-        if (isOpen) {
-          const tt = Math.min(1, Math.max(0, (elapsed - gateOpenedAt - 0.2) / 0.9));
-          gateOpenProgress = easeInOutCubic(tt);
-        } else {
-          gateOpenProgress = Math.max(0, gateOpenProgress - dt / 0.4);
+        // Linha do tempo da cena 07.2 (segundos desde a entrada na cena). Na 07.1, tudo fechado.
+        if (scIdx !== gateSceneSeen) {
+          gateSceneSeen = scIdx;
+          gateSceneAt = elapsed;
         }
-        leaves.forEach(({ side, leaf, seam }) => {
-          const sx = Math.max(0.04, 1 - gateOpenProgress);
-          leaf.scale.x = sx;
-          // a borda externa fica presa à coluna; a interna recua
-          leaf.position.x = side * (COL_X - (LEAF_W * sx) / 2);
-          seam.position.x = side * (COL_X - LEAF_W * sx);
-          (seam.material as THREE.MeshBasicMaterial).opacity = 0.9 * (1 - gateOpenProgress * 0.85);
-        });
-        const gl = (gateLight.material as THREE.ShaderMaterial).uniforms.uOpacity;
-        gl.value += ((isOpen ? 0.26 : 0.11) - gl.value) * Math.min(1, dt * 2.5);
+        const t = scIdx === 2 ? (reducedMotion ? 99 : elapsed - gateSceneAt) : -1;
+        const seg = (a: number, b: number) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+        const easeOut = (x: number) => 1 - Math.pow(1 - x, 3);
+        const easeIn = (x: number) => x * x * x;
+
+        // 1. mudança breve de iluminação: o ambiente baixa, a luz-chave foca a placa
+        const focus = seg(0, 0.6);
+        portalFill.intensity = 0.6 - 0.2 * focus;
+        portalKey.intensity = 2.0 + 0.8 * focus;
+
+        // 2. o Hanko surge de frente, 3. desce e carimba, recua e some
+        const appear = easeOut(seg(0.35, 0.8));
+        const press = easeIn(seg(0.8, 1.05));
+        const retract = easeOut(seg(1.25, 1.7));
+        let hz = 1.6 - 0.6 * appear; // 1.6 → 1.0
+        hz = hz - (1.0 - 0.075) * press; // → encosta na placa
+        hz = hz + (1.0 - 0.075) * retract; // volta
+        hanko.position.z = hz;
+        hanko.visible = t > 0.3 && t < 1.8;
+        const hOpacity = appear * (1 - retract);
+        hankoMats.forEach((m) => (m.opacity = hOpacity));
+        // impacto: leve compressão e um pulso de luz quente (sem flash)
+        const impact = seg(1.05, 1.4);
+        const bell = impact > 0 && impact < 1 ? Math.sin(impact * Math.PI) : 0;
+        hanko.scale.set(1 + 0.04 * bell, 1 - 0.06 * bell, 1 + 0.04 * bell);
+        portalPoint.intensity = 2.2 * bell;
+        sealMat.opacity = seg(1.05, 1.35);
+
+        // 4. a trava gira e destrava
+        const unlock = easeOut(seg(1.75, 2.15));
+        latch.rotation.z = (Math.PI / 2) * unlock;
+        lockDisc.rotation.y = (Math.PI / 2) * unlock;
+
+        // 5. os painéis deslizam para os montantes (recolhem por trás deles)
+        const open = easeInOutCubic(seg(2.15, 3.35));
+        const sx = 1 - 0.88 * open;
+        shojiL.scale.x = sx;
+        shojiR.scale.x = sx;
+        shojiL.position.x = -(POST_X - 0.06) + (PANEL_W * sx) / 2;
+        shojiR.position.x = POST_X - 0.06 - (PANEL_W * sx) / 2;
+        lockGroup.visible = open < 0.98;
+        lockGroup.scale.setScalar(1 - 0.6 * open);
+        seam.visible = open < 0.02;
+
+        // 6. a luz atravessa o portal e revela o espaço do outro lado
+        const reveal = easeOut(seg(2.3, 3.6));
+        // fechado: luz contida atrás do papel; aberto: a luz atravessa
+        beyondMat.uniforms.uOpacity.value = 0.24 + 0.55 * reveal;
+        pathMat.opacity = 0.32 * reveal;
+        washiMat.opacity = 0.22 + 0.12 * reveal;
+      } else {
+        gateSceneSeen = -1;
       }
 
       // -----------------------------------------------------------------------
