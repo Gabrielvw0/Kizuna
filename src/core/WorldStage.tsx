@@ -1113,22 +1113,18 @@ export const WorldStage: React.FC = () => {
     // Percurso no piso com exatamente cinco estações (as mesmas da interface):
     // plintos de laca com aro dourado; o núcleo acende em beni conforme a estratégia avança.
     // Uma peça (laca, aro kin, topo beni) percorre o trecho da cena, por tempo (não por quadro).
+    // Correção de composição: rota reta e horizontal, estações pequenas, ancorada na faixa livre
+    // abaixo dos cartões (ver entryAnchor) — nunca atrás de textos ou cartões.
     // =========================================================================
     const railwayGroup = new THREE.Group();
     scene.add(railwayGroup);
-    railwayGroup.position.set(0.35, -1.15, -0.5);
     {
       const key = new THREE.DirectionalLight(0xfff1dc, 1.6);
       key.position.set(-1.2, 3, 2.5);
       railwayGroup.add(key, new THREE.AmbientLight(0x8a90a0, 0.55));
     }
-    const routeCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-2.05, 0, 0.25),
-      new THREE.Vector3(-1.0, 0, 0.08),
-      new THREE.Vector3(0.05, 0, -0.12),
-      new THREE.Vector3(1.1, 0, -0.38),
-      new THREE.Vector3(2.15, 0, -0.65)
-    ]);
+    const ROUTE_LEN = 4; // de −2 a +2 (unidades do grupo); a escala real vem da âncora na tela
+    const routeCurve = new THREE.LineCurve3(new THREE.Vector3(-ROUTE_LEN / 2, 0, 0), new THREE.Vector3(ROUTE_LEN / 2, 0, 0));
     const ROUTE_SAMPLES = 240;
     const routePts = routeCurve.getSpacedPoints(ROUTE_SAMPLES);
     // linha-base (washi discreto) e trecho percorrido (beni), desenhado até a peça
@@ -1148,17 +1144,17 @@ export const WorldStage: React.FC = () => {
       const p = routeCurve.getPointAt(t);
       const g = new THREE.Group();
       g.position.copy(p);
-      const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.14, 0.05, 48), routeLacquer);
-      plinth.position.y = 0.025;
-      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.006, 8, 64), routeGold);
+      const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.08, 0.034, 48), routeLacquer);
+      plinth.position.y = 0.017;
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.0045, 8, 64), routeGold);
       rim.rotation.x = Math.PI / 2;
-      rim.position.y = 0.052;
+      rim.position.y = 0.035;
       const coreMat = new THREE.MeshStandardMaterial({ color: 0x3a3a40, roughness: 0.5, emissive: new THREE.Color(0x000000) });
-      const core = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.012, 32), coreMat);
-      core.position.y = 0.058;
+      const core = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 0.008, 32), coreMat);
+      core.position.y = 0.038;
       // halo da estação atual: anel kin mais largo, rente ao piso
       const haloMat = new THREE.MeshBasicMaterial({ color: 0xc9a45c, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false, fog: false });
-      const halo = new THREE.Mesh(new THREE.RingGeometry(0.2, 0.215, 64), haloMat);
+      const halo = new THREE.Mesh(new THREE.RingGeometry(0.115, 0.124, 64), haloMat);
       halo.rotation.x = -Math.PI / 2;
       halo.position.y = 0.003;
       g.add(plinth, rim, core, halo);
@@ -1168,15 +1164,15 @@ export const WorldStage: React.FC = () => {
     // a peça que avança: base de laca, aro dourado e topo beni
     const routeMarker = new THREE.Group();
     {
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.085, 0.07, 48), routeLacquer);
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.078, 0.007, 8, 64), routeGold);
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.044, 0.05, 0.04, 48), routeLacquer);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.046, 0.004, 8, 64), routeGold);
       ring.rotation.x = Math.PI / 2;
-      ring.position.y = 0.035;
+      ring.position.y = 0.02;
       const top = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.06, 0.06, 0.012, 48),
+        new THREE.CylinderGeometry(0.035, 0.035, 0.008, 48),
         new THREE.MeshStandardMaterial({ color: 0xc21d33, roughness: 0.45, emissive: new THREE.Color(0x5a0814) })
       );
-      top.position.y = 0.04;
+      top.position.y = 0.023;
       routeMarker.add(body, ring, top);
     }
     routeMarker.position.y = 0.2;
@@ -1197,7 +1193,6 @@ export const WorldStage: React.FC = () => {
     // =========================================================================
     const broadcastGroup = new THREE.Group();
     scene.add(broadcastGroup);
-    broadcastGroup.position.set(1.7, -1.25, -1.8);
     {
       const key = new THREE.DirectionalLight(0xfff1dc, 1.6);
       key.position.set(-1.2, 3, 2.5);
@@ -1226,7 +1221,7 @@ export const WorldStage: React.FC = () => {
     });
     // linhas que convergem do círculo externo para o interno
     const REACH_LINKS = 12;
-    const reachLinkMat = new THREE.LineBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.38, fog: false });
+    const reachLinkMat = new THREE.LineBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.3, fog: false });
     const reachLinks = Array.from({ length: REACH_LINKS }, (_, i) => {
       const a = Math.PI / 2 + (i / REACH_LINKS) * Math.PI * 2 + 0.13;
       const pts: THREE.Vector3[] = [];
@@ -1258,6 +1253,60 @@ export const WorldStage: React.FC = () => {
     const reachCoreOff = new THREE.Color(0x5a1520);
     const reachEmiOn = new THREE.Color(0x5a0814);
     let reachAt = -1;
+
+    // Âncora da tela 09 (correção de composição): a interface marca a faixa livre abaixo do conteúdo
+    // ([data-world-anchor="entry"]). O cenário é colocado nessa faixa, a partir da tomada FINAL da câmera
+    // (não da câmera em movimento), e dimensionado para caber nela — nunca atrás de textos ou cartões.
+    const entryAnchor = { cx: 0.5, cy: 0.9, w: 0.8, h: 0.08, readAt: -1 };
+    const readEntryAnchor = () => {
+      const el = document.querySelector('[data-world-anchor="entry"]');
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const c = renderer.domElement.getBoundingClientRect();
+      if (r.width < 1 || c.width < 1) return;
+      entryAnchor.cx = (r.left + r.width / 2 - c.left) / c.width;
+      entryAnchor.cy = (r.top + r.height / 2 - c.top) / c.height;
+      entryAnchor.w = r.width / c.width;
+      entryAnchor.h = Math.max(0, r.height) / c.height;
+    };
+    const anchorCam = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    const anchorDir = new THREE.Vector3();
+    /**
+     * Coloca `group` no raio da tomada (stage, scene) que passa pelo ponto (fx, fy) da faixa, a `dist` da câmera,
+     * com escala que faz a composição ocupar `wFrac` da largura da faixa e no máximo `hFill` da altura dela.
+     * unitW/unitDepth/unitH: largura, profundidade e altura da composição em escala 1.
+     */
+    const placeInAnchor = (
+      group: THREE.Object3D,
+      stage: number,
+      sceneI: number,
+      fx: number,
+      wFrac: number,
+      hFill: number,
+      unitW: number,
+      unitDepth: number,
+      unitH: number,
+      dist: number
+    ) => {
+      const { pose: shot } = getCameraPoseForSection(stage, sceneI);
+      anchorCam.aspect = camera.aspect;
+      anchorCam.position.copy(shot.pos);
+      anchorCam.lookAt(shot.target);
+      anchorCam.updateProjectionMatrix();
+      anchorCam.updateMatrixWorld();
+      const ndcX = fx * 2 - 1;
+      const ndcY = 1 - entryAnchor.cy * 2;
+      anchorDir.set(ndcX, ndcY, 0.5).unproject(anchorCam).sub(anchorCam.position).normalize();
+      group.position.copy(anchorCam.position).addScaledVector(anchorDir, dist);
+      const visH = 2 * Math.tan(THREE.MathUtils.degToRad(anchorCam.fov / 2)) * dist;
+      const visW = visH * anchorCam.aspect;
+      // ângulo do raio com o piso: quanto mais baixo na tela, mais "de cima" a composição é vista
+      const down = Math.max(0.05, -anchorDir.y);
+      const projH = unitDepth * down + unitH * Math.sqrt(1 - down * down);
+      const sW = (wFrac * entryAnchor.w * visW) / unitW;
+      const sH = (hFill * entryAnchor.h * visH) / projH;
+      group.scale.setScalar(Math.max(0.0001, Math.min(sW, sH)));
+    };
 
     // Esmaecimento dos dois cenários da tela 09 (troca 09.3 ↔ 09.4 sem corte seco)
     const collectFade = (root: THREE.Object3D) => {
@@ -1741,8 +1790,11 @@ export const WorldStage: React.FC = () => {
       // Tudo por tempo; sem ciclos. Os dois cenários se esmaecem entre si na troca 09.3 ↔ 09.4.
       // -----------------------------------------------------------------------
       const onEntry = currentIndex === SCREEN.ENTRY;
-      const routeOn = sIdx === 9;
-      const reachOn = sIdx === 10;
+      // o cenário só aparece com a câmera já na tomada final: durante o voo de entrada na tela ele
+      // ficaria projetado sobre os cartões (está ancorado na faixa livre da tomada final, não da câmera em movimento)
+      const camSettled = camera.position.distanceTo(framed.pos) < 0.15;
+      const routeOn = sIdx === 9 && camSettled;
+      const reachOn = sIdx === 10 && camSettled;
       if (!onEntry) {
         // fora da tela 09: nada residual; a próxima entrada recomeça do início da rota
         entryFade.route = 0;
@@ -1756,10 +1808,16 @@ export const WorldStage: React.FC = () => {
       }
 
       railwayGroup.visible = entryFade.route > 0.001;
-      // em telas 4:3 os dois cenários encolhem um pouco (mesma regra das telas 07 e 08)
-      const narrowEntry = camera.aspect < 1.5;
-      railwayGroup.scale.setScalar(narrowEntry ? 0.8 : 1);
-      broadcastGroup.scale.setScalar(narrowEntry ? 0.68 : 0.85);
+      // a faixa livre muda com a cena e o tamanho da janela: relida a cada 0,25 s na tela 09
+      if (onEntry && (entryAnchor.readAt < 0 || elapsed - entryAnchor.readAt > 0.25)) {
+        readEntryAnchor();
+        entryAnchor.readAt = elapsed;
+      }
+      if (!onEntry) entryAnchor.readAt = -1;
+      // rota: ocupa 80% da largura da faixa (as estações ficam sob as da interface), sempre dentro da altura
+      placeInAnchor(railwayGroup, 9, 0, entryAnchor.cx, 0.8, 0.8, ROUTE_LEN, 0.25, 0.1, 2.4);
+      // alcance: composição menor, sob a coluna do funil (direita)
+      placeInAnchor(broadcastGroup, 10, 0, entryAnchor.cx + entryAnchor.w * 0.24, 0.3, 0.85, REACH_R[0] * 2, REACH_R[0] * 2, 0.08, 2.6);
       if (railwayGroup.visible) {
         applyFade(routeFadeMats, entryFade.route);
         const seg = Math.min(2, Math.max(0, scIdx));
@@ -1774,7 +1832,7 @@ export const WorldStage: React.FC = () => {
         const p = routeAnim.dur > 0 ? Math.min(1, (elapsed - routeAnim.at) / routeAnim.dur) : 1;
         routeAnim.t = routeAnim.from + (routeAnim.to - routeAnim.from) * easeInOutCubic(p);
         const mp = routeCurve.getPointAt(routeAnim.t);
-        routeMarker.position.set(mp.x, 0.13 + (routeAnim.dur > 0 ? 0.06 * Math.sin(Math.PI * p) : 0), mp.z);
+        routeMarker.position.set(mp.x, 0.036 + (routeAnim.dur > 0 ? 0.03 * Math.sin(Math.PI * p) : 0), mp.z);
         routeLitGeo.setDrawRange(0, Math.round(routeAnim.t * ROUTE_SAMPLES) + 1);
         const k = Math.min(1, dt * (reducedMotion ? 8 : 4));
         routeStations.forEach((st, i) => {

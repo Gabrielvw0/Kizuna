@@ -186,8 +186,9 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
       // Etapa 8 • Bloco 1 (tela 09.1–09.3): rota de entrada no piso; a câmera acompanha o trecho da cena
       {
         const s = Math.min(2, Math.max(0, sceneIdx));
-        pose.pos.set(-0.3 + s * 0.3, 0.45, 3.0);
-        pose.target.set(-0.25 + s * 0.3, 0.0, 0);
+        // correção de composição: sem guinada (a rota fica horizontal na faixa inferior), só um leve deslize por cena
+        pose.pos.set(-0.06 + s * 0.06, 0.45, 3.0);
+        pose.target.set(-0.06 + s * 0.06, 0.05, 0);
       }
       break;
 
@@ -195,8 +196,8 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
       env.globeVisibility = 0.0;
       env.broadcastVisibility = 1.0;
       // Etapa 8 • Bloco 1 (tela 09.4): a câmera sobe e olha o alcance no piso, à direita
-      pose.pos.set(0.45, 0.7, 3.3);
-      pose.target.set(0.65, -0.55, -0.8);
+      pose.pos.set(0.1, 0.55, 3.2);
+      pose.target.set(0.1, 0.1, 0);
       break;
 
     case 11: // TELA 12: CONCORRÊNCIA • CONSTELAÇÃO COMPETITIVA 3D
