@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kizuna — transições entre cenas</title>
+<style>
+  :root { --bg:#0B0B0D; --fg:#F2EEE6; --muted:#B9B3A8; --red:#D7263D; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 Inter, system-ui, sans-serif; }
+  main { max-width:1180px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-family:"Noto Serif JP", Georgia, serif; font-weight:600; font-size:28px; margin:0 0 4px; }
+  p { color:var(--muted); margin:0 0 12px; max-width:900px; }
+  .player { position:relative; border:1px solid #222; background:#000; aspect-ratio:16/10; }
+  .player img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+  .bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:12px 0; }
+  button { background:#15151a; color:var(--fg); border:1px solid #333; padding:6px 10px; font:inherit; font-size:13px; cursor:pointer; }
+  button[aria-pressed="true"] { border-color:var(--red); background:#2a0f14; }
+  .cap { margin-top:8px; }
+  .cap b { color:var(--fg); }
+  .t { font-variant-numeric:tabular-nums; color:var(--red); }
+  .strip { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:6px; margin-top:10px; }
+  .strip figure { margin:0; font-size:11px; color:var(--muted); }
+  .strip img { width:100%; display:block; border:1px solid #222; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Transições entre cenas • telas 06, 07 e 08</h1>
+  <p>Gravação quadro a quadro em 1440 × 900 (relógio controlado: cada quadro é o estado real da apresentação naquele instante). O player reproduz os quadros no tempo em que acontecem. Ida e volta em cada tela.</p>
+  <div class="bar" id="clips"></div>
+  <div class="player"><img id="frame" alt=""></div>
+  <div class="bar"><button id="play">▶ Reproduzir</button><button id="all">▶ Reproduzir tudo em sequência</button><span class="t" id="time"></span></div>
+  <div class="cap"><b id="title"></b><br><span id="note"></span></div>
+  <div class="strip" id="strip"></div>
+</main>
+<script>
+const CLIPS = [{"id":"06-avanca","title":"06.1 → 06.2 • Comunicação → decisão e conformidade","note":"A câmera atravessa a camada de kumiko da frente; os pilares de idioma e formatos saem para a esquerda e os de decisão entram pela direita.","frames":[{"t":0,"src":"06-avanca_00_0ms.jpg"},{"t":150,"src":"06-avanca_01_150ms.jpg"},{"t":400,"src":"06-avanca_02_400ms.jpg"},{"t":650,"src":"06-avanca_03_650ms.jpg"},{"t":1100,"src":"06-avanca_04_1100ms.jpg"}]},{"id":"06-volta","title":"06.2 → 06.1 • volta","note":"A câmera recua pela mesma treliça; o conteúdo sai para a direita.","frames":[{"t":0,"src":"06-volta_00_0ms.jpg"},{"t":150,"src":"06-volta_01_150ms.jpg"},{"t":400,"src":"06-volta_02_400ms.jpg"},{"t":650,"src":"06-volta_03_650ms.jpg"},{"t":1100,"src":"06-volta_04_1100ms.jpg"}]},{"id":"07-avanca","title":"07.1 → 07.2 • A aprovação libera a execução","note":"Câmera ajusta o enquadramento (0–0,45 s) → Hanko → 承認 → trava → abertura → luz → execução e registro.","frames":[{"t":0,"src":"07-avanca_00_0ms.jpg"},{"t":300,"src":"07-avanca_01_300ms.jpg"},{"t":1000,"src":"07-avanca_02_1000ms.jpg"},{"t":1450,"src":"07-avanca_03_1450ms.jpg"},{"t":1700,"src":"07-avanca_04_1700ms.jpg"},{"t":2450,"src":"07-avanca_05_2450ms.jpg"},{"t":3100,"src":"07-avanca_06_3100ms.jpg"},{"t":4400,"src":"07-avanca_07_4400ms.jpg"}]},{"id":"07-volta","title":"07.2 → 07.1 • o portal fecha","note":"A luz recolhe, os painéis voltam e a trava fecha (0,9 s); execução e registro voltam a aguardar.","frames":[{"t":0,"src":"07-volta_00_0ms.jpg"},{"t":300,"src":"07-volta_01_300ms.jpg"},{"t":650,"src":"07-volta_02_650ms.jpg"},{"t":1100,"src":"07-volta_03_1100ms.jpg"}]},{"id":"07-repete","title":"07.1 → 07.2 de novo • a sequência se repete","note":"Mesmo estado final, sem duplicar fases.","frames":[{"t":0,"src":"07-repete_00_0ms.jpg"},{"t":4400,"src":"07-repete_01_4400ms.jpg"}]},{"id":"08-sb","title":"08.1 → 08.2 • Start → Business","note":"Segunda plataforma e 8 colunas sobem; câmera recua; a trilha de níveis muda de cor.","frames":[{"t":0,"src":"08-sb_00_0ms.jpg"},{"t":300,"src":"08-sb_01_300ms.jpg"},{"t":650,"src":"08-sb_02_650ms.jpg"},{"t":1300,"src":"08-sb_03_1300ms.jpg"}]},{"id":"08-be","title":"08.2 → 08.3 • Business → Enterprise","note":"Terceira plataforma, 12 colunas e conexões convergentes.","frames":[{"t":0,"src":"08-be_00_0ms.jpg"},{"t":300,"src":"08-be_01_300ms.jpg"},{"t":650,"src":"08-be_02_650ms.jpg"},{"t":1500,"src":"08-be_03_1500ms.jpg"}]},{"id":"08-es","title":"08.3 → 08.4 • Enterprise → Simulador","note":"Visão consolidada; MRR primeiro, depois × 12 e o anel de 12 meses forma o ARR.","frames":[{"t":0,"src":"08-es_00_0ms.jpg"},{"t":300,"src":"08-es_01_300ms.jpg"},{"t":800,"src":"08-es_02_800ms.jpg"},{"t":1800,"src":"08-es_03_1800ms.jpg"},{"t":3400,"src":"08-es_04_3400ms.jpg"}]},{"id":"08-se","title":"08.4 → 08.3 • Simulador → Enterprise","note":"O anel de receita se apaga e a câmera volta.","frames":[{"t":0,"src":"08-se_00_0ms.jpg"},{"t":300,"src":"08-se_01_300ms.jpg"},{"t":700,"src":"08-se_02_700ms.jpg"},{"t":1300,"src":"08-se_03_1300ms.jpg"}]},{"id":"08-eb","title":"08.3 → 08.2 • Enterprise → Business","note":"As 12 colunas e a plataforma superior recolhem.","frames":[{"t":0,"src":"08-eb_00_0ms.jpg"},{"t":300,"src":"08-eb_01_300ms.jpg"},{"t":650,"src":"08-eb_02_650ms.jpg"},{"t":1300,"src":"08-eb_03_1300ms.jpg"}]},{"id":"08-bs","title":"08.2 → 08.1 • Business → Start","note":"Volta ao primeiro nível.","frames":[{"t":0,"src":"08-bs_00_0ms.jpg"},{"t":300,"src":"08-bs_01_300ms.jpg"},{"t":650,"src":"08-bs_02_650ms.jpg"},{"t":1300,"src":"08-bs_03_1300ms.jpg"}]}];
+let cur = 0, timer = null, chain = false;
+const $ = (id) => document.getElementById(id);
+function show(ci, fi) {
+  const c = CLIPS[ci], f = c.frames[fi];
+  $('frame').src = f.src;
+  $('time').textContent = f.t + ' ms';
+}
+function select(ci) {
+  stop();
+  cur = ci;
+  const c = CLIPS[ci];
+  document.querySelectorAll('#clips button').forEach((b, i) => b.setAttribute('aria-pressed', i === ci));
+  $('title').textContent = c.title;
+  $('note').textContent = c.note;
+  $('strip').innerHTML = c.frames.map((f) => '<figure><img src="' + f.src + '" alt=""><figcaption>' + f.t + ' ms</figcaption></figure>').join('');
+  show(ci, 0);
+}
+function stop() { if (timer) clearTimeout(timer); timer = null; }
+function play(ci, done) {
+  const c = CLIPS[ci];
+  let i = 0;
+  const step = () => {
+    show(ci, i);
+    if (i === c.frames.length - 1) { timer = setTimeout(() => done && done(), 1400); return; }
+    const dt = c.frames[i + 1].t - c.frames[i].t;
+    i++;
+    timer = setTimeout(step, dt);
+  };
+  step();
+}
+CLIPS.forEach((c, i) => {
+  const b = document.createElement('button');
+  b.textContent = c.title.split(' • ')[0];
+  b.onclick = () => select(i);
+  $('clips').appendChild(b);
+});
+$('play').onclick = () => { stop(); play(cur); };
+$('all').onclick = () => {
+  stop();
+  const run = (i) => { if (i >= CLIPS.length) return; select(i); play(i, () => run(i + 1)); };
+  run(0);
+};
+select(0);
+</script>
+</body>
+</html>
