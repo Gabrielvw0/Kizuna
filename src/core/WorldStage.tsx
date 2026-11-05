@@ -517,27 +517,19 @@ export const WorldStage: React.FC = () => {
     const modularScaleGroup = new THREE.Group();
     scene.add(modularScaleGroup);
 
-    const centerCell = new THREE.Mesh(
-      new THREE.BoxGeometry(0.55, 0.55, 0.55),
-      new THREE.MeshBasicMaterial({ color: 0xf2eee6, wireframe: true, transparent: true, opacity: 0.22 })
-    );
-    modularScaleGroup.add(centerCell);
-
-    modularScaleGroup.position.z = -1.2; // Etapa 8: reticulado ao fundo, atrás dos anéis
-    const satelliteCells: THREE.Mesh[] = [];
-    const satOffsets = [
-      [-0.8, 0, 0], [0.8, 0, 0], [0, 0.8, 0], [0, -0.8, 0],
-      [-0.8, 0.8, 0], [0.8, 0.8, 0], [-0.8, -0.8, 0], [0.8, -0.8, 0]
-    ];
-    satOffsets.forEach(([ox, oy, oz]) => {
-      const sat = new THREE.Mesh(
-        new THREE.BoxGeometry(0.35, 0.35, 0.35),
-        new THREE.MeshBasicMaterial({ color: 0x5b7db3, wireframe: true, transparent: true, opacity: 0.16 })
+    // Etapa 8: os cubos saíram. Três anéis finos no piso (equipe → departamentos → empresa)
+    // acendem em sequência, de dentro para fora: a ideia de crescimento dos planos.
+    const growthRings: THREE.Mesh[] = [];
+    [0.55, 1.0, 1.45].forEach((r) => {
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(r, 0.006, 8, 128),
+        new THREE.MeshBasicMaterial({ color: 0xf2eee6, transparent: true, opacity: 0.12, fog: false })
       );
-      sat.position.set(ox, oy, oz);
-      modularScaleGroup.add(sat);
-      satelliteCells.push(sat);
+      ring.rotation.x = Math.PI / 2;
+      modularScaleGroup.add(ring);
+      growthRings.push(ring);
     });
+    modularScaleGroup.position.set(0, -1.05, -0.6);
 
     // =========================================================================
     // 08. ADAPTATION METAMORPHOSIS GROUP (SCENE 08: ADAPTAÇÃO)
@@ -545,11 +537,8 @@ export const WorldStage: React.FC = () => {
     const adaptationMorphGroup = new THREE.Group();
     scene.add(adaptationMorphGroup);
 
-    const morphFrame = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.8, 1.1),
-      new THREE.MeshBasicMaterial({ color: 0x3a404c, wireframe: true, transparent: true, opacity: 0.35 })
-    );
-    adaptationMorphGroup.add(morphFrame);
+    // Etapa 8: a moldura aramada (linha diagonal sobre o conteúdo) foi removida; o cenário fica limpo.
+
     // Etapa 8: disco vermelho decorativo removido (o vermelho fica para o que tem função)
 
     // =========================================================================
@@ -558,29 +547,42 @@ export const WorldStage: React.FC = () => {
     const gateGroup = new THREE.Group();
     scene.add(gateGroup);
 
-    const gatePillarMat = new THREE.MeshBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.6, fog: false });
-    const leftPillar = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.9, 0.12), gatePillarMat);
-    leftPillar.position.set(-1.1, 0, 0);
-    const rightPillar = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.9, 0.12), gatePillarMat);
-    rightPillar.position.set(1.1, 0, 0);
-    const topBar = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.14, 0.15), gatePillarMat);
-    topBar.position.set(0, 0.95, 0);
-
-    gateGroup.add(leftPillar, rightPillar, topBar);
+    // Etapa 8: torii estilizado — duas colunas finas, viga superior escura (kasagi) sobre viga
+    // vermelha (shimaki) e travessa (nuki); o painel central de aprovação é o da tela.
+    // Fechado: uma barreira fina atravessa o vão. Aprovado pelo Hanko: a barreira sobe e some,
+    // e as colunas continuam como moldura.
+    const toriiRed = new THREE.MeshBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.85, fog: false });
+    const toriiDark = new THREE.MeshBasicMaterial({ color: 0x1a1c22, fog: false });
+    const COL_X = 1.1;
+    [-COL_X, COL_X].forEach((x) => {
+      const col = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.05, 1.9, 24), toriiRed);
+      col.position.set(x, 0, 0);
+      gateGroup.add(col);
+    });
+    const shimaki = new THREE.Mesh(new THREE.BoxGeometry(2.62, 0.055, 0.09), toriiRed);
+    shimaki.position.set(0, 0.97, 0);
+    const kasagi = new THREE.Mesh(new THREE.BoxGeometry(2.86, 0.07, 0.11), toriiDark);
+    kasagi.position.set(0, 1.035, 0);
+    // pontas levemente erguidas da viga superior
+    [-1, 1].forEach((side) => {
+      const tip = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.06, 0.11), toriiDark);
+      tip.position.set(side * 1.48, 1.065, 0);
+      tip.rotation.z = side * 0.18;
+      gateGroup.add(tip);
+    });
+    const nuki = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.04, 0.07), toriiRed);
+    nuki.position.set(0, 0.72, 0);
+    // o painel central de aprovação é o painel da própria tela, pendurado sob as vigas
+    gateGroup.add(shimaki, kasagi, nuki);
     // Etapa 8: o portão desce para ficar abaixo do título e emoldurar a decisão no centro
-    gateGroup.position.y = -0.68;
+    gateGroup.position.y = -0.52;
 
-    // Sliding Iron Bars
-    const gateBars: THREE.Mesh[] = [];
-    for (let i = 0; i < 7; i++) {
-      const bar = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.02, 0.02, 1.8, 12),
-        new THREE.MeshBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.55, fog: false })
-      );
-      bar.position.set(-0.75 + i * 0.25, 0, 0);
-      gateGroup.add(bar);
-      gateBars.push(bar);
-    }
+    // Barreira única (fechado) — sobe e some quando o Hanko aprova
+    const barrierMat = new THREE.MeshBasicMaterial({ color: 0xd7263d, transparent: true, opacity: 0.7, fog: false });
+    const barrier = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, COL_X * 2, 12), barrierMat);
+    barrier.rotation.z = Math.PI / 2;
+    barrier.position.set(0, -0.05, 0);
+    gateGroup.add(barrier);
 
     // =========================================================================
     // 10. RAILWAY EXPANSION TRACK GROUP (SCENE 10: ENTRADA)
@@ -689,7 +691,7 @@ export const WorldStage: React.FC = () => {
     scene.add(financial3DGroup);
 
     // Etapa 8: barras recuadas para o fundo (não atravessam os números da tela)
-    financial3DGroup.position.set(0.4, 0, -1.6);
+    financial3DGroup.position.set(0.6, -0.2, -3);
     const finBars: THREE.Mesh[] = [];
     const barValues = [0.4, 0.7, 1.1, 1.6, 2.2];
     for (let i = 0; i < 5; i++) {
@@ -698,7 +700,7 @@ export const WorldStage: React.FC = () => {
         color: i === 4 ? 0xf2eee6 : 0x5c6474,
         wireframe: true,
         transparent: true,
-        opacity: i === 4 ? 0.2 : 0.16
+        opacity: i === 4 ? 0.12 : 0.08
       });
       const bar = new THREE.Mesh(bGeo, bMat);
       bar.position.set(-1.0 + i * 0.5, -0.8 + barValues[i] / 2, 0);
@@ -967,12 +969,11 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       modularScaleGroup.visible = sIdx === 6;
       if (sIdx === 6) {
-        centerCell.rotation.y += 0.01;
-        centerCell.rotation.x += 0.006;
-        const spread = scIdx === 0 ? 0.35 : scIdx === 1 ? 0.8 : 1.3;
-        satelliteCells.forEach((sat, i) => {
-          sat.position.lerp(new THREE.Vector3(satOffsets[i][0] * spread, satOffsets[i][1] * spread, satOffsets[i][2] * spread), 0.06);
-          sat.visible = scIdx === 0 ? i < 2 : scIdx === 1 ? i < 4 : true;
+        // onda lenta de dentro para fora (≈ 4,5 s por ciclo), sem girar nem mudar de lugar
+        growthRings.forEach((ring, i) => {
+          const phase = (elapsed * 0.22 - i * 0.18) % 1;
+          const glow = Math.max(0, Math.sin(Math.max(0, phase) * Math.PI));
+          (ring.material as THREE.MeshBasicMaterial).opacity = 0.1 + glow * 0.28;
         });
       }
 
@@ -981,7 +982,6 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       adaptationMorphGroup.visible = sIdx === 7;
       if (sIdx === 7) {
-        morphFrame.rotation.y = Math.sin(elapsed * 0.5) * 0.06;
       }
 
       // -----------------------------------------------------------------------
@@ -992,14 +992,10 @@ export const WorldStage: React.FC = () => {
         // em telas 4:3 o portão estreita um pouco para os pilares continuarem nos vãos entre as colunas
         gateGroup.scale.x = camera.aspect < 1.5 ? 0.86 : 1;
         const isOpen = gateOk;
-        gateBars.forEach((bar) => {
-          const barTargetY = isOpen ? 1.5 : 0;
-          bar.position.y = THREE.MathUtils.lerp(bar.position.y, barTargetY, 0.08);
-          // ao abrir, as grades sobem e somem (não cobrem o título)
-          const m = bar.material as THREE.MeshBasicMaterial;
-          m.opacity = THREE.MathUtils.lerp(m.opacity, isOpen ? 0 : 0.55, 0.08);
-          bar.visible = m.opacity > 0.01;
-        });
+        const k = Math.min(1, dt * 4);
+        barrier.position.y += ((isOpen ? 0.62 : -0.05) - barrier.position.y) * k;
+        barrierMat.opacity += ((isOpen ? 0 : 0.7) - barrierMat.opacity) * k;
+        barrier.visible = barrierMat.opacity > 0.01;
       }
 
       // -----------------------------------------------------------------------
