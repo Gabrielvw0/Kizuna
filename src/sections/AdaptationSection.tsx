@@ -3,6 +3,7 @@ import { Languages, CalendarDays, GitPullRequest, ShieldCheck } from 'lucide-rea
 import { usePresentation } from '../core/PresentationContext';
 import { PRICING, getPlan, yen } from '../data/pricing';
 import { Kicker, DisplayTitle, Accent, Classification, LegibilityVeil } from '../components/strategic/Editorial';
+import { SceneStage } from '../components/strategic/SceneStage';
 
 // Exemplo de 税抜/税込 calculado a partir do preço sugerido do Start e da alíquota em pricing.json
 const NET = getPlan('start').priceMonthly;
@@ -138,11 +139,12 @@ export const AdaptationSection: React.FC = () => {
             Não basta traduzir. <Accent>É preciso respeitar o contexto.</Accent>
           </DisplayTitle>
         </div>
-        <div className="border-b border-washi/10">
+        {/* troca de cena: a dimensão anterior sai e a nova entra (SceneStage), sem remontar a tela */}
+        <SceneStage index={scene} className="border-b border-washi/10">
           {GROUPS.map((group, g) =>
             group.map((p, i) =>
               g === scene ? (
-                <div key={p.title} className="animate-fadeIn">
+                <div key={p.title}>
                   <PillarBand p={p} index={g * 2 + i + 1} />
                 </div>
               ) : (
@@ -150,7 +152,7 @@ export const AdaptationSection: React.FC = () => {
               )
             )
           )}
-        </div>
+        </SceneStage>
       </div>
     </div>
   );

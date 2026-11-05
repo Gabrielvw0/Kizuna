@@ -2,15 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { Bot, Lock, CheckCircle2, PlayCircle, Database, ArrowRight } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
 import { Kicker, DisplayTitle, Classification } from '../components/strategic/Editorial';
+import { SceneStage } from '../components/strategic/SceneStage';
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-// Mesma linha do tempo do portal 3D (WorldStage, cenário 8, cena 2), em ms desde a entrada na 07.2
-const T_STAMP = 1100; // o Hanko toca a placa: 承認
-const T_OPEN = 2300; // a passagem abre
-const T_EXEC = 3000; // execução autorizada
-const T_LOG = 3500; // registro documentado
+// Mesma linha do tempo do portal 3D (WorldStage, cenário 8, cena 2), em ms desde a entrada na 07.2.
+// Inclui os 450 ms em que a câmera ajusta o enquadramento antes do Hanko (GATE_LEAD).
+const T_STAMP = 1550; // o Hanko toca a placa: 承認
+const T_OPEN = 2750; // a passagem abre
+const T_EXEC = 3450; // execução autorizada
+const T_LOG = 3950; // registro documentado
+// Movimento reduzido: a mesma ordem, em ~0,7 s, sem o Hanko em movimento
+const T_REDUCED = [150, 360, 520, 680];
 
 /**
  * Tela 07 • Confiança e aprovação humana — Etapa 8.2.
@@ -32,17 +36,9 @@ export const AISecuritySection: React.FC = () => {
       setPhase(0);
       return;
     }
-    if (prefersReducedMotion()) {
-      setPhase(4);
-      return;
-    }
     setPhase(0);
-    const timers = [
-      window.setTimeout(() => setPhase(1), T_STAMP),
-      window.setTimeout(() => setPhase(2), T_OPEN),
-      window.setTimeout(() => setPhase(3), T_EXEC),
-      window.setTimeout(() => setPhase(4), T_LOG)
-    ];
+    const at = prefersReducedMotion() ? T_REDUCED : [T_STAMP, T_OPEN, T_EXEC, T_LOG];
+    const timers = at.map((ms, i) => window.setTimeout(() => setPhase(i + 1), ms));
     return () => timers.forEach((t) => window.clearTimeout(t));
   }, [scene]);
 
@@ -124,11 +120,13 @@ export const AISecuritySection: React.FC = () => {
               {status}
             </span>
           </div>
-          <p className="mt-1 text-sm md:text-base short:text-sm text-washi">
-            {scene === 0
-              ? 'A IA recomenda, mas não executa: a decisão aguarda o responsável.'
-              : 'O responsável aplica o Hanko: só então a mudança é executada e registrada.'}
-          </p>
+          <SceneStage index={scene}>
+            <p className="mt-1 text-sm md:text-base short:text-sm text-washi">
+              {scene === 0
+                ? 'A IA recomenda, mas não executa: a decisão aguarda o responsável.'
+                : 'O responsável aplica o Hanko: só então a mudança é executada e registrada.'}
+            </p>
+          </SceneStage>
           <p className="mt-0.5 text-xs short:text-[11px] text-washi-dim max-w-2xl mx-auto">
             IA assistiva e fluxo de aprovação: recursos propostos do Kizuna Business. No Start, o registro já vale: toda mudança em atividades entra no histórico.
           </p>

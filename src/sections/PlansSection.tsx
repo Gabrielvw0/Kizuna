@@ -3,6 +3,7 @@ import { Check, Layers, Wrench, Plug, Users } from 'lucide-react';
 import { usePresentation } from '../core/PresentationContext';
 import { PRICING, PlanId, getPlan, planForUsers, yen } from '../data/pricing';
 import { Kicker, DisplayTitle, Accent, Classification, LegibilityVeil } from '../components/strategic/Editorial';
+import { SceneStage } from '../components/strategic/SceneStage';
 
 const PLAN_IDS: PlanId[] = ['start', 'business', 'enterprise'];
 const RING_LABEL: Record<PlanId, string> = { start: 'Equipe', business: 'Departamentos', enterprise: 'Empresa' };
@@ -45,8 +46,8 @@ const LevelTrail: React.FC<{ level: number }> = ({ level }) => (
   <ol className="flex items-center gap-2 text-[11px] md:text-xs uppercase tracking-[0.18em]" aria-label="Nível do plano">
     {PLAN_IDS.map((id, i) => (
       <li key={id} className="flex items-center gap-2">
-        {i > 0 && <span className={`h-px w-5 md:w-8 ${i <= level ? 'bg-beni/70' : 'bg-washi/15'}`} aria-hidden />}
-        <span className={i === level ? 'text-washi' : i < level ? 'text-beni-soft' : 'text-washi-dim'}>
+        {i > 0 && <span className={`h-px w-5 md:w-8 transition-colors duration-700 ${i <= level ? 'bg-beni/70' : 'bg-washi/15'}`} aria-hidden />}
+        <span className={`transition-colors duration-700 ${i === level ? 'text-washi' : i < level ? 'text-beni-soft' : 'text-washi-dim'}`}>
           <span className="font-display normal-case tracking-normal tabular-nums mr-1">{i + 1}</span>
           {RING_LABEL[id]}
         </span>
@@ -100,6 +101,7 @@ export const PlansSection: React.FC = () => {
             <Kicker code="08" label="Planos e receita" jp="価" />
             <Classification kind="preco">{PRICING.badge}</Classification>
           </div>
+          <SceneStage index={isSim ? 1 : 0}>
           <DisplayTitle className="mt-4 short:mt-2 short:!text-[1.8rem] short:lg:!text-[2.15rem]">
             {isSim ? (
               <>
@@ -111,10 +113,19 @@ export const PlansSection: React.FC = () => {
               </>
             )}
           </DisplayTitle>
+          </SceneStage>
 
-          {!isSim ? (
-            <div key={plan.id} className="mt-5 short:mt-2 animate-fadeIn">
+          {/* trilha de níveis fica fixa entre Start, Business e Enterprise; só as cores mudam */}
+          {!isSim && (
+            <div className="mt-5 short:mt-2">
               <LevelTrail level={scene} />
+            </div>
+          )}
+
+          {/* troca de cena: o plano anterior sai e o próximo entra (SceneStage), sem remontar a tela */}
+          <SceneStage index={scene}>
+          {!isSim ? (
+            <div key={plan.id}>
               <div className="mt-4 short:mt-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                 <h2 className="font-display font-semibold text-2xl md:text-3xl short:text-2xl text-washi">{plan.name}</h2>
                 <div className="flex items-baseline gap-1.5">
@@ -149,7 +160,7 @@ export const PlansSection: React.FC = () => {
               )}
             </div>
           ) : (
-            <div key="simulator" className="mt-5 short:mt-2 flex flex-col gap-4 md:gap-5 short:gap-2 animate-fadeIn">
+            <div key="simulator" className="mt-5 short:mt-2 flex flex-col gap-4 md:gap-5 short:gap-2">
               {/* 1. Quantos usuários? */}
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs uppercase tracking-[0.2em] text-washi-dim flex items-center gap-1.5 mr-1">
@@ -231,6 +242,7 @@ export const PlansSection: React.FC = () => {
               <p className="text-xs short:text-[11px] text-washi-dim">{PRICING.expansionJourney.disclaimer}</p>
             </div>
           )}
+          </SceneStage>
         </div>
       </div>
     </div>
