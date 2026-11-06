@@ -183,10 +183,9 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 9: // TELA 10: ENTRADA NO MERCADO • LINHA FERROVIÁRIA METROVIÁRIA
       env.globeVisibility = 0.0;
       env.railwayVisibility = 1.0;
-      // Etapa 8 • Bloco 1 (tela 09.1–09.3): rota de entrada no piso; a câmera acompanha o trecho da cena
+      // Tela 09.1–09.3 (linha de metrô 2D): sem cenário 3D; só o fundo, com um leve deslize por cena
       {
         const s = Math.min(2, Math.max(0, sceneIdx));
-        // correção de composição: sem guinada (a rota fica horizontal na faixa inferior), só um leve deslize por cena
         pose.pos.set(-0.06 + s * 0.06, 0.45, 3.0);
         pose.target.set(-0.06 + s * 0.06, 0.05, 0);
       }
@@ -195,7 +194,7 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 10: // TELA 11: PROMOÇÃO • CIDADE REAGINDO À CAMPANHA (ONDAS ELETROMAGNÉTICAS)
       env.globeVisibility = 0.0;
       env.broadcastVisibility = 1.0;
-      // Etapa 8 • Bloco 1 (tela 09.4): a câmera sobe e olha o alcance no piso, à direita
+      // Tela 09.4 (linhas alimentadoras 2D): sem cenário 3D; tomada frontal do fundo
       pose.pos.set(0.1, 0.55, 3.2);
       pose.target.set(0.1, 0.1, 0);
       break;
