@@ -4,6 +4,7 @@ import { usePresentation } from './PresentationContext';
 import { getCameraPoseForSection } from './CameraDirector';
 import { toStage } from './narrativeMap';
 import { buildMarunouchi, MARUNOUCHI_FOG } from './environments/marunouchi';
+import { buildOffice, OFFICE_FOG } from './environments/office';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -1151,6 +1152,11 @@ export const WorldStage: React.FC = () => {
     marunouchi.root.position.y = -1.4;
     marunouchi.root.visible = false;
     scene.add(marunouchi.root);
+    // Tela 10 (cenário 11): andar executivo com fachada de vidro voltada para Tóquio
+    const office = buildOffice(renderer.capabilities.getMaxAnisotropy());
+    office.root.position.y = -1.6;
+    office.root.visible = false;
+    scene.add(office.root);
 
     // =========================================================================
     // RENDER & ANIMATION LOOP
@@ -1522,15 +1528,17 @@ export const WorldStage: React.FC = () => {
       const onCity = sIdx === 9 || sIdx === 10;
       marunouchi.root.visible = onCity;
       if (onCity) marunouchi.update(dt, sIdx === 10 ? 3 : Math.min(2, scIdx), reducedMotion);
+      // 12. Tela 10: escritório corporativo (Etapa 9), cena estática
+      const onOffice = sIdx === 11;
+      office.root.visible = onOffice;
       {
         const fog = scene.fog as THREE.FogExp2;
-        const target = onCity ? MARUNOUCHI_FOG : DEFAULT_FOG;
+        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : DEFAULT_FOG;
         fog.color.copy(target.color);
         fog.density = target.density;
       }
-      starField.visible = !onCity;
+      starField.visible = !onCity && !onOffice;
 
-      // 12. Tela 10: sem constelação 3D — a comparação editorial em três blocos é o elemento visual.
 
       // 14. Tela 11: sem radar 3D — matriz de riscos e roadmap 2D.
 

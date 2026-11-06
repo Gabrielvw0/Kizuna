@@ -98,7 +98,7 @@ const companyById = (id: string) => GROUPS.flatMap((g) => g.companies.map((c) =>
 const GroupBlock: React.FC<{ group: Group; selected: string | null; onSelect: (id: string) => void }> = ({ group, selected, onSelect }) => {
   const groupSel = selected === group.id;
   return (
-    <article className={`min-w-0 h-full flex flex-col border bg-sumi-800/70 transition-colors duration-300 ${groupSel ? 'border-washi/40' : 'border-washi/10'}`}>
+    <article className={`min-w-0 h-full flex flex-col border bg-sumi-800/[0.88] transition-colors duration-300 ${groupSel ? 'border-washi/40' : 'border-washi/10'}`}>
       <button
         onClick={() => onSelect(group.id)}
         aria-pressed={groupSel}
@@ -136,7 +136,7 @@ const GroupBlock: React.FC<{ group: Group; selected: string | null; onSelect: (i
 
 /** Bloco protagonista: a proposta do Kizuna, sempre visível e completa (não depende de clique). */
 const KizunaBlock: React.FC = () => (
-  <article className="relative min-w-0 h-full flex flex-col border-2 border-beni bg-beni/[0.14] px-[clamp(0.9rem,2.2vw,2.5rem)] py-[clamp(0.8rem,2.6vh,2rem)]">
+  <article className="relative min-w-0 h-full flex flex-col border-2 border-beni bg-[linear-gradient(rgba(215,38,61,0.15),rgba(215,38,61,0.15)),linear-gradient(rgba(14,12,14,0.88),rgba(14,12,14,0.88))] px-[clamp(0.9rem,2.2vw,2.5rem)] py-[clamp(0.8rem,2.6vh,2rem)]">
     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
       <span className="flex items-baseline gap-[0.6em]">
         <span className="font-display text-[clamp(1.1rem,0.8rem+0.8vw,1.8rem)] text-beni-soft tabular-nums leading-none">03</span>
@@ -194,7 +194,7 @@ const ContextPanel: React.FC<{ selected: string | null }> = ({ selected }) => {
   }
 
   return (
-    <div key={selected ?? 'none'} className="step-in h-full min-w-0 border border-washi/10 bg-sumi-800/40 px-[clamp(0.8rem,1.6vw,1.75rem)] py-[clamp(0.5rem,1.8vh,1.25rem)]">
+    <div key={selected ?? 'none'} className="step-in h-full min-w-0 border border-washi/10 bg-sumi-800/[0.82] px-[clamp(0.8rem,1.6vw,1.75rem)] py-[clamp(0.5rem,1.8vh,1.25rem)]">
       <div className="flex flex-wrap items-center gap-x-[0.8em] gap-y-1">
         <span className="text-[clamp(0.95rem,0.75rem+0.6vw,1.5rem)] font-semibold leading-tight text-washi">{title}</span>
         {jp && <span className="text-[clamp(0.66rem,0.58rem+0.22vw,0.88rem)] text-washi-dim">{jp}</span>}
@@ -254,7 +254,8 @@ export const PositioningSection: React.FC = () => {
 
   return (
     <div className="relative w-full h-full select-none">
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-sumi/70" />
+      {/* Etapa 9: véu mais leve — o andar executivo e a vista de Tóquio aparecem; os blocos têm fundo próprio */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(11,11,13,0.6)_0%,rgba(11,11,13,0.5)_45%,rgba(11,11,13,0.62)_100%)]" />
       <div className="relative h-full mx-auto w-[min(88%,1640px)] flex flex-col pt-[clamp(0.6rem,3.6vh,2.75rem)] pb-[clamp(0.5rem,3vh,2.25rem)]">
         <header className="shrink-0">
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">

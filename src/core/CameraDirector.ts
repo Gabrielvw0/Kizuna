@@ -203,9 +203,9 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 11: // TELA 12: CONCORRÊNCIA • CONSTELAÇÃO COMPETITIVA 3D
       env.globeVisibility = 0.0;
       env.constellationVisibility = 1.0;
-      // Tela 10 (comparação editorial 2D, sem 3D, cena única): tomada fixa do fundo
-      pose.pos.set(0, 0, 2.85);
-      pose.target.set(0, 0, 0);
+      // Tela 10 (Etapa 9, cena única): tomada fixa no andar executivo, de frente para a fachada de vidro
+      pose.pos.set(0, 0, 3.0);
+      pose.target.set(0, 0.35, -9);
       break;
 
     case 12: // TELA 13: PREÇO • PAINEL FINANCEIRO VOLUMÉTRICO VIVO

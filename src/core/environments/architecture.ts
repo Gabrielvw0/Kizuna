@@ -174,3 +174,63 @@ export function skyDome(stops: [number, string][], glowDir?: THREE.Vector3, glow
 
 /** Aproxima um valor do alvo por tempo (não por quadro). */
 export const approach = (cur: number, target: number, dt: number, rate: number) => cur + (target - cur) * (1 - Math.exp(-dt * rate));
+
+/** Piso de tábuas de madeira (cor), repetível; `seed` muda o desenho das tábuas. */
+export function woodTexture(seed: number, anisotropy = 4, base = '#7a5a3e') {
+  const S = 512;
+  const rnd = seeded(seed);
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const g = c.getContext('2d')!;
+  g.fillStyle = base;
+  g.fillRect(0, 0, S, S);
+  const rows = 8;
+  const h = S / rows;
+  for (let r = 0; r < rows; r++) {
+    let x = -rnd() * S * 0.5;
+    while (x < S) {
+      const w = S * (0.35 + rnd() * 0.45);
+      const l = 0.82 + rnd() * 0.3;
+      g.fillStyle = `rgba(${Math.round(122 * l)},${Math.round(90 * l)},${Math.round(62 * l)},1)`;
+      g.fillRect(x, r * h, w, h);
+      // veios
+      g.strokeStyle = 'rgba(40,25,15,0.18)';
+      g.lineWidth = 1;
+      for (let k = 0; k < 5; k++) {
+        const y = r * h + rnd() * h;
+        g.beginPath();
+        g.moveTo(x, y);
+        g.bezierCurveTo(x + w * 0.3, y + (rnd() - 0.5) * 6, x + w * 0.7, y + (rnd() - 0.5) * 6, x + w, y);
+        g.stroke();
+      }
+      // junta
+      g.fillStyle = 'rgba(25,16,10,0.55)';
+      g.fillRect(x, r * h, 2, h);
+      x += w;
+    }
+    g.fillStyle = 'rgba(25,16,10,0.6)';
+    g.fillRect(0, r * h, S, 2);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = anisotropy;
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+/** Mancha de luz suave (gradiente radial) para simular sol entrando pela janela. */
+export function lightPoolTexture(color = '255,214,160') {
+  const S = 256;
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const g = c.getContext('2d')!;
+  const grd = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+  grd.addColorStop(0, `rgba(${color},0.9)`);
+  grd.addColorStop(0.5, `rgba(${color},0.35)`);
+  grd.addColorStop(1, `rgba(${color},0)`);
+  g.fillStyle = grd;
+  g.fillRect(0, 0, S, S);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
