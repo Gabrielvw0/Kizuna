@@ -540,7 +540,11 @@ export const EntrySection: React.FC = () => {
   return (
     <div className="relative w-full h-full select-none">
       <LocalStyles />
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-sumi/70" />
+      {/* Etapa 9: véu em gradiente — o céu de Marunouchi aparece no alto; atrás da linha e do painel, mais escuro para a leitura */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(11,11,13,0.42)_0%,rgba(11,11,13,0.38)_14%,rgba(11,11,13,0.62)_24%,rgba(11,11,13,0.66)_38%,rgba(11,11,13,0.55)_52%,rgba(11,11,13,0.72)_100%)]"
+      />
       <div className="relative h-full mx-auto w-[min(88%,1640px)] flex flex-col pt-[clamp(0.6rem,3.6vh,2.75rem)] pb-[clamp(0.5rem,3vh,2.25rem)]">
         <SceneStage index={isAcquisition ? 1 : 0} className="shrink-0">
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">

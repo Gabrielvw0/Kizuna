@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { usePresentation } from './PresentationContext';
 import { getCameraPoseForSection } from './CameraDirector';
 import { toStage } from './narrativeMap';
+import { buildMarunouchi, MARUNOUCHI_FOG } from './environments/marunouchi';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -1141,6 +1142,17 @@ export const WorldStage: React.FC = () => {
     scene.add(starField);
 
     // =========================================================================
+    // ETAPA 9 • AMBIENTES DE FUNDO DAS TELAS 09–11
+    // Tela 09 (cenários 9 e 10): avenida de Marunouchi ao entardecer. A névoa e o céu próprios só valem
+    // enquanto o cenário está ativo; fora dele, a névoa padrão da apresentação é restaurada.
+    // =========================================================================
+    const DEFAULT_FOG = { color: (scene.fog as THREE.FogExp2).color.clone(), density: (scene.fog as THREE.FogExp2).density };
+    const marunouchi = buildMarunouchi(renderer.capabilities.getMaxAnisotropy());
+    marunouchi.root.position.y = -1.4;
+    marunouchi.root.visible = false;
+    scene.add(marunouchi.root);
+
+    // =========================================================================
     // RENDER & ANIMATION LOOP
     // =========================================================================
     let animId: number;
@@ -1505,7 +1517,18 @@ export const WorldStage: React.FC = () => {
         Object.assign(gateSnap, { focus: 0, seal: 0, unlock: 0, open: 0, reveal: 0 });
       }
 
-      // 10–11. Tela 09: sem cenário 3D — a linha de metrô 2D da interface é o elemento visual (EntrySection).
+      // 10–11. Tela 09: a linha de metrô 2D da interface é o elemento principal; ao fundo, a avenida de
+      // Marunouchi (Etapa 9). A câmera avança pela avenida a cada trecho e sobe na cena de aquisição.
+      const onCity = sIdx === 9 || sIdx === 10;
+      marunouchi.root.visible = onCity;
+      if (onCity) marunouchi.update(dt, sIdx === 10 ? 3 : Math.min(2, scIdx), reducedMotion);
+      {
+        const fog = scene.fog as THREE.FogExp2;
+        const target = onCity ? MARUNOUCHI_FOG : DEFAULT_FOG;
+        fog.color.copy(target.color);
+        fog.density = target.density;
+      }
+      starField.visible = !onCity;
 
       // 12. Tela 10: sem constelação 3D — a comparação editorial em três blocos é o elemento visual.
 

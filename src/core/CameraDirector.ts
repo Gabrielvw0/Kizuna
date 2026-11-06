@@ -183,20 +183,21 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 9: // TELA 10: ENTRADA NO MERCADO • LINHA FERROVIÁRIA METROVIÁRIA
       env.globeVisibility = 0.0;
       env.railwayVisibility = 1.0;
-      // Tela 09.1–09.3 (linha de metrô 2D): sem cenário 3D; só o fundo, com um leve deslize por cena
+      // Tela 09.1–09.3 (Etapa 9): a câmera avança pela avenida de Marunouchi a cada trecho da rota.
+      // O horizonte fica no terço superior, na altura da linha de metrô da interface.
       {
         const s = Math.min(2, Math.max(0, sceneIdx));
-        pose.pos.set(-0.06 + s * 0.06, 0.45, 3.0);
-        pose.target.set(-0.06 + s * 0.06, 0.05, 0);
+        pose.pos.set(s * 0.25, 1.9, 3.0 - s * 2.6);
+        pose.target.set(s * 0.25, -3.6, -40 - s * 2.6);
       }
       break;
 
     case 10: // TELA 11: PROMOÇÃO • CIDADE REAGINDO À CAMPANHA (ONDAS ELETROMAGNÉTICAS)
       env.globeVisibility = 0.0;
       env.broadcastVisibility = 1.0;
-      // Tela 09.4 (linhas alimentadoras 2D): sem cenário 3D; tomada frontal do fundo
-      pose.pos.set(0.1, 0.55, 3.2);
-      pose.target.set(0.1, 0.1, 0);
+      // Tela 09.4 (Etapa 9): a câmera sobe e olha mais longe — a cidade como mercado a conquistar
+      pose.pos.set(0.6, 2.6, -6.5);
+      pose.target.set(0.3, -3.2, -50);
       break;
 
     case 11: // TELA 12: CONCORRÊNCIA • CONSTELAÇÃO COMPETITIVA 3D
