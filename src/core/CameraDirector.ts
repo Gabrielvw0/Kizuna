@@ -202,8 +202,8 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 11: // TELA 12: CONCORRÊNCIA • CONSTELAÇÃO COMPETITIVA 3D
       env.globeVisibility = 0.0;
       env.constellationVisibility = 1.0;
-      // Tela 10 (comparação editorial 2D, sem 3D): a câmera avança um pouco na 10.2, junto com o foco no Kizuna
-      pose.pos.set(0, 0, sceneIdx >= 1 ? 2.55 : 2.85);
+      // Tela 10 (comparação editorial 2D, sem 3D, cena única): tomada fixa do fundo
+      pose.pos.set(0, 0, 2.85);
       pose.target.set(0, 0, 0);
       break;
 

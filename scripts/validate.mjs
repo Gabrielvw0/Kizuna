@@ -17,7 +17,8 @@ const labelsBlocks = [...ctx.matchAll(/sceneLabels:\s*\[([\s\S]*?)\]\s*\n\s*\}/g
 const mapJs = ts.transpileModule(read('src/core/narrativeMap.ts'), { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 } }).outputText;
 const map = await import('data:text/javascript;base64,' + Buffer.from(mapJs).toString('base64'));
 check(sceneCounts.length === 12, 'roteiro com 12 telas', `roteiro com ${sceneCounts.length} telas (esperado 12)`);
-check(sceneCounts.reduce((a, b) => a + b, 0) === 32, 'roteiro com 32 cenas', `roteiro com ${sceneCounts.reduce((a, b) => a + b, 0)} cenas (esperado 32)`);
+// tela 10 passou a ter uma única cena (Etapa 8): 32 → 31
+check(sceneCounts.reduce((a, b) => a + b, 0) === 31, 'roteiro com 31 cenas', `roteiro com ${sceneCounts.reduce((a, b) => a + b, 0)} cenas (esperado 31)`);
 const mapProblems = map.checkNarrativeMap(sceneCounts);
 check(mapProblems.length === 0, 'mapa técnico consistente com o roteiro', 'mapa técnico: ' + mapProblems.join('; '));
 check(

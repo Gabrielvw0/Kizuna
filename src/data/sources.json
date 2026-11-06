@@ -341,13 +341,13 @@
       "id": "10",
       "title": "TELA 10 | POSICIONAMENTO — Proposta estratégica",
       "banca": {
-        "duration": "≈ 60 s • 2 cenas",
-        "speech": "Se o Japão já tem sistemas, por que o Kizuna? Este mapa é a nossa leitura qualitativa, não uma pesquisa de mercado. ERPs globais são amplos e custosos para PMEs; os tradicionais japoneses são muito aderentes, mas fechados; ferramentas de produtividade são simples, mas não conhecem o Ringi. [avançar] A posição que propomos é alta adaptação local com um escopo que cresce por módulos.",
-        "concept": "Mapa 2×2 (adaptação local × amplitude de escopo) com a posição-alvo do Kizuna.",
+        "duration": "≈ 60 s • 1 cena",
+        "speech": "Se o Japão já tem sistemas, por que o Kizuna? Esta comparação é a nossa leitura qualitativa, não uma pesquisa de mercado. Os sistemas corporativos têm escopo amplo: os ERPs globais são custosos para PMEs e os tradicionais japoneses são muito aderentes, mas fechados. As ferramentas especializadas resolvem processos específicos, mas não conhecem o Ringi. A posição que propomos para o Kizuna é uma entrada modular, começando pela gestão de equipes, com adaptação local como requisito e expansão progressiva conforme o plano contratado.",
+        "concept": "Comparação editorial em três blocos (sistemas corporativos, ferramentas especializadas e Kizuna) com faixa de síntese, em uma única cena.",
         "evidence": "As leituras dos concorrentes são hipóteses do grupo, a conferir em fontes oficiais.",
         "premise": "Não afirmamos superioridade sem dados; mostramos o espaço estratégico pretendido.",
-        "risk": "Apresentar o mapa como pesquisa comprovada.",
-        "response": "O mapa traz o rótulo 'Proposta estratégica • não é pesquisa de mercado'.",
+        "risk": "Apresentar a comparação como pesquisa comprovada.",
+        "response": "A tela traz o rótulo 'Proposta estratégica • não é pesquisa de mercado' e marca as leituras dos concorrentes como hipóteses de posicionamento.",
         "probableQuestion": "Qual o diferencial real do Kizuna diante de soluções locais e globais?",
         "suggestedAnswer": "A hipótese é que soluções globais têm menor adaptação aos rituais japoneses e as locais tradicionais têm menor abertura a integração moderna. O Kizuna propõe entrada simples pela equipe, adaptação local desde o início e expansão modular — algo a validar nos pilotos."
       },
@@ -366,7 +366,7 @@
           "title": "Leitura das alternativas (SAP/Oracle, OBIC/奉行, freee/Money Forward, Notion/Asana)",
           "source": "Avaliação qualitativa do grupo",
           "date": "2026",
-          "info": "Posições no mapa e limitações são hipóteses do grupo, sem pesquisa de mercado; devem ser conferidas em fontes oficiais de cada fornecedor.",
+          "info": "Leituras e limitações atribuídas a cada alternativa são hipóteses do grupo, sem pesquisa de mercado; devem ser conferidas em fontes oficiais de cada fornecedor.",
           "methodology": "Comparação conceitual.",
           "implication": "Evita alegações competitivas sem prova."
         }

@@ -175,13 +175,13 @@ export const PRESENTATION_SECTIONS: SectionMeta[] = [
     id: 'posicionamento',
     shortTitle: 'POSICIONAMENTO',
     fullTitle: '10 | POSICIONAMENTO — Proposta estratégica',
-    bgThemeName: 'Strategic 2x2 Matrix',
+    bgThemeName: 'Editorial comparison',
     storyQuestion: 'Se o Japão já possui sistemas, por que escolher o Kizuna?',
     metamorphosisFromTo: 'Alternativas do mercado → Posição-alvo proposta',
     narrativeNode: 'NEGÓCIO',
     kanji: '位',
-    sceneCount: 2,
-    sceneLabels: ['As alternativas existentes', 'A posição-alvo do Kizuna']
+    sceneCount: 1,
+    sceneLabels: ['Alternativas e posição proposta']
   },
   {
     index: 10,
