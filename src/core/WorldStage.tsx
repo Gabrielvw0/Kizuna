@@ -1115,44 +1115,9 @@ export const WorldStage: React.FC = () => {
     // =========================================================================
 
     // =========================================================================
-    // 12. COMPETITIVE CONSTELLATION 3D (SCENE 12: CONCORRÊNCIA)
+    // 12. TELA 10 (posicionamento): sem constelação 3D.
+    // A comparação editorial em três blocos (PositioningSection) substitui o mapa 2×2 e os pontos flutuantes.
     // =========================================================================
-    const constellationGroup = new THREE.Group();
-    scene.add(constellationGroup);
-
-    // X and Y Coordinate Axes
-    const xAxisGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1.8, -1.0, 0), new THREE.Vector3(1.8, -1.0, 0)]);
-    const yAxisGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1.8, -1.0, 0), new THREE.Vector3(-1.8, 1.2, 0)]);
-    const axisMat = new THREE.LineBasicMaterial({ color: 0x64748b, transparent: true, opacity: 0.45 });
-    constellationGroup.add(new THREE.Line(xAxisGeo, axisMat));
-    constellationGroup.add(new THREE.Line(yAxisGeo, axisMat));
-
-    // Competitor Star Nodes
-    const competitors = [
-      { name: 'SAP / Oracle', x: 1.4, y: -0.7, color: 0x6366f1, size: 0.08 },
-      { name: 'OBIC / Bugyo', x: -1.2, y: 0.8, color: 0xf59e0b, size: 0.07 },
-      { name: 'Freee / MF', x: -0.6, y: -0.2, color: 0x38bdf8, size: 0.06 },
-      { name: 'Notion / Asana', x: -1.3, y: -0.6, color: 0x94a3b8, size: 0.05 },
-      { name: 'KIZUNA', x: 1.2, y: 0.9, color: 0xef4444, size: 0.12, isHero: true }
-    ];
-
-    competitors.forEach((c) => {
-      const star = new THREE.Mesh(
-        new THREE.SphereGeometry(c.size, 16, 16),
-        new THREE.MeshBasicMaterial({ color: c.color })
-      );
-      star.position.set(c.x, c.y, 0);
-      constellationGroup.add(star);
-
-      if (c.isHero) {
-        const halo = new THREE.Mesh(
-          new THREE.RingGeometry(0.15, 0.22, 32),
-          new THREE.MeshBasicMaterial({ color: 0xd4af37, transparent: true, opacity: 0.7, side: THREE.DoubleSide })
-        );
-        halo.position.set(c.x, c.y, 0.02);
-        constellationGroup.add(halo);
-      }
-    });
 
     // =========================================================================
     // 14. MISSION CONTROL RADAR GROUP (SCENE 14: RISCOS & KPIS)
@@ -1574,13 +1539,7 @@ export const WorldStage: React.FC = () => {
 
       // 10–11. Tela 09: sem cenário 3D — a linha de metrô 2D da interface é o elemento visual (EntrySection).
 
-      // -----------------------------------------------------------------------
-      // 12. Competitive Constellation (Scene 12)
-      // -----------------------------------------------------------------------
-      constellationGroup.visible = sIdx === 11;
-      if (sIdx === 11) {
-        constellationGroup.rotation.y = Math.sin(elapsed * 0.3) * 0.04;
-      }
+      // 12. Tela 10: sem constelação 3D — a comparação editorial em três blocos é o elemento visual.
 
       // -----------------------------------------------------------------------
       // 14. Mission Control Radar (Scene 14)
