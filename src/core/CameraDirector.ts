@@ -219,7 +219,8 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 13: // TELA 14: RISCOS & KPIS • CENTRO DE COMANDO 4 QUADRANTES
       env.globeVisibility = 0.0;
       env.missionControlVisibility = 1.0;
-      pose.pos.set(0, 0, 2.7);
+      // Tela 11 (painel 2D, sem radar 3D): leve deslocamento lateral no roadmap, acompanhando a linha do tempo
+      pose.pos.set(sceneIdx >= 1 ? 0.25 : 0, 0, 2.7);
       pose.target.set(0, 0, 0);
       break;
 

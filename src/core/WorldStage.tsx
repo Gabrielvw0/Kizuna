@@ -1120,41 +1120,9 @@ export const WorldStage: React.FC = () => {
     // =========================================================================
 
     // =========================================================================
-    // 14. MISSION CONTROL RADAR GROUP (SCENE 14: RISCOS & KPIS)
+    // 14. TELA 11 (riscos e 12 meses): sem radar 3D.
+    // A matriz de riscos e o roadmap 2D (RisksSection) são o elemento visual.
     // =========================================================================
-    const missionControlGroup = new THREE.Group();
-    scene.add(missionControlGroup);
-
-    const radarDisc = new THREE.Mesh(
-      new THREE.RingGeometry(0.1, 1.4, 48),
-      new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.15, side: THREE.DoubleSide })
-    );
-    radarDisc.rotation.x = Math.PI / 2.4;
-    missionControlGroup.add(radarDisc);
-
-    const sweepLineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(1.3, 0, 0)]);
-    const sweepLine = new THREE.Line(
-      sweepLineGeo,
-      new THREE.LineBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.85 })
-    );
-    sweepLine.rotation.x = Math.PI / 2.4;
-    missionControlGroup.add(sweepLine);
-
-    // 4 Floating Telemetry Node Points
-    const quadPoints = [
-      { x: -0.8, y: 0.4, color: 0x10b981 }, // Mercado
-      { x: 0.8, y: 0.4, color: 0xef4444 },  // Produto
-      { x: -0.8, y: -0.4, color: 0xf59e0b }, // Comercial
-      { x: 0.8, y: -0.4, color: 0x38bdf8 }  // Financeiro
-    ];
-    quadPoints.forEach((qp) => {
-      const qMesh = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.1, 0),
-        new THREE.MeshBasicMaterial({ color: qp.color, wireframe: true })
-      );
-      qMesh.position.set(qp.x, qp.y, 0.2);
-      missionControlGroup.add(qMesh);
-    });
 
     // =========================================================================
     // BACKGROUND STAR FIELD
@@ -1541,13 +1509,7 @@ export const WorldStage: React.FC = () => {
 
       // 12. Tela 10: sem constelação 3D — a comparação editorial em três blocos é o elemento visual.
 
-      // -----------------------------------------------------------------------
-      // 14. Mission Control Radar (Scene 14)
-      // -----------------------------------------------------------------------
-      missionControlGroup.visible = sIdx === 13;
-      if (sIdx === 13) {
-        sweepLine.rotation.z -= 0.035;
-      }
+      // 14. Tela 11: sem radar 3D — matriz de riscos e roadmap 2D.
 
       // Ambient background drift
       starField.rotation.y += 0.0002;
