@@ -220,9 +220,14 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
     case 13: // TELA 14: RISCOS & KPIS • CENTRO DE COMANDO 4 QUADRANTES
       env.globeVisibility = 0.0;
       env.missionControlVisibility = 1.0;
-      // Tela 11 (painel 2D, sem radar 3D): leve deslocamento lateral no roadmap, acompanhando a linha do tempo
-      pose.pos.set(sceneIdx >= 1 ? 0.25 : 0, 0, 2.7);
-      pose.target.set(0, 0, 0);
+      // Tela 11 (Etapa 9): sala de planejamento; na 11.2 a câmera desliza um pouco em direção à parede do roadmap
+      if (sceneIdx >= 1) {
+        pose.pos.set(0.6, 0.05, 2.3);
+        pose.target.set(0.55, 0.1, -7.5);
+      } else {
+        pose.pos.set(0, 0, 3.0);
+        pose.target.set(0, 0.05, -7.5);
+      }
       break;
 
     case 14: // TELA 15: ENCERRAMENTO • O FIO RETORNA AO MUNDO (Globo 3D)

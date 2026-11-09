@@ -5,6 +5,7 @@ import { getCameraPoseForSection } from './CameraDirector';
 import { toStage } from './narrativeMap';
 import { buildMarunouchi, MARUNOUCHI_FOG } from './environments/marunouchi';
 import { buildOffice, OFFICE_FOG } from './environments/office';
+import { buildPlanning, PLANNING_FOG } from './environments/planning';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -1157,6 +1158,11 @@ export const WorldStage: React.FC = () => {
     office.root.position.y = -1.6;
     office.root.visible = false;
     scene.add(office.root);
+    // Tela 11 (cenário 13): sala de planejamento estratégico
+    const planning = buildPlanning(renderer.capabilities.getMaxAnisotropy());
+    planning.root.position.y = -1.45;
+    planning.root.visible = false;
+    scene.add(planning.root);
 
     // =========================================================================
     // RENDER & ANIMATION LOOP
@@ -1531,16 +1537,18 @@ export const WorldStage: React.FC = () => {
       // 12. Tela 10: escritório corporativo (Etapa 9), cena estática
       const onOffice = sIdx === 11;
       office.root.visible = onOffice;
+      // 14. Tela 11: sala de planejamento (Etapa 9); a câmera desliza um pouco na 11.2
+      const onPlanning = sIdx === 13;
+      planning.root.visible = onPlanning;
       {
         const fog = scene.fog as THREE.FogExp2;
-        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : DEFAULT_FOG;
+        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : onPlanning ? PLANNING_FOG : DEFAULT_FOG;
         fog.color.copy(target.color);
         fog.density = target.density;
       }
-      starField.visible = !onCity && !onOffice;
+      starField.visible = !onCity && !onOffice && !onPlanning;
 
 
-      // 14. Tela 11: sem radar 3D — matriz de riscos e roadmap 2D.
 
       // Ambient background drift
       starField.rotation.y += 0.0002;
