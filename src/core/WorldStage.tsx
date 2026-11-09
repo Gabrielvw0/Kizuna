@@ -12,6 +12,8 @@ import { buildCorridor, CORRIDOR_FOG, DOOR_W } from './environments/corridor';
 import { buildPassage, PASSAGE_FOG } from './environments/passage';
 import { buildWorkspace, WORKSPACE_FOG } from './environments/workspace';
 import { buildEcosystem, ECOSYSTEM_FOG } from './environments/ecosystem';
+import { buildPortal } from './environments/portal';
+import { buildModular, HALL_DAIS } from './environments/modular';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -897,7 +899,8 @@ export const WorldStage: React.FC = () => {
     scene.add(modularScaleGroup);
     const growth = createGrowthStructure();
     modularScaleGroup.add(growth.group);
-    modularScaleGroup.position.set(1.55, -1.05, -0.6);
+    // Etapa 10: a estrutura fica no estrado da sala depois do portão (atrás do paredão da tela 07)
+    modularScaleGroup.position.set(HALL_DAIS.x, -1.05, HALL_DAIS.z);
     modularScaleGroup.scale.setScalar(0.72);
 
     // =========================================================================
@@ -1212,6 +1215,15 @@ export const WorldStage: React.FC = () => {
     const ecosystem = buildEcosystem();
     ecosystem.root.visible = false;
     scene.add(ecosystem.root);
+    // Tela 07 (cenário 8): paredão monumental em torno do portal de validação (névoa padrão preservada)
+    const portalHall = buildPortal();
+    portalHall.root.position.y = -1.53;
+    portalHall.root.visible = false;
+    scene.add(portalHall.root);
+    // Tela 08 (cenários 6 e 12): arquitetura modular em torno da estrutura de crescimento
+    const modular = buildModular();
+    modular.root.visible = false;
+    scene.add(modular.root);
 
     // =========================================================================
     // RENDER & ANIMATION LOOP
@@ -1238,6 +1250,8 @@ export const WorldStage: React.FC = () => {
     const currentPos = initialShot.pos.clone();
     const currentTarget = initialShot.target.clone();
     let lastElapsed = 0;
+    // Etapa 10: a tela 08 foi alcançada atravessando o portão da tela 07 (o portão fica aberto atrás da câmera)
+    let gatePassage = false;
     // Tomada de câmera entre CENAS da mesma tela: tween com easing (acelera e desacelera) a partir de onde
     // a câmera está. Entre TELAS continua a aproximação exponencial já aprovada.
     const camShot = {
@@ -1247,7 +1261,9 @@ export const WorldStage: React.FC = () => {
       at: 0,
       dur: 1.0,
       fromPos: new THREE.Vector3(),
-      fromTarget: new THREE.Vector3()
+      fromTarget: new THREE.Vector3(),
+      // Etapa 10: voo pelo portão (07 → 08) — trajetória curva própria em vez de reta
+      path: null as null | { pos: THREE.CatmullRomCurve3; target: THREE.CatmullRomCurve3 }
     };
 
     // Orientação do globo: tomadas com duração e suavização, sem rotação infinita.
@@ -1311,12 +1327,37 @@ export const WorldStage: React.FC = () => {
       const framed = sIdx === 0 ? frameGlobePose(pose, camera.aspect) : pose;
       if (currentIndex !== camShot.screen) {
         // (A) troca de tela: comportamento existente
+        // Etapa 10: da tela 07 para a 08 a câmera atravessa o portão aberto até a sala (voo contínuo).
+        // Qualquer outra troca que entre ou saia da tela 08 é um corte (a sala fica 12 m atrás do paredão
+        // e um voo longo cruzaria outros cenários). O voo acontece também com "movimento reduzido" no sistema
+        // (é a transição narrativa pedida para a apresentação), apenas mais curto.
+        const prevScreen = camShot.screen;
+        const intoHall = prevScreen === 6 && currentIndex === 7;
+        if (currentIndex === 7) gatePassage = intoHall;
         camShot.screen = currentIndex;
         camShot.scene = sceneIndex;
         camShot.tween = false;
+        camShot.path = null;
+        if ((prevScreen === 7 || currentIndex === 7) && !intoHall) {
+          currentPos.copy(framed.pos);
+          currentTarget.copy(framed.target);
+        } else if (intoHall) {
+          // Voo de ~2,8 s com aceleração e desaceleração: alinha-se ao eixo diante do portão, atravessa o vão
+          // olhando para dentro da sala e acomoda-se no enquadramento da 08.1. (A aproximação exponencial
+          // padrão cruzaria os 17 m em ~0,2 s e pareceria um corte.)
+          const V = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
+          camShot.path = {
+            pos: new THREE.CatmullRomCurve3([currentPos.clone(), V(0, -0.05, 2.6), V(0.05, -0.12, 0.6), V(0.25, -0.15, -2.6), V(0.7, -0.1, -7.2), framed.pos.clone()], false, 'centripetal'),
+            target: new THREE.CatmullRomCurve3([currentTarget.clone(), V(0, -0.2, -3), V(0.1, -0.35, -6.5), V(0.5, -0.6, -10.5), V(0.9, -0.8, -12.2), framed.target.clone()], false, 'centripetal')
+          };
+          camShot.at = elapsed;
+          camShot.dur = reducedMotion ? 2.2 : 2.8;
+          camShot.tween = true;
+        }
       } else if (sceneIndex !== camShot.scene) {
         // (B) troca de cena na mesma tela: nova tomada (o globo mantém a aproximação lenta própria)
         camShot.scene = sceneIndex;
+        camShot.path = null;
         if (sIdx !== 0 && sIdx !== 14) {
           camShot.fromPos.copy(currentPos);
           camShot.fromTarget.copy(currentTarget);
@@ -1328,9 +1369,17 @@ export const WorldStage: React.FC = () => {
       if (camShot.tween) {
         const p = Math.min(1, (elapsed - camShot.at) / camShot.dur);
         const e = easeInOutCubic(p);
-        currentPos.lerpVectors(camShot.fromPos, framed.pos, e);
-        currentTarget.lerpVectors(camShot.fromTarget, framed.target, e);
-        if (p >= 1) camShot.tween = false;
+        if (camShot.path) {
+          camShot.path.pos.getPoint(e, currentPos);
+          camShot.path.target.getPoint(e, currentTarget);
+        } else {
+          currentPos.lerpVectors(camShot.fromPos, framed.pos, e);
+          currentTarget.lerpVectors(camShot.fromTarget, framed.target, e);
+        }
+        if (p >= 1) {
+          camShot.tween = false;
+          camShot.path = null;
+        }
       } else {
         currentPos.lerp(framed.pos, camK);
         currentTarget.lerp(framed.target, camK);
@@ -1499,7 +1548,9 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       // 9. Red Gate / Vault (Scene 09)
       // -----------------------------------------------------------------------
-      gateGroup.visible = sIdx === 8;
+      // Etapa 10: na tela 08 alcançada pelo portão, o portão continua visível e aberto (a câmera passa por ele)
+      const gateOpenBeyond = (sIdx === 6 || sIdx === 12) && gatePassage;
+      gateGroup.visible = sIdx === 8 || gateOpenBeyond;
       if (sIdx === 8) {
         // em telas 4:3 o portal estreita um pouco para os montantes ficarem nos vãos entre as colunas
         gateGroup.scale.x = camera.aspect < 1.5 ? 0.86 : 1;
@@ -1574,9 +1625,30 @@ export const WorldStage: React.FC = () => {
         beyondMat.uniforms.uOpacity.value = 0.24 + 0.55 * reveal;
         pathMat.opacity = 0.32 * reveal;
         washiMat.opacity = 0.22 + 0.12 * reveal;
+        // Etapa 10: a sala depois do portão (tela 08) acende junto com a abertura
+        modular.setLight(reveal);
       } else {
         gateSceneSeen = -1;
         Object.assign(gateSnap, { focus: 0, seal: 0, unlock: 0, open: 0, reveal: 0 });
+        if (gateOpenBeyond) {
+          // portão aberto (estado final da 07.2), só visual; a luz do portal some quando a câmera entra na sala
+          shojiL.scale.x = shojiR.scale.x = 0.12;
+          shojiL.position.x = -(POST_X - 0.06) + (PANEL_W * 0.12) / 2;
+          shojiR.position.x = POST_X - 0.06 - (PANEL_W * 0.12) / 2;
+          lockGroup.visible = false;
+          seam.visible = false;
+          latch.rotation.z = Math.PI / 2;
+          lockDisc.rotation.y = Math.PI / 2;
+          sealMat.opacity = 1;
+          hanko.visible = false;
+          beyondMat.uniforms.uOpacity.value = 0.79;
+          pathMat.opacity = 0.32;
+          washiMat.opacity = 0.34;
+          const outside = Math.max(0, Math.min(1, (camera.position.z + 3) / 4));
+          portalKey.intensity = 2.0 * outside;
+          portalFill.intensity = 0.6 * outside;
+          portalPoint.intensity = 0;
+        }
       }
 
       // 10–11. Tela 09: a linha de metrô 2D da interface é o elemento principal; ao fundo, a avenida de
@@ -1609,6 +1681,13 @@ export const WorldStage: React.FC = () => {
       workspace.root.visible = onWorkspace;
       const onEcosystem = sIdx === 7;
       ecosystem.root.visible = onEcosystem;
+      // Etapa 10 • Telas 07 e 08: portal monumental e arquitetura modular (materiais sem névoa)
+      const onPortal = sIdx === 8;
+      const onModular = sIdx === 6 || sIdx === 12;
+      portalHall.root.visible = onPortal || (onModular && gatePassage);
+      // a sala existe atrás do paredão também na tela 07 (vista pela abertura); na 08 fica acesa
+      modular.root.visible = onPortal || onModular;
+      if (onModular) modular.setLight(1);
       {
         const fog = scene.fog as THREE.FogExp2;
         const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : onPlanning ? PLANNING_FOG : onAtrium ? ATRIUM_FOG : onCorridor ? CORRIDOR_FOG : onPassage ? PASSAGE_FOG : onWorkspace ? WORKSPACE_FOG : onEcosystem ? ECOSYSTEM_FOG : DEFAULT_FOG;
@@ -1616,7 +1695,7 @@ export const WorldStage: React.FC = () => {
         fog.density = target.density;
       }
       // a cúpula do salão substitui o campo de estrelas solto na tela 01
-      starField.visible = !onCity && !onOffice && !onPlanning && !onHall && !onAtrium && !onCorridor && !onPassage && !onWorkspace && !onEcosystem;
+      starField.visible = !onCity && !onOffice && !onPlanning && !onHall && !onAtrium && !onCorridor && !onPassage && !onWorkspace && !onEcosystem && !onPortal && !onModular;
 
 
 
