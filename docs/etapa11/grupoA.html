@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Etapa 11 • Grupo A</title>
+<style>
+:root{--bg:#0B0B0D;--fg:#F2EEE6;--muted:#B9B3A8;--line:#26262b;--red:#D7263D}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,'Segoe UI',sans-serif}
+main{max-width:1180px;margin:0 auto;padding:28px 16px 72px}
+h1{font-family:Georgia,serif;font-weight:600;font-size:28px;margin:0 0 6px}
+h2{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:40px 0 10px}
+h3{font-size:16px;margin:22px 0 8px}
+p,li{color:var(--muted);max-width:940px}
+b{color:var(--fg)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.player{border:1px solid var(--line);padding:10px;background:#111114}
+.player img{width:100%;height:auto;display:block}
+.controls{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.cap{font-size:12px;color:var(--muted);margin-bottom:6px}
+button{background:#1c1c21;color:var(--fg);border:1px solid #3a3a42;padding:5px 12px;font:inherit;cursor:pointer}
+button:hover{border-color:var(--red)}
+input[type=range]{flex:1;min-width:140px;accent-color:var(--red)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+td,th{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:500}
+.ok{color:#7fd19b}
+@media(max-width:820px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<h1>Etapa 11 • Fase 3 • Grupo A — 01 → 02, 02 → 03, 03 → 04</h1>
+<p>Três travessias com identidade própria sobre o sistema da Fase 2 (TransitionDirector, planos, âncora/rebase, sincronização da interface). Gravações da <b>interface completa</b> (texto, cromo e 3D), feitas no Edge sem janela com renderização por software — por isso a cadência de quadros é baixa (≈4–8 por segundo) e o tempo de cada travessia aparece alongado; na apresentação real o movimento é contínuo. Use o controle deslizante para ver os quadros intermediários.</p>
+
+<h2>01 → 02 · entrada na atmosfera (3,4 s; volta 2,7 s)</h2>
+<p>Mergulho sobre o Japão até a superfície tomar o quadro; uma névoa fria e longa sobe; sob ela o planeta dá lugar ao céu sobre o átrio, e a câmera desce pela cobertura de vidro até o térreo. Na volta, sobe pela cobertura, atravessa a névoa e se afasta do Japão — o globo reaparece já orientado, sem girar.</p>
+<div class="two">
+  <div class="player" data-k="a_ida"><div class="cap">Ida</div><img alt=""><div class="controls"><button type="button">Reproduzir</button><input type="range" min="0" value="0"><span class="lbl"></span></div></div>
+  <div class="player" data-k="a_volta"><div class="cap">Volta</div><img alt=""><div class="controls"><button type="button">Reproduzir</button><input type="range" min="0" value="0"><span class="lbl"></span></div></div>
+</div>
+
+<h2>02 → 03 · a fronteira pela colunata (3,6 s; volta 2,9 s)</h2>
+<p>A rota original pela passarela foi descartada na validação geométrica: ela termina numa fachada contínua, sem passagem. A nova rota usa a colunata do térreo (caminho livre sob a laje): a câmera desce do alto do átrio, entra entre os pilares e segue rente a um deles; quando ele cobre o quadro, uma sombra breve dá lugar ao corredor japonês, ancorado com o primeiro montante no lugar do pilar. Nada é atravessado. As quatro portas surgem ao fundo e a primeira se abre na chegada.</p>
+<div class="two">
+  <div class="player" data-k="b_ida"><div class="cap">Ida</div><img alt=""><div class="controls"><button type="button">Reproduzir</button><input type="range" min="0" value="0"><span class="lbl"></span></div></div>
+  <div class="player" data-k="b_volta"><div class="cap">Volta</div><img alt=""><div class="controls"><button type="button">Reproduzir</button><input type="range" min="0" value="0"><span class="lbl"></span></div></div>
+</div>
+
+<h2>03 → 04 · a porta e a luz (2,6 s; volta 2,1 s)</h2>
+<p>Da síntese, a câmera contorna a fusão pela direita, cruza a porta 03 (aberta) e entra no cômodo iluminado; a luz quente se concentra no centro do quadro e, nela, surge o vestíbulo contemporâneo, de frente para o jardim.</p>
+<div class="two">
+  <div class="player" data-k="c_ida"><div class="cap">Ida</div><img alt=""><div class="controls"><button type="button">Reproduzir</button><input type="range" min="0" value="0"><span class="lbl"></span></div></div>
+  <div class="player" data-k="c_volta"><div class="cap">Volta</div><img alt=""><div class="controls"><button type="button">Reproduzir</button><input type="range" min="0" value="0"><span class="lbl"></span></div></div>
+</div>
+
+<h2>Identidade de cada travessia</h2>
+<table>
+<tr><th></th><th>01 → 02</th><th>02 → 03</th><th>03 → 04</th></tr>
+<tr><td>Movimento</td><td>mergulho frontal + descida vertical</td><td>descida em diagonal + travelling entre pilares</td><td>contorno lateral + avanço pela porta</td></tr>
+<tr><td>Passagem</td><td>névoa atmosférica fria, longa (~0,25 s plena), quase uniforme</td><td>sombra escura breve (~0,1 s) no pilar</td><td>luz quente concentrada no centro, curta</td></tr>
+<tr><td>Âncora do destino</td><td>átrio 37,9 m abaixo do ponto de contato</td><td>corredor alinhado à colunata (montante = pilar)</td><td>vestíbulo logo após o cômodo iluminado</td></tr>
+<tr><td>Interface</td><td>01 some antes do contato; 02 entra na descida final</td><td>02 some antes da colunata; 03 entra após o montante</td><td>03 some ao contornar a fusão; 04 entra no vestíbulo</td></tr>
+</table>
+
+<h2>Validação (medida pela sonda <code>?kzdebug</code>)</h2>
+<table>
+<tr><th>Item</th><th>Resultado</th></tr>
+<tr><td>Chegada exata (ida e volta)</td><td class="ok">02.1 (0, 0, 6) · 03.1 (−0,18, 0,05, 2,9) · 04 (0, 0,1, 2,5) · 03.5 (0, 0, 2,7) · 02.2 (0,5, 6,6, −3) · 01.2 conforme a proporção (1440×900 e 4:3)</td></tr>
+<tr><td>Rebase</td><td class="ok">posição da câmera relativa ao ambiente ancorado contínua no instante do rebase, nos três sentidos de ida e no início das voltas</td></tr>
+<tr><td>Globo compartilhado</td><td class="ok">posição do Japão idêntica (4 casas) antes, durante e depois da volta 02 → 01; nenhum deslocamento; tela 12 com a composição de sempre</td></tr>
+<tr><td>Interrupções</td><td class="ok">voltar antes/depois da troca, trocar de cena durante o voo, salto pelo menu durante o voo, alternância rápida 03 ↔ 04, saltos não adjacentes por véu — todos terminam no estado exato, sem âncora residual</td></tr>
+<tr><td>Movimento reduzido</td><td class="ok">as três usam o véu curto, com chegada exata</td></tr>
+<tr><td>Resoluções / tela cheia</td><td class="ok">800×600, 1024×768 e 1440×900; redimensionamento durante a travessia (02 → 03 e 01 → 02) termina na pose da nova proporção. A tecla F exige gesto real — conferir manualmente.</td></tr>
+<tr><td>07 ↔ 08 (Fase 2)</td><td class="ok">ida e volta idênticas à versão aprovada (poses, rebase, portal aprovado, estrutura)</td></tr>
+<tr><td>Desempenho</td><td>custo de CPU por quadro durante as travessias: 01 → 02 até 4,9 ms; 02 → 03 até 4,2 ms; 03 → 04 até 1,4 ms (um pico isolado de 34 ms na primeira execução, não reproduzido). Chamadas de desenho: planeta ~21, átrio 350–420, corredor 13–75, vestíbulo ~34 — sem coexistência simultânea (a troca acontece sob a camada de passagem). Corrigidas travadas de 600–800 ms de compilação de shaders e envio de texturas na primeira aparição (pré-compilação na carga).</td></tr>
+<tr><td>Navegação completa</td><td class="ok">01 → 12 → 01, 31 cenas em ordem nos dois sentidos; sem erros no console; build, TypeScript e validate (58) OK</td></tr>
+</table>
+</main>
+<script>
+const DATA = {"index":{"a_ida":[{"f":"a_ida_000.jpg","t":164},{"f":"a_ida_001.jpg","t":398},{"f":"a_ida_002.jpg","t":581},{"f":"a_ida_003.jpg","t":814},{"f":"a_ida_004.jpg","t":1031},{"f":"a_ida_005.jpg","t":1231},{"f":"a_ida_006.jpg","t":2014},{"f":"a_ida_007.jpg","t":2214},{"f":"a_ida_008.jpg","t":2248},{"f":"a_ida_009.jpg","t":2414},{"f":"a_ida_010.jpg","t":2881},{"f":"a_ida_011.jpg","t":2931},{"f":"a_ida_012.jpg","t":3231},{"f":"a_ida_013.jpg","t":3264},{"f":"a_ida_014.jpg","t":3414},{"f":"a_ida_015.jpg","t":3931},{"f":"a_ida_016.jpg","t":4164},{"f":"a_ida_017.jpg","t":4381},{"f":"a_ida_018.jpg","t":4598},{"f":"a_ida_019.jpg","t":4798},{"f":"a_ida_020.jpg","t":4998},{"f":"a_ida_021.jpg","t":5181},{"f":"a_ida_022.jpg","t":5964},{"f":"a_ida_023.jpg","t":6464},{"f":"a_ida_024.jpg","t":6564},{"f":"a_ida_025.jpg","t":6931},{"f":"a_ida_026.jpg","t":7298},{"f":"a_ida_027.jpg","t":7664},{"f":"a_ida_028.jpg","t":8014},{"f":"a_ida_029.jpg","t":8364}],"b_ida":[{"f":"b_ida_000.jpg","t":50},{"f":"b_ida_001.jpg","t":417},{"f":"b_ida_002.jpg","t":783},{"f":"b_ida_003.jpg","t":1133},{"f":"b_ida_004.jpg","t":1567},{"f":"b_ida_005.jpg","t":1917},{"f":"b_ida_006.jpg","t":2267},{"f":"b_ida_007.jpg","t":2583},{"f":"b_ida_008.jpg","t":2917},{"f":"b_ida_009.jpg","t":3233},{"f":"b_ida_010.jpg","t":3567},{"f":"b_ida_011.jpg","t":3917},{"f":"b_ida_012.jpg","t":4300},{"f":"b_ida_013.jpg","t":4700},{"f":"b_ida_014.jpg","t":5083},{"f":"b_ida_015.jpg","t":5233},{"f":"b_ida_016.jpg","t":5650},{"f":"b_ida_017.jpg","t":5900},{"f":"b_ida_018.jpg","t":6100},{"f":"b_ida_019.jpg","t":6350},{"f":"b_ida_020.jpg","t":6583},{"f":"b_ida_021.jpg","t":6750},{"f":"b_ida_022.jpg","t":6950},{"f":"b_ida_023.jpg","t":7083},{"f":"b_ida_024.jpg","t":7233},{"f":"b_ida_025.jpg","t":7383},{"f":"b_ida_026.jpg","t":7517},{"f":"b_ida_027.jpg","t":7650},{"f":"b_ida_028.jpg","t":7800},{"f":"b_ida_029.jpg","t":7933},{"f":"b_ida_030.jpg","t":8083},{"f":"b_ida_031.jpg","t":8233},{"f":"b_ida_032.jpg","t":8400},{"f":"b_ida_033.jpg","t":8567},{"f":"b_ida_034.jpg","t":8717},{"f":"b_ida_035.jpg","t":8850},{"f":"b_ida_036.jpg","t":8983},{"f":"b_ida_037.jpg","t":9133},{"f":"b_ida_038.jpg","t":9250},{"f":"b_ida_039.jpg","t":9383},{"f":"b_ida_040.jpg","t":9517},{"f":"b_ida_041.jpg","t":9650}],"c_ida":[{"f":"c_ida_000.jpg","t":23},{"f":"c_ida_001.jpg","t":156},{"f":"c_ida_002.jpg","t":290},{"f":"c_ida_003.jpg","t":440},{"f":"c_ida_004.jpg","t":573},{"f":"c_ida_005.jpg","t":723},{"f":"c_ida_006.jpg","t":906},{"f":"c_ida_007.jpg","t":1056},{"f":"c_ida_008.jpg","t":1306},{"f":"c_ida_009.jpg","t":1473},{"f":"c_ida_010.jpg","t":1590},{"f":"c_ida_011.jpg","t":1723},{"f":"c_ida_012.jpg","t":1840},{"f":"c_ida_013.jpg","t":1956},{"f":"c_ida_014.jpg","t":2040},{"f":"c_ida_015.jpg","t":2123},{"f":"c_ida_016.jpg","t":2206},{"f":"c_ida_017.jpg","t":2290},{"f":"c_ida_018.jpg","t":2373},{"f":"c_ida_019.jpg","t":2456},{"f":"c_ida_020.jpg","t":2590},{"f":"c_ida_021.jpg","t":3073},{"f":"c_ida_022.jpg","t":3323},{"f":"c_ida_023.jpg","t":3840},{"f":"c_ida_024.jpg","t":4123},{"f":"c_ida_025.jpg","t":4423},{"f":"c_ida_026.jpg","t":4690},{"f":"c_ida_027.jpg","t":4956},{"f":"c_ida_028.jpg","t":5223},{"f":"c_ida_029.jpg","t":5490},{"f":"c_ida_030.jpg","t":5756},{"f":"c_ida_031.jpg","t":6023},{"f":"c_ida_032.jpg","t":6290},{"f":"c_ida_033.jpg","t":6556},{"f":"c_ida_034.jpg","t":6823},{"f":"c_ida_035.jpg","t":7090},{"f":"c_ida_036.jpg","t":7373}],"c_volta":[{"f":"c_volta_000.jpg","t":229},{"f":"c_volta_001.jpg","t":479},{"f":"c_volta_002.jpg","t":729},{"f":"c_volta_003.jpg","t":996},{"f":"c_volta_004.jpg","t":1296},{"f":"c_volta_005.jpg","t":1379},{"f":"c_volta_006.jpg","t":1546},{"f":"c_volta_007.jpg","t":1663},{"f":"c_volta_008.jpg","t":1779},{"f":"c_volta_009.jpg","t":1913},{"f":"c_volta_010.jpg","t":2046},{"f":"c_volta_011.jpg","t":2696},{"f":"c_volta_012.jpg","t":2879},{"f":"c_volta_013.jpg","t":3013},{"f":"c_volta_014.jpg","t":3163},{"f":"c_volta_015.jpg","t":3330},{"f":"c_volta_016.jpg","t":3479},{"f":"c_volta_017.jpg","t":3630},{"f":"c_volta_018.jpg","t":3779},{"f":"c_volta_019.jpg","t":3930},{"f":"c_volta_020.jpg","t":4080},{"f":"c_volta_021.jpg","t":4230},{"f":"c_volta_022.jpg","t":4379},{"f":"c_volta_023.jpg","t":4530},{"f":"c_volta_024.jpg","t":4679},{"f":"c_volta_025.jpg","t":4813},{"f":"c_volta_026.jpg","t":4963},{"f":"c_volta_027.jpg","t":5113},{"f":"c_volta_028.jpg","t":5263},{"f":"c_volta_029.jpg","t":5413},{"f":"c_volta_030.jpg","t":5563},{"f":"c_volta_031.jpg","t":5696},{"f":"c_volta_032.jpg","t":5863},{"f":"c_volta_033.jpg","t":5996},{"f":"c_volta_034.jpg","t":6146},{"f":"c_volta_035.jpg","t":6280},{"f":"c_volta_036.jpg","t":6430},{"f":"c_volta_037.jpg","t":6563}],"b_volta":[{"f":"b_volta_000.jpg","t":78},{"f":"b_volta_001.jpg","t":194},{"f":"b_volta_002.jpg","t":328},{"f":"b_volta_003.jpg","t":478},{"f":"b_volta_004.jpg","t":594},{"f":"b_volta_005.jpg","t":761},{"f":"b_volta_006.jpg","t":978},{"f":"b_volta_007.jpg","t":1144},{"f":"b_volta_008.jpg","t":1294},{"f":"b_volta_009.jpg","t":1744},{"f":"b_volta_010.jpg","t":2177},{"f":"b_volta_011.jpg","t":2544},{"f":"b_volta_012.jpg","t":2878},{"f":"b_volta_013.jpg","t":3211},{"f":"b_volta_014.jpg","t":3528},{"f":"b_volta_015.jpg","t":3878},{"f":"b_volta_016.jpg","t":4211},{"f":"b_volta_017.jpg","t":4594},{"f":"b_volta_018.jpg","t":4978},{"f":"b_volta_019.jpg","t":5378},{"f":"b_volta_020.jpg","t":5744},{"f":"b_volta_021.jpg","t":6111},{"f":"b_volta_022.jpg","t":6494},{"f":"b_volta_023.jpg","t":6861},{"f":"b_volta_024.jpg","t":7244},{"f":"b_volta_025.jpg","t":7594},{"f":"b_volta_026.jpg","t":7961}],"a_volta":[{"f":"a_volta_000.jpg","t":315},{"f":"a_volta_001.jpg","t":682},{"f":"a_volta_002.jpg","t":1049},{"f":"a_volta_003.jpg","t":1399},{"f":"a_volta_004.jpg","t":1732},{"f":"a_volta_005.jpg","t":1932},{"f":"a_volta_006.jpg","t":2132},{"f":"a_volta_007.jpg","t":2415},{"f":"a_volta_008.jpg","t":2649},{"f":"a_volta_009.jpg","t":2899},{"f":"a_volta_010.jpg","t":3065},{"f":"a_volta_011.jpg","t":3232},{"f":"a_volta_012.jpg","t":3432},{"f":"a_volta_013.jpg","t":3632},{"f":"a_volta_014.jpg","t":3799},{"f":"a_volta_015.jpg","t":3965},{"f":"a_volta_016.jpg","t":4165},{"f":"a_volta_017.jpg","t":4349},{"f":"a_volta_018.jpg","t":4532},{"f":"a_volta_019.jpg","t":4715},{"f":"a_volta_020.jpg","t":4899},{"f":"a_volta_021.jpg","t":5099},{"f":"a_volta_022.jpg","t":5265},{"f":"a_volta_023.jpg","t":5449},{"f":"a_volta_024.jpg","t":5632},{"f":"a_volta_025.jpg","t":5815},{"f":"a_volta_026.jpg","t":5999},{"f":"a_volta_027.jpg","t":6165},{"f":"a_volta_028.jpg","t":6349},{"f":"a_volta_029.jpg","t":6515},{"f":"a_volta_030.jpg","t":6715},{"f":"a_volta_031.jpg","t":6932},{"f":"a_volta_032.jpg","t":7132},{"f":"a_volta_033.jpg","t":7315},{"f":"a_volta_034.jpg","t":7499},{"f":"a_volta_035.jpg","t":7699},{"f":"a_volta_036.jpg","t":7899},{"f":"a_volta_037.jpg","t":8099}]}};
+((data) => {
+  document.querySelectorAll('.player').forEach((pl) => {
+    const frames = data.index[pl.dataset.k];
+    const img = pl.querySelector('img');
+    const range = pl.querySelector('input');
+    const btn = pl.querySelector('button');
+    const lbl = pl.querySelector('.lbl');
+    range.max = String(frames.length - 1);
+    let i = 0;
+    let timer = null;
+    const show = (k) => {
+      i = k;
+      img.src = 'grupoA/' + frames[k].f;
+      range.value = String(k);
+      lbl.textContent = (k + 1) + ' / ' + frames.length + ' · ' + frames[k].t + ' ms';
+    };
+    const stop = () => { clearTimeout(timer); timer = null; btn.textContent = 'Reproduzir'; };
+    const step = () => {
+      if (i >= frames.length - 1) return stop();
+      const dt = Math.min(400, Math.max(60, frames[i + 1].t - frames[i].t));
+      timer = setTimeout(() => { show(i + 1); step(); }, dt);
+    };
+    btn.addEventListener('click', () => {
+      if (timer) return stop();
+      if (i >= frames.length - 1) show(0);
+      btn.textContent = 'Pausar';
+      step();
+    });
+    range.addEventListener('input', () => { stop(); show(+range.value); });
+    show(0);
+  });
+})(DATA);
+</script>
+</body>
+</html>

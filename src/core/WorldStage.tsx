@@ -16,7 +16,7 @@ import { buildPortal } from './environments/portal';
 import { buildModular, HALL_DAIS } from './environments/modular';
 import { TransitionDirector } from './transitions/TransitionDirector';
 import { uiBus } from './transitions/uiBus';
-import { findPlan, PLANS, prefersReducedMotion, SCREEN_PLANS, SCREEN_TRUST, transitionKind } from './transitions/plans';
+import { findPlan, PLANS, prefersReducedMotion, SCREEN_PLANS, SCREEN_TRUST, transitionKind, type Anchor, type FlightPlan } from './transitions/plans';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -1244,10 +1244,94 @@ export const WorldStage: React.FC = () => {
     cluster08.add(modular.root, modularScaleGroup);
     const HALL_ANCHOR_Z = PLANS[0].anchorZ;
     const HALL_REST_Z = -HALL_ANCHOR_Z;
+    // Etapa 11 • Fase 3: grupos das telas 02, 03 e 04 para âncora/rebase genéricos (transformação rígida).
+    // Na posição natural (repouso) a transformação é a identidade; os objetos mantêm as posições internas.
+    // O globo NÃO entra em grupo nenhum: é compartilhado com a tela 12 e nunca se desloca.
+    const clusters = { c02: new THREE.Group(), c03: new THREE.Group(), c04: new THREE.Group() };
+    clusters.c02.name = 'cluster-02';
+    clusters.c03.name = 'cluster-03';
+    clusters.c04.name = 'cluster-04';
+    scene.add(clusters.c02, clusters.c03, clusters.c04);
+    clusters.c02.add(atrium.root);
+    clusters.c03.add(corridorEnv.root, corridorGroup, fusionGroup);
+    clusters.c04.add(passage.root, threadWeaveGroup);
+    const anchorMatrix = (a: Anchor) =>
+      new THREE.Matrix4().compose(new THREE.Vector3(...a.pos), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), a.yaw ?? 0), new THREE.Vector3(1, 1, 1));
+    let anchoredPlan: FlightPlan | null = null;
+    const anchorCluster = (plan: FlightPlan) => {
+      const a = plan.anchor!;
+      const g = clusters[a.cluster];
+      g.position.set(...a.pos);
+      g.rotation.set(0, a.yaw ?? 0, 0);
+      anchoredPlan = plan;
+    };
+    const restClusters = () => {
+      Object.values(clusters).forEach((g) => {
+        g.position.set(0, 0, 0);
+        g.rotation.set(0, 0, 0);
+      });
+      anchoredPlan = null;
+    };
+    // camada de passagem (névoa atmosférica, sombra de oclusão, luz) desenhada sobre o mundo 3D, em tela cheia
+    const passageMat = new THREE.ShaderMaterial({
+      uniforms: { uColor: { value: new THREE.Color() }, uOpacity: { value: 0 }, uRadial: { value: 0 } },
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+      fragmentShader: `uniform vec3 uColor; uniform float uOpacity; uniform float uRadial; varying vec2 vUv;
+        void main(){
+          float d = length((vUv - 0.5) * vec2(1.6, 1.0));
+          float shape = mix(1.0, 1.35 * smoothstep(1.05, 0.0, d), uRadial);
+          float a = clamp(uOpacity * shape, 0.0, 1.0);
+          a = mix(a, 1.0, smoothstep(0.86, 1.0, uOpacity));
+          gl_FragColor = vec4(uColor, a);
+          #include <colorspace_fragment>
+        }`,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      fog: false
+    });
+    const passageQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), passageMat);
+    passageQuad.frustumCulled = false;
+    passageQuad.renderOrder = 10000;
+    passageQuad.visible = false;
+    scene.add(passageQuad);
+    // estado da tela anterior (cenário e cena) — fica "congelado" à mostra durante a travessia
+    let frozen = { stage: -1, scene: 0 };
 
     // =========================================================================
     // RENDER & ANIMATION LOOP
     // =========================================================================
+    // Fase 3: pré-compila os materiais de cada ambiente das travessias do Grupo A (com as luzes de cada um),
+    // para que a primeira aparição durante uma transição não trave a câmera compilando shaders.
+    {
+      const saved = scene.children.map((o) => o.visible);
+      const warm = (objs: THREE.Object3D[]) => {
+        scene.children.forEach((o) => (o.visible = objs.includes(o)));
+        objs.forEach((o) => (o.visible = true));
+        renderer.compile(scene, camera);
+        // também envia as texturas (canvas) para a GPU: o compile() só prepara os shaders
+        objs.forEach((root) =>
+          root.traverse((o) => {
+            const mats = (o as THREE.Mesh).material;
+            if (!mats) return;
+            (Array.isArray(mats) ? mats : [mats]).forEach((m) => {
+              Object.values(m).forEach((v) => {
+                if ((v as THREE.Texture)?.isTexture) renderer.initTexture(v as THREE.Texture);
+              });
+              const u = (m as THREE.ShaderMaterial).uniforms;
+              if (u) Object.values(u).forEach((x) => (x.value as THREE.Texture)?.isTexture && renderer.initTexture(x.value as THREE.Texture));
+            });
+          })
+        );
+      };
+      warm([globeRoot, globeLights, planetarium.root, passageQuad]);
+      warm([clusters.c02, atrium.root, passageQuad]);
+      warm([clusters.c03, corridorEnv.root, corridorGroup, fusionGroup, passageQuad]);
+      warm([clusters.c04, passage.root, threadWeaveGroup, passageQuad]);
+      scene.children.forEach((o, i) => (o.visible = saved[i]));
+      [atrium.root, corridorEnv.root, passage.root, planetarium.root].forEach((o) => (o.visible = false));
+    }
+    let frameCostMs = 0;
     let animId: number;
     let clock = new THREE.Clock();
     // Tela 08 avisa o 3D quando o número de usuários muda no simulador
@@ -1342,6 +1426,7 @@ export const WorldStage: React.FC = () => {
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
+      const frameT0 = performance.now();
       const elapsed = clock.getElapsedTime();
 
       // Tela narrativa → cenário técnico (ver narrativeMap.ts)
@@ -1360,6 +1445,10 @@ export const WorldStage: React.FC = () => {
         // (A) troca de tela. Etapa 11: o TransitionDirector decide o tipo (voo de um plano, véu curto ou o
         // comportamento existente das conexões ainda não tratadas) e resolve as interrupções.
         const prevScreen = camShot.screen;
+        {
+          const prevSt = toStage(prevScreen, camShot.scene);
+          frozen = { stage: prevSt.stage, scene: prevSt.scene };
+        }
         camShot.screen = currentIndex;
         camShot.scene = sceneIndex;
         camShot.tween = false;
@@ -1381,20 +1470,34 @@ export const WorldStage: React.FC = () => {
           const found = findPlan(prevScreen, currentIndex)!;
           if (found.reverse) {
             // 08 → 07: desfaz o rebase no mesmo quadro (sala e câmera recuam juntas; nada muda na imagem)
-            if (!hallAnchored) {
+            if (found.plan.to === SCREEN_PLANS && !hallAnchored) {
               hallAnchored = true;
               cluster08.position.z = 0;
               currentPos.z -= HALL_REST_Z;
               currentTarget.z -= HALL_REST_Z;
             }
-            gateArriveApproved = true;
-            growthFrozen = lastGrowthLevel;
+            if (found.plan.to === SCREEN_PLANS) {
+              gateArriveApproved = true;
+              growthFrozen = lastGrowthLevel;
+            }
           }
           destPos.copy(framed.pos);
           destTarget.copy(framed.target);
-          if (!found.reverse) {
-            destPos.z += HALL_ANCHOR_Z;
-            destTarget.z += HALL_ANCHOR_Z;
+          if (found.plan.anchor) {
+            // Fase 3: o destino do plano fica ancorado onde a narrativa pede
+            const A = anchorMatrix(found.plan.anchor);
+            anchorCluster(found.plan);
+            if (found.reverse) {
+              // volta a partir do repouso: destino ancorado e câmera transformados juntos (nada muda na imagem)
+              currentPos.applyMatrix4(A);
+              currentTarget.applyMatrix4(A);
+            } else {
+              destPos.applyMatrix4(A);
+              destTarget.applyMatrix4(A);
+            }
+          } else if (!found.reverse) {
+            destPos.z += found.plan.anchorZ;
+            destTarget.z += found.plan.anchorZ;
           }
           director.startFlight(found.plan, found.reverse, currentPos, currentTarget, destPos, destTarget);
         }
@@ -1421,6 +1524,13 @@ export const WorldStage: React.FC = () => {
           destPos.z += HALL_ANCHOR_Z;
           destTarget.z += HALL_ANCHOR_Z;
         }
+        // Fase 3: a pose da tela de destino de um plano ancorado é lida no quadro ancorado
+        if (anchoredPlan && currentIndex === anchoredPlan.to) {
+          const A = anchorMatrix(anchoredPlan.anchor!);
+          destPos.applyMatrix4(A);
+          destTarget.applyMatrix4(A);
+          hallShot = true;
+        }
       };
       computeDest();
       let trOut: ReturnType<TransitionDirector['update']>;
@@ -1435,16 +1545,18 @@ export const WorldStage: React.FC = () => {
         hallAnchored = currentIndex !== SCREEN_PLANS;
         cluster08.position.z = hallAnchored ? 0 : HALL_REST_Z;
         growthFrozen = null;
+        restClusters();
         computeDest();
         currentPos.copy(destPos);
         currentTarget.copy(destTarget);
-        trOut = { pos: null, target: null, flightDone: null, veilPeak: null };
+        trOut = { pos: null, target: null, overlay: null, flightDone: null, veilPeak: null };
       }
       if (trOut.veilPeak) {
         // pico do véu: destino aplicado de forma determinística (âncora coerente, câmera exata, sem resíduos)
         hallAnchored = trOut.veilPeak.target !== SCREEN_PLANS;
         cluster08.position.z = hallAnchored ? 0 : HALL_REST_Z;
         growthFrozen = null;
+        restClusters();
         computeDest(); // a âncora pode ter mudado neste quadro
         currentPos.copy(destPos);
         currentTarget.copy(destTarget);
@@ -1472,19 +1584,55 @@ export const WorldStage: React.FC = () => {
           currentPos.z += HALL_REST_Z;
           currentTarget.z += HALL_REST_Z;
         }
+        if (done.plan.anchor) {
+          if (done.dir === 1) {
+            // rebase genérico: destino volta ao repouso e a câmera recebe a transformação inversa no mesmo quadro
+            const inv = anchorMatrix(done.plan.anchor).invert();
+            currentPos.applyMatrix4(inv);
+            currentTarget.applyMatrix4(inv);
+          }
+          restClusters();
+        }
         growthFrozen = null;
         camShot.screen = currentIndex;
         camShot.scene = sceneIndex;
       }
       camera.position.copy(currentPos);
       camera.lookAt(currentTarget);
+      // camada de passagem do plano em curso
+      if (trOut.overlay && trOut.overlay.opacity > 0.001) {
+        passageQuad.visible = true;
+        passageMat.uniforms.uColor.value.set(trOut.overlay.color);
+        passageMat.uniforms.uOpacity.value = trOut.overlay.opacity;
+        passageMat.uniforms.uRadial.value = trOut.overlay.radial;
+      } else passageQuad.visible = false;
+
+      // Fase 3: quais cenários aparecem. Fora de transição: só o atual. Num voo com troca (swapAt), antes do
+      // instante de troca aparece a origem e depois o destino; a tela que não é a atual aparece "congelada"
+      // no estado em que estava. No piloto 07 ↔ 08 (sem troca), os dois coexistem (regras próprias abaixo).
+      const flV = director.active?.kind === 'flight' ? director.active : null;
+      let showCurrent = true;
+      let showFrozen = false;
+      if (flV) {
+        if (flV.plan.swapAt !== undefined) {
+          const shownScreen = flV.tau >= flV.plan.swapAt ? flV.plan.to : flV.plan.from;
+          showCurrent = shownScreen === currentIndex;
+          showFrozen = !showCurrent;
+        } else showFrozen = true;
+      }
+      const vis = (st: number) =>
+        showCurrent && st === sIdx ? { on: true, scene: scIdx } : showFrozen && st === frozen.stage ? { on: true, scene: frozen.scene } : { on: false, scene: 0 };
 
       // -----------------------------------------------------------------------
       // 1. Globe Visibility (STRICT: ONLY ACTIVE ON SCENE 00 AND SCENE 14)
       // -----------------------------------------------------------------------
+      // Fase 3: durante a travessia 01 ↔ 02 o globo pode aparecer "congelado" (sem tomadas nem rotação);
+      // como tela atual, segue as tomadas de sempre (na volta, já virado para o Japão: nada gira).
+      const g0 = vis(0);
       const isGlobeActive = sIdx === 0 || sIdx === 14;
-      globeRoot.visible = isGlobeActive;
-      globeLights.visible = isGlobeActive;
+      const globeShown = sIdx === 14 || g0.on;
+      globeRoot.visible = globeShown;
+      globeLights.visible = globeShown;
       if (isGlobeActive) {
         globeRoot.scale.lerp(new THREE.Vector3(env.globeScale, env.globeScale, env.globeScale), 0.05);
         atmosMat.uniforms.uOpacity.value = env.globeVisibility;
@@ -1521,7 +1669,7 @@ export const WorldStage: React.FC = () => {
         const labelMat = japanLabel.material as THREE.SpriteMaterial;
         const labelTarget = sIdx === 0 && scIdx === 3 ? showJapan : 0;
         labelMat.opacity += (labelTarget - labelMat.opacity) * Math.min(1, dt * 3);
-      } else {
+      } else if (!g0.on) {
         shotKey = '';
       }
 
@@ -1539,10 +1687,11 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       // 3. Corredor escuro (tela 03, cenas 1–4)
       // -----------------------------------------------------------------------
-      corridorGroup.visible = sIdx === 2;
-      if (sIdx === 2) {
+      const c2 = vis(2);
+      corridorGroup.visible = c2.on;
+      if (c2.on) {
         // a luz desliza até a posição da porta aberta (mesma ordem das portas da tela)
-        const targetX = (Math.min(3, scIdx) - 1.5) * DOOR_W; // Etapa 10: centro da porta aberta
+        const targetX = (Math.min(3, c2.scene) - 1.5) * DOOR_W; // Etapa 10: centro da porta aberta
         lightShaft.position.x += (targetX - lightShaft.position.x) * Math.min(1, dt * 3);
         floorPool.position.x = lightShaft.position.x;
         const shaftMat = lightShaft.material as THREE.ShaderMaterial;
@@ -1554,8 +1703,10 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       // 4. Global x Local Fusion (Scene 04)
       // -----------------------------------------------------------------------
-      fusionGroup.visible = sIdx === 3;
-      if (sIdx === 3) {
+      const c3 = vis(3);
+      fusionGroup.visible = c3.on;
+      if (c3.on) {
+        const scIdx = c3.scene;
         globalBlock.rotation.x += 0.008;
         globalBlock.rotation.y += 0.01;
         localBlock.rotation.y -= 0.01;
@@ -1583,8 +1734,8 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       // 5. Quadro discreto da tela 04
       // -----------------------------------------------------------------------
-      threadWeaveGroup.visible = sIdx === 4;
-      if (sIdx === 4) {
+      threadWeaveGroup.visible = vis(4).on;
+      if (vis(4).on) {
         uiBoard.rotation.y = Math.sin(elapsed * 0.6) * 0.08;
       }
 
@@ -1771,18 +1922,18 @@ export const WorldStage: React.FC = () => {
       const onPlanning = sIdx === 13;
       planning.root.visible = onPlanning;
       // Etapa 10 • Tela 01: salão-planetário (a névoa padrão continua valendo para o globo)
-      const onHall = sIdx === 0;
+      const onHall = vis(0).on;
       planetarium.root.visible = onHall;
       if (onHall) planetarium.update(dt, reducedMotion);
       // Etapa 10 • Tela 02: átrio corporativo, cena estática
-      const onAtrium = sIdx === 1;
+      const onAtrium = vis(1).on;
       atrium.root.visible = onAtrium;
       // Etapa 10 • Tela 03: corredor tradicional (portas = cenas 1–4; na síntese, todas abertas)
-      const onCorridor = sIdx === 2 || sIdx === 3;
+      const onCorridor = c2.on || c3.on;
       corridorEnv.root.visible = onCorridor;
-      if (onCorridor) corridorEnv.update(dt, sIdx === 2 ? Math.min(3, scIdx) : -1, sIdx === 3, reducedMotion);
+      if (onCorridor) corridorEnv.update(dt, c2.on ? Math.min(3, c2.scene) : -1, c3.on, reducedMotion);
       // Etapa 10 • Tela 04: espaço de transição contemporâneo, cena estática
-      const onPassage = sIdx === 4;
+      const onPassage = vis(4).on;
       passage.root.visible = onPassage;
       // Etapa 10 • Telas 05 e 06: escritório e pavilhão de vidro e aço, cenas estáticas
       const onWorkspace = sIdx === 5;
@@ -1804,7 +1955,11 @@ export const WorldStage: React.FC = () => {
           // Etapa 11: na travessia, a névoa passa da origem ao destino em torno do limiar
           const fa = fogForStage(toStage(fl.plan.from, 0).stage);
           const fb = fogForStage(toStage(fl.plan.to, 0).stage);
-          const k = Math.max(0, Math.min(1, (fl.s - (fl.plan.threshold - 0.08)) / 0.16));
+          // piloto: em torno do limiar (percurso); Fase 3: no instante da troca, sob a camada de passagem
+          const k =
+            fl.plan.swapAt !== undefined
+              ? Math.max(0, Math.min(1, (fl.tau - (fl.plan.swapAt - 0.01)) / 0.02))
+              : Math.max(0, Math.min(1, (fl.s - (fl.plan.threshold - 0.08)) / 0.16));
           fog.color.copy(fa.color).lerp(fb.color, k);
           fog.density = fa.density + (fb.density - fa.density) * k;
         } else {
@@ -1834,18 +1989,24 @@ export const WorldStage: React.FC = () => {
           quat: [q.x, q.y, q.z, q.w],
           hallAnchored,
           cluster08z: cluster08.position.z,
-          tr: a ? (a.kind === 'flight' ? { kind: 'flight', dir: a.dir, s: a.s, shown: a.shown } : { kind: 'veil', phase: a.phase, value: a.value, target: a.target }) : null,
+          tr: a ? (a.kind === 'flight' ? { kind: 'flight', id: a.plan.id, dir: a.dir, s: a.s, tau: a.tau, shown: a.shown } : { kind: 'veil', phase: a.phase, value: a.value, target: a.target }) : null,
+          overlay: passageQuad.visible ? passageMat.uniforms.uOpacity.value : 0,
+          clusters: Object.fromEntries(Object.entries(clusters).map(([k, g]) => [k, g.position.toArray()])),
+          vis: [0, 1, 2, 3, 4].map((st) => (vis(st).on ? 1 : 0)).join(''),
           gate: { visible: gateGroup.visible, open: shojiL.scale.x < 0.5, seal: sealMat.opacity, hanko: hanko.visible, lock: lockGroup.visible },
           portalVisible: portalHall.root.visible,
           growthLevel: lastGrowthLevel,
           growthVisible: modularScaleGroup.visible,
           growthLightK,
           fog: [(scene.fog as THREE.FogExp2).density],
+          japan: japanPos.clone().applyMatrix4(globeRoot.matrixWorld).toArray(),
           drawCalls: renderer.info.render.calls,
+          frameMs: frameCostMs,
           rendered: !veilRising
         };
       }
       if (!veilRising) renderer.render(scene, camera);
+      frameCostMs = performance.now() - frameT0;
     };
 
     animate();

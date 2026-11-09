@@ -22,6 +22,46 @@ const smoothstep = (a: number, b: number, x: number) => {
 };
 const v3 = (p: [number, number, number]) => new THREE.Vector3(p[0], p[1], p[2]);
 
+/**
+ * Interpolação monotônica (PCHIP, Fritsch–Carlson) com derivada zero nas pontas: o tempo (x) vira progresso
+ * no percurso (y) passando por marcos, com velocidade contínua, saída suave e chegada desacelerada.
+ */
+function pchip(xs: number[], ys: number[], x: number) {
+  const n = xs.length;
+  if (x <= xs[0]) return ys[0];
+  if (x >= xs[n - 1]) return ys[n - 1];
+  const h: number[] = [];
+  const d: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    h.push(Math.max(1e-6, xs[i + 1] - xs[i]));
+    d.push((ys[i + 1] - ys[i]) / h[i]);
+  }
+  const m: number[] = new Array(n).fill(0);
+  for (let i = 1; i < n - 1; i++) {
+    if (d[i - 1] * d[i] <= 0) m[i] = 0;
+    else {
+      const w1 = 2 * h[i] + h[i - 1];
+      const w2 = h[i] + 2 * h[i - 1];
+      m[i] = (w1 + w2) / (w1 / d[i - 1] + w2 / d[i]);
+    }
+  }
+  let k = 0;
+  while (k < n - 2 && x > xs[k + 1]) k++;
+  const t = (x - xs[k]) / h[k];
+  const t2 = t * t;
+  const t3 = t2 * t;
+  return (2 * t3 - 3 * t2 + 1) * ys[k] + (t3 - 2 * t2 + t) * h[k] * m[k] + (-2 * t3 + 3 * t2) * ys[k + 1] + (t3 - t2) * h[k] * m[k + 1];
+}
+
+/** Fração do comprimento de arco em que a curva passa por cada ponto de controle. */
+function controlFractions(curve: THREE.CatmullRomCurve3) {
+  const L = curve.getLengths();
+  const div = L.length - 1;
+  const total = L[div] || 1;
+  const n = curve.points.length;
+  return curve.points.map((_, i) => L[Math.round((i / (n - 1)) * div)] / total);
+}
+
 /** Desacelera o percurso perto do limiar mantendo s(0)=0 e s(1)=1 (derivada 1−k·cos, monotônica com k<1). */
 function lingerWarp(e: number, threshold: number, k: number) {
   const c = Math.sin(-2 * Math.PI * threshold);
@@ -71,6 +111,8 @@ export interface FrameOut {
   /** a câmera deve seguir estas coordenadas (null = comportamento normal do WorldStage). */
   pos: THREE.Vector3 | null;
   target: THREE.Vector3 | null;
+  /** camada de passagem (névoa, sombra ou luz) do plano, se houver: cor, forma e opacidade. */
+  overlay: { color: string; radial: number; opacity: number } | null;
   /** o voo terminou neste quadro (para o rebase). */
   flightDone: Flight | null;
   /** o véu atingiu o pico neste quadro (aplicar o destino). */
@@ -162,23 +204,40 @@ export class TransitionDirector {
     }
     f.pos.updateArcLengths();
     f.target.updateArcLengths();
-    f.pos.getPointAt(f.s, this.outPos);
-    f.target.getPointAt(f.s, this.outTarget);
+    const keys = f.plan.keys;
+    if (keys) {
+      // planos com marcos de tempo: cada ponto de passagem tem o seu instante (Fase 3)
+      const xs = [0, ...keys.map((k) => k.t), 1];
+      const sp = Math.max(0, Math.min(1, pchip(xs, controlFractions(f.pos), f.tau)));
+      const st = Math.max(0, Math.min(1, pchip(xs, controlFractions(f.target), f.tau)));
+      f.s = sp;
+      f.pos.getPointAt(sp, this.outPos);
+      f.target.getPointAt(st, this.outTarget);
+    } else {
+      f.pos.getPointAt(f.s, this.outPos);
+      f.target.getPointAt(f.s, this.outTarget);
+    }
+    // nos planos com marcos, interface e camada de passagem seguem o tempo (τ); no piloto 07 ↔ 08, o percurso (s)
+    const u = keys ? f.tau : f.s;
 
     // interface: troca no ponto narrativo combinado
-    if (f.dir === 1 && f.shown === 'from' && f.s >= f.plan.uiRelease) {
+    if (f.dir === 1 && f.shown === 'from' && u >= f.plan.uiRelease) {
       f.shown = 'to';
       uiBus.release();
-    } else if (f.dir === -1 && f.shown === 'to' && f.s < f.plan.uiRelease) {
+    } else if (f.dir === -1 && f.shown === 'to' && u < f.plan.uiRelease) {
       f.shown = 'from';
       uiBus.release();
     }
-    const opacity = f.shown === 'from' ? 1 - smoothstep(0, f.plan.uiOutEnd, f.s) : smoothstep(f.plan.uiRelease, f.plan.uiInFull, f.s);
-    return { opacity, done: f.dir === 1 ? f.tau >= 1 : f.tau <= 0 };
+    const opacity = f.shown === 'from' ? 1 - smoothstep(0, f.plan.uiOutEnd, u) : smoothstep(f.plan.uiRelease, f.plan.uiInFull, u);
+    const ov = f.plan.overlay;
+    const overlay = ov
+      ? { color: ov.color, radial: ov.radial, opacity: Math.min(smoothstep(ov.rise[0], ov.rise[1], f.tau), 1 - smoothstep(ov.fall[0], ov.fall[1], f.tau)) }
+      : null;
+    return { opacity, overlay, done: f.dir === 1 ? f.tau >= 1 : f.tau <= 0 };
   }
 
   update(fi: FrameIn): FrameOut {
-    const out: FrameOut = { pos: null, target: null, flightDone: null, veilPeak: null };
+    const out: FrameOut = { pos: null, target: null, overlay: null, flightDone: null, veilPeak: null };
     const a = this.active;
     if (!a) {
       uiBus.setVisuals(1, 0);
@@ -188,6 +247,7 @@ export class TransitionDirector {
       const r = this.stepFlight(a, fi);
       out.pos = this.outPos;
       out.target = this.outTarget;
+      out.overlay = r.overlay;
       uiBus.setVisuals(r.opacity, 0);
       if (r.done) {
         out.flightDone = a;
