@@ -10,6 +10,8 @@ import { buildPlanetarium } from './environments/planetarium';
 import { buildAtrium, ATRIUM_FOG } from './environments/atrium';
 import { buildCorridor, CORRIDOR_FOG, DOOR_W } from './environments/corridor';
 import { buildPassage, PASSAGE_FOG } from './environments/passage';
+import { buildWorkspace, WORKSPACE_FOG } from './environments/workspace';
+import { buildEcosystem, ECOSYSTEM_FOG } from './environments/ecosystem';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -1201,6 +1203,15 @@ export const WorldStage: React.FC = () => {
     passage.root.position.y = -1.6;
     passage.root.visible = false;
     scene.add(passage.root);
+    // Tela 05 (cenário 5): escritório contemporâneo atrás da demonstração (o trilho de estações continua à frente)
+    const workspace = buildWorkspace(renderer.capabilities.getMaxAnisotropy());
+    workspace.root.position.y = -1.35;
+    workspace.root.visible = false;
+    scene.add(workspace.root);
+    // Tela 06 (cenário 7): pavilhão de vidro e aço; as treliças kumiko ficam gravadas nas divisórias
+    const ecosystem = buildEcosystem();
+    ecosystem.root.visible = false;
+    scene.add(ecosystem.root);
 
     // =========================================================================
     // RENDER & ANIMATION LOOP
@@ -1593,14 +1604,19 @@ export const WorldStage: React.FC = () => {
       // Etapa 10 • Tela 04: espaço de transição contemporâneo, cena estática
       const onPassage = sIdx === 4;
       passage.root.visible = onPassage;
+      // Etapa 10 • Telas 05 e 06: escritório e pavilhão de vidro e aço, cenas estáticas
+      const onWorkspace = sIdx === 5;
+      workspace.root.visible = onWorkspace;
+      const onEcosystem = sIdx === 7;
+      ecosystem.root.visible = onEcosystem;
       {
         const fog = scene.fog as THREE.FogExp2;
-        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : onPlanning ? PLANNING_FOG : onAtrium ? ATRIUM_FOG : onCorridor ? CORRIDOR_FOG : onPassage ? PASSAGE_FOG : DEFAULT_FOG;
+        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : onPlanning ? PLANNING_FOG : onAtrium ? ATRIUM_FOG : onCorridor ? CORRIDOR_FOG : onPassage ? PASSAGE_FOG : onWorkspace ? WORKSPACE_FOG : onEcosystem ? ECOSYSTEM_FOG : DEFAULT_FOG;
         fog.color.copy(target.color);
         fog.density = target.density;
       }
       // a cúpula do salão substitui o campo de estrelas solto na tela 01
-      starField.visible = !onCity && !onOffice && !onPlanning && !onHall && !onAtrium && !onCorridor && !onPassage;
+      starField.visible = !onCity && !onOffice && !onPlanning && !onHall && !onAtrium && !onCorridor && !onPassage && !onWorkspace && !onEcosystem;
 
 
 
