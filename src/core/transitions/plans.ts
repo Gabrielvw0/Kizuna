@@ -28,11 +28,13 @@ export interface PassageOverlay {
   fall: [number, number];
   /** reflexo em faixa diagonal que varre o quadro (travessia de vidro) */
   sweep?: boolean;
+  /** persiana de ripas verticais que desliza pelo quadro (passagem pelas ripas de madeira) */
+  slats?: boolean;
 }
 
 /** Grupo de ambiente posicionado provisoriamente durante a transição (desfeito no rebase). */
 export interface Anchor {
-  cluster: 'c02' | 'c03' | 'c04' | 'c05' | 'c06' | 'c07';
+  cluster: 'c02' | 'c03' | 'c04' | 'c05' | 'c06' | 'c07' | 'c09' | 'c10' | 'c11';
   pos: Vec3;
   yaw?: number;
 }
@@ -273,6 +275,79 @@ export const PLANS: FlightPlan[] = [
     uiOutEnd: 0.3,
     uiRelease: 0.86,
     uiInFull: 0.97
+  }),
+
+  // 08 → 09 · DO CRESCIMENTO À ENTRADA NO JAPÃO. A câmera se afasta da estrutura de crescimento, recua e sobe
+  // pela sala até a claraboia sobre o estrado; a luz da claraboia toma o quadro e, do outro lado, está o céu de
+  // entardecer sobre a avenida de Marunouchi (ancorada abaixo). A cidade se revela de cima e a câmera desce
+  // planando pelo eixo da avenida até a 09.1. Nada é atravessado: a troca acontece sob a luz.
+  keyed({
+    id: '08-09',
+    from: 7,
+    to: 8,
+    duration: 3.8,
+    reverseDuration: 3.0,
+    keys: [
+      { pos: [-0.35, 2.4, 6.2], target: [0.5, -0.3, -0.6], t: 0.16 },
+      { pos: [0.2, 3.5, 4.0], target: [1.3, 3.5, -2.5], t: 0.34 },
+      { pos: [1.0, 4.4, 1.4], target: [1.5, 8.0, -1.2], t: 0.46 },
+      { pos: [1.25, 5.0, 0.4], target: [1.5, 9.5, -1.0], t: 0.53, swap: true },
+      { pos: [1.25, 6.1, -3.1], target: [1.25, 4.5, -45.6], t: 0.66 },
+      { pos: [1.25, 1.0, -8.6], target: [1.25, -6.0, -55.6], t: 0.82 }
+    ],
+    overlay: { color: '#c7b79a', radial: 0.35, rise: [0.36, 0.5], fall: [0.56, 0.7] },
+    anchor: { cluster: 'c09', pos: [1.25, -4.5, -15.6] },
+    uiOutEnd: 0.26,
+    uiRelease: 0.84,
+    uiInFull: 0.96
+  }),
+
+  // 09 → 10 · DA ENTRADA À COMPETIÇÃO. Da 09.4, a câmera sobe na vertical pelo eixo da avenida, entre as torres,
+  // nivelando o olhar com o horizonte; no alto, uma bruma clara de altitude toma o quadro e dela surge Tóquio vista
+  // do andar executivo, rente ao vidro (ancorado lá em cima). A câmera recua devagar para dentro da sala até a 10.
+  keyed({
+    id: '09-10',
+    from: 8,
+    to: 9,
+    duration: 3.2,
+    reverseDuration: 2.55,
+    keys: [
+      { pos: [0.65, 5.5, -8.0], target: [0.4, 1.0, -60], t: 0.18 },
+      { pos: [0.75, 11.5, -9.8], target: [0.5, 8.0, -75], t: 0.36 },
+      { pos: [0.85, 17.5, -11.0], target: [0.6, 15.5, -80], t: 0.5 },
+      { pos: [0.9, 19.8, -11.4], target: [0.6, 18.3, -82], t: 0.56, swap: true },
+      { pos: [0.8, 19.75, -11.0], target: [0.7, 19.57, -65.2], t: 0.66 },
+      { pos: [0.2, 19.45, -6.7], target: [0.0, 19.59, -25.2], t: 0.82 }
+    ],
+    overlay: { color: '#d9dee2', radial: 0, rise: [0.4, 0.53], fall: [0.6, 0.74] },
+    anchor: { cluster: 'c10', pos: [-0.2, 19.25, -5.2] },
+    uiOutEnd: 0.3,
+    uiRelease: 0.86,
+    uiInFull: 0.97
+  }),
+
+  // 10 → 11 · DA COMPETIÇÃO À EXECUÇÃO. A câmera deixa a janela, gira para a esquerda e percorre o andar rente à
+  // parede de ripas de madeira; as ripas passam pelo quadro como uma persiana e, depois delas, está a sala de
+  // planejamento (ancorada ao lado). A câmera gira para a parede do roadmap até a 11.1.
+  keyed({
+    id: '10-11',
+    from: 9,
+    to: 10,
+    duration: 2.5,
+    reverseDuration: 2.0,
+    keys: [
+      { pos: [-1.4, 0, 3.0], target: [-6.5, 0.15, -5.5], t: 0.2 },
+      { pos: [-4.6, 0, 1.4], target: [-10, 0.1, -0.2], t: 0.4 },
+      { pos: [-6.9, 0, 1.9], target: [-10.2, 0.05, 3.2], t: 0.52 },
+      { pos: [-7.4, 0, 2.3], target: [-10.3, 0.05, 3.9], t: 0.56, swap: true },
+      { pos: [-6.8, -0.02, 2.7], target: [-9.4, 0, 1.5], t: 0.66 },
+      { pos: [-4.4, -0.05, 2.3], target: [-6.0, -0.02, -7.1], t: 0.8 }
+    ],
+    overlay: { color: '#1d1814', radial: 0, rise: [0.44, 0.54], fall: [0.58, 0.68], slats: true },
+    anchor: { cluster: 'c11', pos: [-2.4, -0.12, -1.1] },
+    uiOutEnd: 0.3,
+    uiRelease: 0.85,
+    uiInFull: 0.96
   })
 ];
 
@@ -306,7 +381,7 @@ export function transitionKind(from: number, to: number, reduced: boolean): Tran
   if (from === to) return 'none';
   if (findPlan(from, to)) return reduced ? 'veil' : 'flight';
   if (from === SCREEN_PLANS || to === SCREEN_PLANS) return 'veil';
-  // Fase 3: saltos não adjacentes que envolvem as telas com âncora dos Grupos A e B (01–07) usam o véu
-  if (Math.abs(from - to) > 1 && (from <= 6 || to <= 6)) return 'veil';
+  // Fase 3: saltos não adjacentes que envolvem as telas com âncora dos Grupos A, B e C (01–11) usam o véu
+  if (Math.abs(from - to) > 1 && (from <= 10 || to <= 10)) return 'veil';
   return 'none';
 }

@@ -112,7 +112,7 @@ export interface FrameOut {
   pos: THREE.Vector3 | null;
   target: THREE.Vector3 | null;
   /** camada de passagem (névoa, sombra ou luz) do plano, se houver: cor, forma e opacidade. */
-  overlay: { color: string; radial: number; opacity: number; sweep: number } | null;
+  overlay: { color: string; radial: number; opacity: number; sweep: number; slats: number } | null;
   /** o voo terminou neste quadro (para o rebase). */
   flightDone: Flight | null;
   /** o véu atingiu o pico neste quadro (aplicar o destino). */
@@ -236,7 +236,9 @@ export class TransitionDirector {
           radial: ov.radial,
           opacity: Math.min(smoothstep(ov.rise[0], ov.rise[1], f.tau), 1 - smoothstep(ov.fall[0], ov.fall[1], f.tau)),
           // reflexo em faixa: posição da faixa ao longo da passagem (−1 = sem faixa)
-          sweep: ov.sweep ? Math.max(0, Math.min(1, (f.tau - ov.rise[0]) / Math.max(1e-4, ov.fall[1] - ov.rise[0]))) : -1
+          sweep: ov.sweep ? Math.max(0, Math.min(1, (f.tau - ov.rise[0]) / Math.max(1e-4, ov.fall[1] - ov.rise[0]))) : -1,
+          // persiana de ripas: deslocamento das ripas ao longo da passagem (−1 = sem ripas)
+          slats: ov.slats ? Math.max(0, Math.min(1, (f.tau - ov.rise[0]) / Math.max(1e-4, ov.fall[1] - ov.rise[0]))) : -1
         }
       : null;
     return { opacity, overlay, done: f.dir === 1 ? f.tau >= 1 : f.tau <= 0 };
