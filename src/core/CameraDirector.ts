@@ -92,18 +92,17 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
       // Globe strictly HIDDEN
       env.globeVisibility = 0.0;
       env.tokyoSkylineVisibility = 1.0;
+      // Etapa 10: átrio corporativo monumental. 02.1 olha o vão a partir do térreo;
+      // 02.2 sobe pelos pavimentos em direção às passarelas que ligam as duas alas.
       if (sceneIdx === 0) {
-        // High altitude over Tokyo skyline
-        pose.pos.set(0, 1.8, 3.8);
-        pose.target.set(0, 0.3, 0);
+        pose.pos.set(0, 0, 6);
+        pose.target.set(0, 2.6, -30);
       } else if (sceneIdx === 1) {
-        // Descending into Marunouchi / Chiyoda financial corridor
-        pose.pos.set(0.4, 0.8, 2.9);
-        pose.target.set(0.1, 0.2, -0.4);
+        pose.pos.set(0.3, 3.5, 0);
+        pose.target.set(0.1, 6, -32);
       } else {
-        // Approaching corporate tower with glowing red anchor
-        pose.pos.set(0, 0.3, 2.2);
-        pose.target.set(0, 0.1, -0.8);
+        pose.pos.set(0.5, 6.6, -3);
+        pose.target.set(0.2, 9.8, -36);
       }
       break;
 

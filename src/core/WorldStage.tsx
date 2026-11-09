@@ -6,6 +6,8 @@ import { toStage } from './narrativeMap';
 import { buildMarunouchi, MARUNOUCHI_FOG } from './environments/marunouchi';
 import { buildOffice, OFFICE_FOG } from './environments/office';
 import { buildPlanning, PLANNING_FOG } from './environments/planning';
+import { buildPlanetarium } from './environments/planetarium';
+import { buildAtrium, ATRIUM_FOG } from './environments/atrium';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -1165,6 +1167,21 @@ export const WorldStage: React.FC = () => {
     scene.add(planning.root);
 
     // =========================================================================
+    // ETAPA 10 • AMBIENTES DAS TELAS 01 E 02
+    // Tela 01 (cenário 0): salão-planetário ao redor do globo. Sem luzes próprias e sem névoa nos materiais:
+    // o globo, o halo do Japão e os pontos de presença continuam exatamente como antes. A tela 12 (cenário 14),
+    // que reutiliza o globo, NÃO recebe o salão.
+    // =========================================================================
+    const planetarium = buildPlanetarium(renderer.capabilities.getMaxAnisotropy());
+    planetarium.root.visible = false;
+    scene.add(planetarium.root);
+    // Tela 02 (cenário 1): átrio corporativo monumental (substitui a grade em wireframe, preservada no código)
+    const atrium = buildAtrium(renderer.capabilities.getMaxAnisotropy());
+    atrium.root.position.y = -1.6;
+    atrium.root.visible = false;
+    scene.add(atrium.root);
+
+    // =========================================================================
     // RENDER & ANIMATION LOOP
     // =========================================================================
     let animId: number;
@@ -1338,8 +1355,9 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       // 2. Tokyo Skyline (Scene 02)
       // -----------------------------------------------------------------------
-      tokyoSkylineGroup.visible = sIdx === 1;
-      if (sIdx === 1) {
+      // Etapa 10: a grade em wireframe deu lugar ao átrio corporativo (ver "Ambientes" abaixo); o grupo fica oculto
+      tokyoSkylineGroup.visible = false;
+      if (tokyoSkylineGroup.visible) {
         bldgGroup.children.forEach((tw, i) => {
           tw.position.y = -1.2 + towerCoords[i].h / 2 + Math.sin(elapsed * 1.5 + i) * 0.02;
         });
@@ -1540,13 +1558,21 @@ export const WorldStage: React.FC = () => {
       // 14. Tela 11: sala de planejamento (Etapa 9); a câmera desliza um pouco na 11.2
       const onPlanning = sIdx === 13;
       planning.root.visible = onPlanning;
+      // Etapa 10 • Tela 01: salão-planetário (a névoa padrão continua valendo para o globo)
+      const onHall = sIdx === 0;
+      planetarium.root.visible = onHall;
+      if (onHall) planetarium.update(dt, reducedMotion);
+      // Etapa 10 • Tela 02: átrio corporativo, cena estática
+      const onAtrium = sIdx === 1;
+      atrium.root.visible = onAtrium;
       {
         const fog = scene.fog as THREE.FogExp2;
-        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : onPlanning ? PLANNING_FOG : DEFAULT_FOG;
+        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : onPlanning ? PLANNING_FOG : onAtrium ? ATRIUM_FOG : DEFAULT_FOG;
         fog.color.copy(target.color);
         fog.density = target.density;
       }
-      starField.visible = !onCity && !onOffice && !onPlanning;
+      // a cúpula do salão substitui o campo de estrelas solto na tela 01
+      starField.visible = !onCity && !onOffice && !onPlanning && !onHall && !onAtrium;
 
 
 
