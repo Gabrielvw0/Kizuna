@@ -8,6 +8,8 @@ import { buildOffice, OFFICE_FOG } from './environments/office';
 import { buildPlanning, PLANNING_FOG } from './environments/planning';
 import { buildPlanetarium } from './environments/planetarium';
 import { buildAtrium, ATRIUM_FOG } from './environments/atrium';
+import { buildCorridor, CORRIDOR_FOG, DOOR_W } from './environments/corridor';
+import { buildPassage, PASSAGE_FOG } from './environments/passage';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -1180,6 +1182,25 @@ export const WorldStage: React.FC = () => {
     atrium.root.position.y = -1.6;
     atrium.root.visible = false;
     scene.add(atrium.root);
+    // Tela 03 (cenários 2 e 3): corredor japonês tradicional com as quatro portas de correr. As linhas e
+    // pilares abstratos do corredor antigo ficam ocultos (código preservado); a luz que acompanha a porta
+    // aberta passa a nascer da própria porta.
+    const corridorEnv = buildCorridor(renderer.capabilities.getMaxAnisotropy());
+    corridorEnv.root.position.y = -1.5;
+    corridorEnv.root.visible = false;
+    scene.add(corridorEnv.root);
+    corridorGroup.children.forEach((c) => {
+      if (c !== lightShaft && c !== floorPool) c.visible = false;
+    });
+    lightShaft.position.set(0, -1.5 + 1.05, -5.62);
+    lightShaft.scale.set(DOOR_W * 0.95, 2.1 / 2.3, 1);
+    floorPool.position.set(0, -1.5 + 0.006, -5.0);
+    floorPool.scale.set(1.6, 1.2, 1);
+    // Tela 04 (cenário 4): espaço de transição contemporâneo com jardim interno
+    const passage = buildPassage(renderer.capabilities.getMaxAnisotropy());
+    passage.root.position.y = -1.6;
+    passage.root.visible = false;
+    scene.add(passage.root);
 
     // =========================================================================
     // RENDER & ANIMATION LOOP
@@ -1369,7 +1390,7 @@ export const WorldStage: React.FC = () => {
       corridorGroup.visible = sIdx === 2;
       if (sIdx === 2) {
         // a luz desliza até a posição da porta aberta (mesma ordem das portas da tela)
-        const targetX = (Math.min(3, scIdx) - 1.5) * 1.05;
+        const targetX = (Math.min(3, scIdx) - 1.5) * DOOR_W; // Etapa 10: centro da porta aberta
         lightShaft.position.x += (targetX - lightShaft.position.x) * Math.min(1, dt * 3);
         floorPool.position.x = lightShaft.position.x;
         const shaftMat = lightShaft.material as THREE.ShaderMaterial;
@@ -1565,14 +1586,21 @@ export const WorldStage: React.FC = () => {
       // Etapa 10 • Tela 02: átrio corporativo, cena estática
       const onAtrium = sIdx === 1;
       atrium.root.visible = onAtrium;
+      // Etapa 10 • Tela 03: corredor tradicional (portas = cenas 1–4; na síntese, todas abertas)
+      const onCorridor = sIdx === 2 || sIdx === 3;
+      corridorEnv.root.visible = onCorridor;
+      if (onCorridor) corridorEnv.update(dt, sIdx === 2 ? Math.min(3, scIdx) : -1, sIdx === 3, reducedMotion);
+      // Etapa 10 • Tela 04: espaço de transição contemporâneo, cena estática
+      const onPassage = sIdx === 4;
+      passage.root.visible = onPassage;
       {
         const fog = scene.fog as THREE.FogExp2;
-        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : onPlanning ? PLANNING_FOG : onAtrium ? ATRIUM_FOG : DEFAULT_FOG;
+        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : onPlanning ? PLANNING_FOG : onAtrium ? ATRIUM_FOG : onCorridor ? CORRIDOR_FOG : onPassage ? PASSAGE_FOG : DEFAULT_FOG;
         fog.color.copy(target.color);
         fog.density = target.density;
       }
       // a cúpula do salão substitui o campo de estrelas solto na tela 01
-      starField.visible = !onCity && !onOffice && !onPlanning && !onHall && !onAtrium;
+      starField.visible = !onCity && !onOffice && !onPlanning && !onHall && !onAtrium && !onCorridor && !onPassage;
 
 
 
