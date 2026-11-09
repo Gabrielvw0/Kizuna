@@ -1,8 +1,5 @@
 import * as THREE from 'three';
 
-/** Etapa 10: deslocamento da sala da tela 08 (atrás do paredão da tela 07); igual a HALL_DAIS.z − (−0,6). */
-const HALL_Z_SHIFT = -12;
-
 export interface CameraPose {
   pos: THREE.Vector3;
   target: THREE.Vector3;
@@ -152,9 +149,6 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
         pose.pos.set(0.4, 0.9, 3.45);
         pose.target.set(0.45, -0.68, -0.6);
       }
-      // Etapa 10: a estrutura está na sala depois do portão (12 m atrás); mesmo enquadramento, deslocado
-      pose.pos.z += HALL_Z_SHIFT;
-      pose.target.z += HALL_Z_SHIFT;
       break;
 
     case 7: // TELA 08: ADAPTAÇÃO • 7 TRANSFORMAÇÕES DA INTERFACE
@@ -218,8 +212,8 @@ export function getCameraPoseForSection(sectionIdx: number, sceneIdx: number): {
       env.financial3DVisibility = 1.0;
       // Etapa 8.2: visão consolidada da mesma estrutura (cenário 6), com o anel de receita
       env.modularScaleVisibility = 1.0;
-      pose.pos.set(-0.15, 1.55, 4.5 + HALL_Z_SHIFT);
-      pose.target.set(0.05, -0.78, -0.6 + HALL_Z_SHIFT);
+      pose.pos.set(-0.15, 1.55, 4.5);
+      pose.target.set(0.05, -0.78, -0.6);
       break;
 
     case 13: // TELA 14: RISCOS & KPIS • CENTRO DE COMANDO 4 QUADRANTES

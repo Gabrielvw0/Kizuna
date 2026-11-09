@@ -1,5 +1,7 @@
-import React from 'react';
-import { PresentationProvider, usePresentation } from './core/PresentationContext';
+import React, { useEffect, useReducer, useRef, useSyncExternalStore } from 'react';
+import { FrozenPresentation, PresentationProvider, usePresentation } from './core/PresentationContext';
+import { uiBus } from './core/transitions/uiBus';
+import { prefersReducedMotion, transitionKind } from './core/transitions/plans';
 import { NavigationChrome } from './core/NavigationChrome';
 import { VisualBackgroundEngine } from './core/VisualBackgroundEngine';
 import { WorldStage } from './core/WorldStage';
@@ -148,10 +150,39 @@ const LiveProductDemoWorkspace: React.FC<{ onClose: () => void }> = ({ onClose }
 };
 
 const StrategicPresentationStage: React.FC = () => {
-  const { currentIndex, erpDemoOpen, setErpDemoOpen, stageMode } = usePresentation();
+  const { currentIndex, sceneIndex, erpDemoOpen, setErpDemoOpen, stageMode, safeMode } = usePresentation();
 
-  const renderSection = () => {
-    switch (currentIndex) {
+  // Etapa 11: durante uma transição espacial, a interface da origem permanece (congelada) até o mundo 3D
+  // avisar que a câmera chegou ao ponto narrativo combinado; só então a tela de destino entra.
+  const releaseSeq = useSyncExternalStore(uiBus.subscribe, uiBus.getReleaseSeq);
+  const lastRef = useRef({ index: currentIndex, scene: sceneIndex });
+  const holdRef = useRef<{ index: number; scene: number; seq: number } | null>(null);
+  if (currentIndex !== lastRef.current.index) {
+    const hold = holdRef.current;
+    if (hold && hold.index === currentIndex) holdRef.current = null; // voltou à origem: nada a reter
+    else if (!hold && !safeMode && transitionKind(lastRef.current.index, currentIndex, prefersReducedMotion()) !== 'none') {
+      holdRef.current = { ...lastRef.current, seq: uiBus.getReleaseSeq() };
+    }
+  }
+  if (holdRef.current && releaseSeq > holdRef.current.seq) holdRef.current = null;
+  lastRef.current = { index: currentIndex, scene: sceneIndex };
+  const held = holdRef.current;
+  const shownIndex = held ? held.index : currentIndex;
+  // rede de segurança: se o mundo 3D não responder (ex.: sem WebGL), a interface nunca fica presa
+  const [, forceRender] = useReducer((x: number) => x + 1, 0);
+  useEffect(() => {
+    if (!held) return;
+    const t = window.setTimeout(() => {
+      if (holdRef.current === held) {
+        holdRef.current = null;
+        forceRender();
+      }
+    }, 4500);
+    return () => window.clearTimeout(t);
+  }, [held]);
+
+  const renderSection = (index: number) => {
+    switch (index) {
       case SCREEN.OPENING:
         return <IntroSection />;
       case SCREEN.WHY_JAPAN:
@@ -193,14 +224,22 @@ const StrategicPresentationStage: React.FC = () => {
       <NavigationChrome />
 
       {/* Active Interactive Experience Stage */}
-      <main
-        key={currentIndex}
-        className={`relative z-10 flex-1 overflow-hidden animate-sectionCinema transition-all duration-500 ${
-          stageMode ? 'pt-0 pb-0' : 'pt-12 pb-11'
-        }`}
-      >
-        {renderSection()}
-      </main>
+      <FrozenPresentation frozen={held}>
+        <main
+          key={shownIndex}
+          className={`relative z-10 flex-1 overflow-hidden animate-sectionCinema transition-all duration-500 ${
+            stageMode ? 'pt-0 pb-0' : 'pt-12 pb-11'
+          }`}
+        >
+          {/* Etapa 11: opacidade da travessia (a animação de entrada do <main> fixa a própria opacidade) */}
+          <div className="h-full w-full" style={{ opacity: 'var(--kz-ui-opacity, 1)' }}>
+            {renderSection(shownIndex)}
+          </div>
+        </main>
+      </FrozenPresentation>
+
+      {/* Etapa 11: véu curto das transições simplificadas (saltos, movimento reduzido) */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-[15] bg-[#05080D]" style={{ opacity: 'var(--kz-veil, 0)' }} />
 
       {/* 15th Invisible Layer: Modo Banca (B) + Teleprompter & Camada de Evidências (E) */}
       <EvidenceAndBancaPanels />

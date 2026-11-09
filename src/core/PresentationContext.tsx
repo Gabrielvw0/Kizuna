@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import sourcesData from '../data/sources.json';
 import { getPlan, scaleStory, yen } from '../data/pricing';
 import { SCREEN, checkNarrativeMap } from './narrativeMap';
@@ -587,6 +587,22 @@ export const PresentationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       {children}
     </PresentationContext.Provider>
   );
+};
+
+/**
+ * Etapa 11 • Mantém a interface da tela de ORIGEM exatamente como estava durante uma transição espacial:
+ * as seções leem a tela/cena congeladas, sem remontar (a árvore é sempre a mesma; só os valores mudam).
+ * Sem congelamento, repassa o contexto real.
+ */
+export const FrozenPresentation: React.FC<{ frozen: { index: number; scene: number } | null; children: React.ReactNode }> = ({ frozen, children }) => {
+  const ctx = usePresentation();
+  const value = useMemo(() => {
+    if (!frozen) return ctx;
+    const section = PRESENTATION_SECTIONS[frozen.index];
+    const key = (section.sourceKey ?? section.code) as keyof typeof sourcesData.sections;
+    return { ...ctx, currentIndex: frozen.index, sceneIndex: frozen.scene, currentSection: section, currentSectionData: sourcesData.sections[key] || sourcesData.sections['01'] };
+  }, [ctx, frozen]);
+  return <PresentationContext.Provider value={value}>{children}</PresentationContext.Provider>;
 };
 
 export const usePresentation = (): PresentationContextType => {

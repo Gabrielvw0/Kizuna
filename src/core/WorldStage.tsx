@@ -14,6 +14,9 @@ import { buildWorkspace, WORKSPACE_FOG } from './environments/workspace';
 import { buildEcosystem, ECOSYSTEM_FOG } from './environments/ecosystem';
 import { buildPortal } from './environments/portal';
 import { buildModular, HALL_DAIS } from './environments/modular';
+import { TransitionDirector } from './transitions/TransitionDirector';
+import { uiBus } from './transitions/uiBus';
+import { findPlan, PLANS, prefersReducedMotion, SCREEN_PLANS, SCREEN_TRUST, transitionKind } from './transitions/plans';
 import worldGeoJsonRaw from '../data/world.geojson?raw';
 import { GLOBANT_PRESENCE, GLOBANT_PRESENCE_POINTS, JAPAN } from '../data/globantPresence';
 
@@ -176,7 +179,8 @@ const orientationFor = (lat: number, lng: number) => ({
  */
 function frameGlobePose(pose: { pos: THREE.Vector3; target: THREE.Vector3 }, aspect: number) {
   const ref = 16 / 9;
-  if (aspect >= ref) return pose;
+  // área sem tamanho (aba oculta, 0×0): sem ajuste, para a câmera nunca receber NaN
+  if (!(aspect > 0) || aspect >= ref) return pose;
   const k = Math.min(1.45, Math.pow(ref / aspect, 0.9));
   const pos = pose.pos.clone();
   const target = pose.target.clone();
@@ -1158,6 +1162,9 @@ export const WorldStage: React.FC = () => {
     // enquanto o cenário está ativo; fora dele, a névoa padrão da apresentação é restaurada.
     // =========================================================================
     const DEFAULT_FOG = { color: (scene.fog as THREE.FogExp2).color.clone(), density: (scene.fog as THREE.FogExp2).density };
+    /** Etapa 11: névoa de cada cenário técnico (a mesma regra de antes, por cenário, para poder interpolar). */
+    const fogForStage = (st: number) =>
+      st === 9 || st === 10 ? MARUNOUCHI_FOG : st === 11 ? OFFICE_FOG : st === 13 ? PLANNING_FOG : st === 1 ? ATRIUM_FOG : st === 2 || st === 3 ? CORRIDOR_FOG : st === 4 ? PASSAGE_FOG : st === 5 ? WORKSPACE_FOG : st === 7 ? ECOSYSTEM_FOG : DEFAULT_FOG;
     const marunouchi = buildMarunouchi(renderer.capabilities.getMaxAnisotropy());
     marunouchi.root.position.y = -1.4;
     marunouchi.root.visible = false;
@@ -1224,6 +1231,19 @@ export const WorldStage: React.FC = () => {
     const modular = buildModular();
     modular.root.visible = false;
     scene.add(modular.root);
+    // Etapa 11: contêineres por cenário para âncora/rebase. Os objetos mantêm as posições internas; só o
+    // contêiner se desloca. A sala da 08 tem posição natural própria (REST); enquanto a 07 está em cena ou
+    // durante a travessia, fica ancorada atrás do paredão (deslocamento do plano 07 → 08).
+    const cluster07 = new THREE.Group();
+    cluster07.name = 'cluster-07';
+    scene.add(cluster07);
+    cluster07.add(portalHall.root, gateGroup);
+    const cluster08 = new THREE.Group();
+    cluster08.name = 'cluster-08';
+    scene.add(cluster08);
+    cluster08.add(modular.root, modularScaleGroup);
+    const HALL_ANCHOR_Z = PLANS[0].anchorZ;
+    const HALL_REST_Z = -HALL_ANCHOR_Z;
 
     // =========================================================================
     // RENDER & ANIMATION LOOP
@@ -1231,7 +1251,8 @@ export const WorldStage: React.FC = () => {
     let animId: number;
     let clock = new THREE.Clock();
     // Tela 08 avisa o 3D quando o número de usuários muda no simulador
-    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const reducedMotion = prefersReducedMotion();
+    const debugProbe = new URLSearchParams(window.location.search).has('kzdebug');
     const onRevenue = (e: Event) => {
       const strength = Math.max(0.4, Math.min(1, Number((e as CustomEvent).detail?.strength) || 0.6));
       growth.revenuePulse(strength, clock.getElapsedTime());
@@ -1250,8 +1271,20 @@ export const WorldStage: React.FC = () => {
     const currentPos = initialShot.pos.clone();
     const currentTarget = initialShot.target.clone();
     let lastElapsed = 0;
-    // Etapa 10: a tela 08 foi alcançada atravessando o portão da tela 07 (o portão fica aberto atrás da câmera)
-    let gatePassage = false;
+    // Etapa 11: controle central das transições entre telas (piloto: 07 ↔ 08)
+    const director = new TransitionDirector();
+    let hallAnchored = stateRef.current.currentIndex !== SCREEN_PLANS;
+    cluster08.position.z = hallAnchored ? 0 : HALL_REST_Z;
+    let gateArriveApproved = false; // chegando à 07 vindo da 08: o portal já está aprovado (sem repetir o Hanko)
+    let growthFrozen: number | null = null; // nível da 08 congelado enquanto ela é a origem de um voo
+    let lastGrowthLevel = 0;
+    let growthLightK = 0;
+    const growthLights: { l: THREE.Light; base: number }[] = [];
+    growth.group.traverse((o) => {
+      if ((o as THREE.Light).isLight) growthLights.push({ l: o as THREE.Light, base: (o as THREE.Light).intensity });
+    });
+    const destPos = new THREE.Vector3();
+    const destTarget = new THREE.Vector3();
     // Tomada de câmera entre CENAS da mesma tela: tween com easing (acelera e desacelera) a partir de onde
     // a câmera está. Entre TELAS continua a aproximação exponencial já aprovada.
     const camShot = {
@@ -1261,9 +1294,7 @@ export const WorldStage: React.FC = () => {
       at: 0,
       dur: 1.0,
       fromPos: new THREE.Vector3(),
-      fromTarget: new THREE.Vector3(),
-      // Etapa 10: voo pelo portão (07 → 08) — trajetória curva própria em vez de reta
-      path: null as null | { pos: THREE.CatmullRomCurve3; target: THREE.CatmullRomCurve3 }
+      fromTarget: new THREE.Vector3()
     };
 
     // Orientação do globo: tomadas com duração e suavização, sem rotação infinita.
@@ -1326,39 +1357,52 @@ export const WorldStage: React.FC = () => {
       const camK = 1 - Math.exp(-dt * (sIdx === 0 || sIdx === 14 ? 0.9 : 2.75));
       const framed = sIdx === 0 ? frameGlobePose(pose, camera.aspect) : pose;
       if (currentIndex !== camShot.screen) {
-        // (A) troca de tela: comportamento existente
-        // Etapa 10: da tela 07 para a 08 a câmera atravessa o portão aberto até a sala (voo contínuo).
-        // Qualquer outra troca que entre ou saia da tela 08 é um corte (a sala fica 12 m atrás do paredão
-        // e um voo longo cruzaria outros cenários). O voo acontece também com "movimento reduzido" no sistema
-        // (é a transição narrativa pedida para a apresentação), apenas mais curto.
+        // (A) troca de tela. Etapa 11: o TransitionDirector decide o tipo (voo de um plano, véu curto ou o
+        // comportamento existente das conexões ainda não tratadas) e resolve as interrupções.
         const prevScreen = camShot.screen;
-        const intoHall = prevScreen === 6 && currentIndex === 7;
-        if (currentIndex === 7) gatePassage = intoHall;
         camShot.screen = currentIndex;
         camShot.scene = sceneIndex;
         camShot.tween = false;
-        camShot.path = null;
-        if ((prevScreen === 7 || currentIndex === 7) && !intoHall) {
-          currentPos.copy(framed.pos);
-          currentTarget.copy(framed.target);
-        } else if (intoHall) {
-          // Voo de ~2,8 s com aceleração e desaceleração: alinha-se ao eixo diante do portão, atravessa o vão
-          // olhando para dentro da sala e acomoda-se no enquadramento da 08.1. (A aproximação exponencial
-          // padrão cruzaria os 17 m em ~0,2 s e pareceria um corte.)
-          const V = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
-          camShot.path = {
-            pos: new THREE.CatmullRomCurve3([currentPos.clone(), V(0, -0.05, 2.6), V(0.05, -0.12, 0.6), V(0.25, -0.15, -2.6), V(0.7, -0.1, -7.2), framed.pos.clone()], false, 'centripetal'),
-            target: new THREE.CatmullRomCurve3([currentTarget.clone(), V(0, -0.2, -3), V(0.1, -0.35, -6.5), V(0.5, -0.6, -10.5), V(0.9, -0.8, -12.2), framed.target.clone()], false, 'centripetal')
-          };
-          camShot.at = elapsed;
-          camShot.dur = reducedMotion ? 2.2 : 2.8;
-          camShot.tween = true;
+        const kind = transitionKind(prevScreen, currentIndex, reducedMotion);
+        const fl = director.active?.kind === 'flight' ? director.active : null;
+        const isReturn = !!fl && ((fl.dir === 1 && currentIndex === fl.plan.from) || (fl.dir === -1 && currentIndex === fl.plan.to));
+        if (fl && isReturn) {
+          // voltar durante o voo: a mesma trajetória, no sentido inverso, a partir do ponto atual
+          director.reverseFlight();
+          if (currentIndex === SCREEN_TRUST) {
+            gateArriveApproved = true;
+            growthFrozen = lastGrowthLevel;
+          }
+        } else if (director.active || kind === 'veil') {
+          // qualquer outra troca durante uma transição, saltos pelo menu e trocas sem plano envolvendo a 08
+          if (prevScreen === SCREEN_PLANS && currentIndex === SCREEN_TRUST) gateArriveApproved = true;
+          director.startVeil(currentIndex);
+        } else if (kind === 'flight') {
+          const found = findPlan(prevScreen, currentIndex)!;
+          if (found.reverse) {
+            // 08 → 07: desfaz o rebase no mesmo quadro (sala e câmera recuam juntas; nada muda na imagem)
+            if (!hallAnchored) {
+              hallAnchored = true;
+              cluster08.position.z = 0;
+              currentPos.z -= HALL_REST_Z;
+              currentTarget.z -= HALL_REST_Z;
+            }
+            gateArriveApproved = true;
+            growthFrozen = lastGrowthLevel;
+          }
+          destPos.copy(framed.pos);
+          destTarget.copy(framed.target);
+          if (!found.reverse) {
+            destPos.z += HALL_ANCHOR_Z;
+            destTarget.z += HALL_ANCHOR_Z;
+          }
+          director.startFlight(found.plan, found.reverse, currentPos, currentTarget, destPos, destTarget);
         }
       } else if (sceneIndex !== camShot.scene) {
-        // (B) troca de cena na mesma tela: nova tomada (o globo mantém a aproximação lenta própria)
+        // (B) troca de cena na mesma tela: nova tomada (o globo mantém a aproximação lenta própria).
+        // Durante uma transição, o fim do voo acompanha a nova pose e a tomada fica para a chegada.
         camShot.scene = sceneIndex;
-        camShot.path = null;
-        if (sIdx !== 0 && sIdx !== 14) {
+        if (sIdx !== 0 && sIdx !== 14 && !director.active) {
           camShot.fromPos.copy(currentPos);
           camShot.fromTarget.copy(currentTarget);
           camShot.at = elapsed;
@@ -1366,23 +1410,71 @@ export const WorldStage: React.FC = () => {
           camShot.tween = true;
         }
       }
-      if (camShot.tween) {
+
+      // pose de destino no quadro em que a câmera está (a sala da 08 pode estar ancorada atrás da 07)
+      let hallShot = false;
+      const computeDest = () => {
+        hallShot = hallAnchored && (sIdx === 6 || sIdx === 12);
+        destPos.copy(framed.pos);
+        destTarget.copy(framed.target);
+        if (hallShot) {
+          destPos.z += HALL_ANCHOR_Z;
+          destTarget.z += HALL_ANCHOR_Z;
+        }
+      };
+      computeDest();
+      let trOut: ReturnType<TransitionDirector['update']>;
+      try {
+        trOut = director.update({ dt, destPos, destTarget });
+      } catch (err) {
+        // segurança: uma falha na transição nunca congela a apresentação — vai direto ao destino
+        console.error('[Kizuna] transição cancelada', err);
+        director.cancel();
+        uiBus.release();
+        uiBus.setVisuals(1, 0);
+        hallAnchored = currentIndex !== SCREEN_PLANS;
+        cluster08.position.z = hallAnchored ? 0 : HALL_REST_Z;
+        growthFrozen = null;
+        computeDest();
+        currentPos.copy(destPos);
+        currentTarget.copy(destTarget);
+        trOut = { pos: null, target: null, flightDone: null, veilPeak: null };
+      }
+      if (trOut.veilPeak) {
+        // pico do véu: destino aplicado de forma determinística (âncora coerente, câmera exata, sem resíduos)
+        hallAnchored = trOut.veilPeak.target !== SCREEN_PLANS;
+        cluster08.position.z = hallAnchored ? 0 : HALL_REST_Z;
+        growthFrozen = null;
+        computeDest(); // a âncora pode ter mudado neste quadro
+        currentPos.copy(destPos);
+        currentTarget.copy(destTarget);
+        camShot.tween = false;
+      }
+      if (trOut.pos && trOut.target) {
+        currentPos.copy(trOut.pos);
+        currentTarget.copy(trOut.target);
+      } else if (camShot.tween) {
         const p = Math.min(1, (elapsed - camShot.at) / camShot.dur);
         const e = easeInOutCubic(p);
-        if (camShot.path) {
-          camShot.path.pos.getPoint(e, currentPos);
-          camShot.path.target.getPoint(e, currentTarget);
-        } else {
-          currentPos.lerpVectors(camShot.fromPos, framed.pos, e);
-          currentTarget.lerpVectors(camShot.fromTarget, framed.target, e);
-        }
-        if (p >= 1) {
-          camShot.tween = false;
-          camShot.path = null;
-        }
+        currentPos.lerpVectors(camShot.fromPos, hallShot ? destPos : framed.pos, e);
+        currentTarget.lerpVectors(camShot.fromTarget, hallShot ? destTarget : framed.target, e);
+        if (p >= 1) camShot.tween = false;
       } else {
-        currentPos.lerp(framed.pos, camK);
-        currentTarget.lerp(framed.target, camK);
+        currentPos.lerp(hallShot ? destPos : framed.pos, camK);
+        currentTarget.lerp(hallShot ? destTarget : framed.target, camK);
+      }
+      if (trOut.flightDone) {
+        const done = trOut.flightDone;
+        if (done.dir === 1 && done.plan.to === SCREEN_PLANS) {
+          // rebase: a sala volta à posição natural e a câmera acompanha no mesmo quadro (sem salto)
+          hallAnchored = false;
+          cluster08.position.z = HALL_REST_Z;
+          currentPos.z += HALL_REST_Z;
+          currentTarget.z += HALL_REST_Z;
+        }
+        growthFrozen = null;
+        camShot.screen = currentIndex;
+        camShot.scene = sceneIndex;
       }
       camera.position.copy(currentPos);
       camera.lookAt(currentTarget);
@@ -1513,8 +1605,20 @@ export const WorldStage: React.FC = () => {
       // 7. Modular Expansion Lattice (Scene 07)
       // -----------------------------------------------------------------------
       // nível da estrutura: 08.1 Start • 08.2 Business • 08.3 Enterprise • 08.4 simulador
-      const growthLevel = sIdx === 6 ? Math.min(3, scIdx + 1) : sIdx === 12 ? 4 : 0;
+      const naturalGrowth = sIdx === 6 ? Math.min(3, scIdx + 1) : sIdx === 12 ? 4 : 0;
+      let growthLevel = naturalGrowth;
+      {
+        // Etapa 11: chegando pelo portão, a estrutura só começa a crescer quando a câmera chega à sala;
+        // saindo (volta para a 07), fica como estava até a câmera deixar a sala.
+        const fl = director.active?.kind === 'flight' ? director.active : null;
+        if (fl && fl.dir === 1 && naturalGrowth > 0) growthLevel = fl.s >= fl.plan.arrival ? naturalGrowth : 0;
+        else if (fl && growthFrozen !== null) growthLevel = growthFrozen;
+      }
+      lastGrowthLevel = growthLevel;
       growth.setLevel(growthLevel, elapsed);
+      // as luzes da estrutura entram e saem gradualmente (não "acendem" a sala de uma vez)
+      growthLightK += ((growthLevel > 0 ? 1 : 0) - growthLightK) * (1 - Math.exp(-dt * 2.5));
+      growthLights.forEach(({ l, base }) => (l.intensity = base * growthLightK));
       modularScaleGroup.visible = growthLevel > 0;
       if (growthLevel > 0) {
         // em telas 4:3 a estrutura encolhe um pouco para não invadir a coluna de texto
@@ -1548,8 +1652,9 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       // 9. Red Gate / Vault (Scene 09)
       // -----------------------------------------------------------------------
-      // Etapa 10: na tela 08 alcançada pelo portão, o portão continua visível e aberto (a câmera passa por ele)
-      const gateOpenBeyond = (sIdx === 6 || sIdx === 12) && gatePassage;
+      // Etapa 11: durante a travessia rumo à 08, o portão continua visível e aberto (a câmera passa por ele)
+      const flightActive = director.active?.kind === 'flight';
+      const gateOpenBeyond = (sIdx === 6 || sIdx === 12) && flightActive;
       gateGroup.visible = sIdx === 8 || gateOpenBeyond;
       if (sIdx === 8) {
         // em telas 4:3 o portal estreita um pouco para os montantes ficarem nos vãos entre as colunas
@@ -1557,7 +1662,9 @@ export const WorldStage: React.FC = () => {
         // Linha do tempo da cena 07.2 (segundos desde a entrada na cena). Na 07.1, tudo fechado.
         if (scIdx !== gateSceneSeen) {
           gateSceneSeen = scIdx;
-          gateSceneAt = elapsed;
+          // Etapa 11: chegando da 08, o portal já está aprovado — Hanko aplicado e abertura concluída
+          gateSceneAt = gateArriveApproved ? elapsed - 60 : elapsed;
+          gateArriveApproved = false;
         }
         const tr = elapsed - gateSceneAt;
         // 07.2: a câmera ajusta o enquadramento primeiro (GATE_LEAD) e só então o Hanko entra.
@@ -1602,8 +1709,9 @@ export const WorldStage: React.FC = () => {
           open = gateSnap.open * c;
           reveal = gateSnap.reveal * c;
         }
-        portalFill.intensity = 0.6 - 0.2 * focus;
-        portalKey.intensity = 2.0 + 0.8 * focus;
+        // Etapa 11: a luz do portal cede lugar à da estrutura de crescimento (cruzamento, sem "vale" de luz)
+        portalFill.intensity = (0.6 - 0.2 * focus) * (1 - growthLightK);
+        portalKey.intensity = (2.0 + 0.8 * focus) * (1 - growthLightK);
         sealMat.opacity = seal;
 
         // 4. a trava gira e destrava
@@ -1644,9 +1752,9 @@ export const WorldStage: React.FC = () => {
           beyondMat.uniforms.uOpacity.value = 0.79;
           pathMat.opacity = 0.32;
           washiMat.opacity = 0.34;
-          const outside = Math.max(0, Math.min(1, (camera.position.z + 3) / 4));
-          portalKey.intensity = 2.0 * outside;
-          portalFill.intensity = 0.6 * outside;
+          // a luz do portal só cede quando a da estrutura entra (mesma regra na ida e na volta)
+          portalKey.intensity = 2.0 * (1 - growthLightK);
+          portalFill.intensity = 0.6 * (1 - growthLightK);
           portalPoint.intensity = 0;
         }
       }
@@ -1684,15 +1792,25 @@ export const WorldStage: React.FC = () => {
       // Etapa 10 • Telas 07 e 08: portal monumental e arquitetura modular (materiais sem névoa)
       const onPortal = sIdx === 8;
       const onModular = sIdx === 6 || sIdx === 12;
-      portalHall.root.visible = onPortal || (onModular && gatePassage);
+      portalHall.root.visible = onPortal || (onModular && flightActive);
       // a sala existe atrás do paredão também na tela 07 (vista pela abertura); na 08 fica acesa
       modular.root.visible = onPortal || onModular;
       if (onModular) modular.setLight(1);
       {
         const fog = scene.fog as THREE.FogExp2;
-        const target = onCity ? MARUNOUCHI_FOG : onOffice ? OFFICE_FOG : onPlanning ? PLANNING_FOG : onAtrium ? ATRIUM_FOG : onCorridor ? CORRIDOR_FOG : onPassage ? PASSAGE_FOG : onWorkspace ? WORKSPACE_FOG : onEcosystem ? ECOSYSTEM_FOG : DEFAULT_FOG;
-        fog.color.copy(target.color);
-        fog.density = target.density;
+        const target = fogForStage(sIdx);
+        const fl = director.active?.kind === 'flight' ? director.active : null;
+        if (fl) {
+          // Etapa 11: na travessia, a névoa passa da origem ao destino em torno do limiar
+          const fa = fogForStage(toStage(fl.plan.from, 0).stage);
+          const fb = fogForStage(toStage(fl.plan.to, 0).stage);
+          const k = Math.max(0, Math.min(1, (fl.s - (fl.plan.threshold - 0.08)) / 0.16));
+          fog.color.copy(fa.color).lerp(fb.color, k);
+          fog.density = fa.density + (fb.density - fa.density) * k;
+        } else {
+          fog.color.copy(target.color);
+          fog.density = target.density;
+        }
       }
       // a cúpula do salão substitui o campo de estrelas solto na tela 01
       starField.visible = !onCity && !onOffice && !onPlanning && !onHall && !onAtrium && !onCorridor && !onPassage && !onWorkspace && !onEcosystem && !onPortal && !onModular;
@@ -1702,7 +1820,32 @@ export const WorldStage: React.FC = () => {
       // Ambient background drift
       starField.rotation.y += 0.0002;
 
-      renderer.render(scene, camera);
+      // Etapa 11: enquanto o véu sobe, a imagem da origem fica congelada (o destino só é desenhado no pico)
+      const veilRising = director.active?.kind === 'veil' && director.active.phase === 'up';
+      if (debugProbe) {
+        // sonda de validação (?kzdebug): só leitura
+        const a = director.active;
+        const q = camera.quaternion;
+        (window as unknown as { __kzWorld?: unknown }).__kzWorld = {
+          t: elapsed,
+          screen: currentIndex,
+          scene: sceneIndex,
+          cam: [camera.position.x, camera.position.y, camera.position.z],
+          quat: [q.x, q.y, q.z, q.w],
+          hallAnchored,
+          cluster08z: cluster08.position.z,
+          tr: a ? (a.kind === 'flight' ? { kind: 'flight', dir: a.dir, s: a.s, shown: a.shown } : { kind: 'veil', phase: a.phase, value: a.value, target: a.target }) : null,
+          gate: { visible: gateGroup.visible, open: shojiL.scale.x < 0.5, seal: sealMat.opacity, hanko: hanko.visible, lock: lockGroup.visible },
+          portalVisible: portalHall.root.visible,
+          growthLevel: lastGrowthLevel,
+          growthVisible: modularScaleGroup.visible,
+          growthLightK,
+          fog: [(scene.fog as THREE.FogExp2).density],
+          drawCalls: renderer.info.render.calls,
+          rendered: !veilRising
+        };
+      }
+      if (!veilRising) renderer.render(scene, camera);
     };
 
     animate();
