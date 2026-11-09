@@ -37,6 +37,8 @@ export interface Anchor {
   cluster: 'c02' | 'c03' | 'c04' | 'c05' | 'c06' | 'c07' | 'c09' | 'c10' | 'c11';
   pos: Vec3;
   yaw?: number;
+  /** qual lado fica ancorado: o destino (padrão) ou a origem — quando o destino não pode se deslocar (globo) */
+  side?: 'from' | 'to';
 }
 
 export interface FlightPlan {
@@ -348,6 +350,29 @@ export const PLANS: FlightPlan[] = [
     uiOutEnd: 0.3,
     uiRelease: 0.85,
     uiInFull: 0.96
+  }),
+
+  // 11 → 12 · DA EXECUÇÃO AO ENCERRAMENTO. A sala de planejamento fica, durante a travessia, diante do globo (a
+  // origem é que se ancora: o globo é o mesmo da abertura e não se desloca). A câmera avança reto e devagar para o
+  // painel central da parede do roadmap, por cima da linha vermelha; o vidro escuro do painel toma o quadro e vira
+  // o espaço: o globo surge à frente, pequeno, e cresce até a composição final da 12.
+  keyed({
+    id: '11-12',
+    from: 10,
+    to: 11,
+    duration: 4.2,
+    reverseDuration: 3.2,
+    keys: [
+      { pos: [0.35, 0.25, 15.6], target: [0.2, 0.45, 5], t: 0.25 },
+      { pos: [0.08, 0.48, 11.6], target: [0.02, 0.5, 0], t: 0.45 },
+      { pos: [0.03, 0.5, 10.6], target: [0, 0.48, 0], t: 0.52, swap: true },
+      { pos: [0.01, 0.45, 8.2], target: [0, 0.1, 0], t: 0.68 }
+    ],
+    overlay: { color: '#0a0e15', radial: 0, rise: [0.4, 0.5], fall: [0.55, 0.76] },
+    anchor: { cluster: 'c11', pos: [0, 0, 16.9], side: 'from' },
+    uiOutEnd: 0.3,
+    uiRelease: 0.78,
+    uiInFull: 0.95
   })
 ];
 
@@ -381,7 +406,7 @@ export function transitionKind(from: number, to: number, reduced: boolean): Tran
   if (from === to) return 'none';
   if (findPlan(from, to)) return reduced ? 'veil' : 'flight';
   if (from === SCREEN_PLANS || to === SCREEN_PLANS) return 'veil';
-  // Fase 3: saltos não adjacentes que envolvem as telas com âncora dos Grupos A, B e C (01–11) usam o véu
+  // Fase 3: saltos não adjacentes (todas as telas têm âncora a partir do Grupo D) usam o véu
   if (Math.abs(from - to) > 1 && (from <= 10 || to <= 10)) return 'veil';
   return 'none';
 }

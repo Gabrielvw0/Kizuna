@@ -1282,6 +1282,8 @@ export const WorldStage: React.FC = () => {
       g.rotation.set(0, a.yaw ?? 0, 0);
       anchoredPlan = plan;
     };
+    /** tela cujo ambiente fica ancorado: o destino (padrão) ou, no 11 → 12, a origem (o globo não se desloca) */
+    const anchoredScreen = (p: FlightPlan) => (p.anchor!.side === 'from' ? p.from : p.to);
     const restClusters = () => {
       Object.values(clusters).forEach((g) => {
         g.position.set(0, 0, 0);
@@ -1521,8 +1523,8 @@ export const WorldStage: React.FC = () => {
             // Fase 3: o destino do plano fica ancorado onde a narrativa pede
             const A = anchorMatrix(found.plan.anchor);
             anchorCluster(found.plan);
-            if (found.reverse) {
-              // volta a partir do repouso: destino ancorado e câmera transformados juntos (nada muda na imagem)
+            if (currentIndex !== anchoredScreen(found.plan)) {
+              // a câmera parte do ambiente ancorado: ele e a câmera são transformados juntos (nada muda na imagem)
               currentPos.applyMatrix4(A);
               currentTarget.applyMatrix4(A);
             } else {
@@ -1559,7 +1561,7 @@ export const WorldStage: React.FC = () => {
           destTarget.z += HALL_ANCHOR_Z;
         }
         // Fase 3: a pose da tela de destino de um plano ancorado é lida no quadro ancorado
-        if (anchoredPlan && currentIndex === anchoredPlan.to) {
+        if (anchoredPlan && currentIndex === anchoredScreen(anchoredPlan)) {
           const A = anchorMatrix(anchoredPlan.anchor!);
           destPos.applyMatrix4(A);
           destTarget.applyMatrix4(A);
@@ -1619,8 +1621,8 @@ export const WorldStage: React.FC = () => {
           currentTarget.z += HALL_REST_Z;
         }
         if (done.plan.anchor) {
-          if (done.dir === 1) {
-            // rebase genérico: destino volta ao repouso e a câmera recebe a transformação inversa no mesmo quadro
+          if (currentIndex === anchoredScreen(done.plan)) {
+            // rebase genérico: o ambiente de chegada volta ao repouso e a câmera recebe a transformação inversa no mesmo quadro
             const inv = anchorMatrix(done.plan.anchor).invert();
             currentPos.applyMatrix4(inv);
             currentTarget.applyMatrix4(inv);
@@ -1671,7 +1673,8 @@ export const WorldStage: React.FC = () => {
       // como tela atual, segue as tomadas de sempre (na volta, já virado para o Japão: nada gira).
       const g0 = vis(0);
       const isGlobeActive = sIdx === 0 || sIdx === 14;
-      const globeShown = sIdx === 14 || g0.on;
+      // Grupo D: na travessia 11 ↔ 12 o globo só aparece do lado da troca em que está à mostra
+      const globeShown = vis(14).on || g0.on;
       globeRoot.visible = globeShown;
       globeLights.visible = globeShown;
       if (isGlobeActive) {
