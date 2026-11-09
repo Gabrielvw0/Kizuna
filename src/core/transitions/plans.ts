@@ -26,11 +26,13 @@ export interface PassageOverlay {
   /** sobe entre rise[0] e rise[1] (τ) e desce entre fall[0] e fall[1] */
   rise: [number, number];
   fall: [number, number];
+  /** reflexo em faixa diagonal que varre o quadro (travessia de vidro) */
+  sweep?: boolean;
 }
 
 /** Grupo de ambiente posicionado provisoriamente durante a transição (desfeito no rebase). */
 export interface Anchor {
-  cluster: 'c02' | 'c03' | 'c04';
+  cluster: 'c02' | 'c03' | 'c04' | 'c05' | 'c06' | 'c07';
   pos: Vec3;
   yaw?: number;
 }
@@ -201,6 +203,76 @@ export const PLANS: FlightPlan[] = [
     uiOutEnd: 0.28,
     uiRelease: 0.84,
     uiInFull: 0.96
+  }),
+
+  // 04 → 05 · DO CONCEITO AO TRABALHO. Travelling lateral para a direita no vestíbulo, girando para a parede de
+  // reboco; quando ela cobre o quadro, um apagamento breve na cor do reboco e a câmera sai da parede esquerda do
+  // escritório (ancorado do outro lado), seguindo até a 05.1. A demonstração só aparece com a câmera posicionada.
+  keyed({
+    id: '04-05',
+    from: 3,
+    to: 4,
+    duration: 2.8,
+    reverseDuration: 2.2,
+    keys: [
+      { pos: [0.9, 0.1, 2.3], target: [3.0, 0, -1.5], t: 0.2 },
+      { pos: [2.2, 0.1, 2.0], target: [6.0, 0.05, 1.2], t: 0.42 },
+      { pos: [3.45, 0.1, 1.8], target: [8.0, 0.1, 1.6], t: 0.55, swap: true },
+      { pos: [4.7, 0.0, 2.2], target: [12.3, -0.25, 0.8], t: 0.66 },
+      { pos: [7.3, -0.17, 2.8], target: [10.3, -0.25, -0.2], t: 0.82 }
+    ],
+    overlay: { color: '#5a5853', radial: 0, rise: [0.48, 0.54], fall: [0.56, 0.62] },
+    anchor: { cluster: 'c05', pos: [10.3, -0.25, 0.3] },
+    uiOutEnd: 0.3,
+    uiRelease: 0.86,
+    uiInFull: 0.97
+  }),
+
+  // 05 → 06 · DA ATIVIDADE AO SISTEMA. Voo pelo corredor central entre as bancadas, acima dos monitores e abaixo das
+  // luminárias, até atravessar a fachada envidraçada entre dois montantes; um reflexo em faixa varre o quadro e, do
+  // outro lado, está o pavilhão de vidro (ancorado além da fachada), até a 06.1.
+  keyed({
+    id: '05-06',
+    from: 4,
+    to: 5,
+    duration: 3.0,
+    reverseDuration: 2.4,
+    keys: [
+      { pos: [0.6, 0.12, 1.2], target: [0.7, 0.05, -8], t: 0.16 },
+      { pos: [0.8, 0.15, -3.0], target: [0.85, 0.1, -12], t: 0.42 },
+      { pos: [0.85, 0.12, -7.5], target: [0.87, 0.1, -14], t: 0.64 },
+      { pos: [0.875, 0.1, -9.95], target: [0.875, 0.1, -16], t: 0.76, swap: true },
+      { pos: [0.725, 0.06, -11.15], target: [0.475, 0, -15.05], t: 0.88 }
+    ],
+    overlay: { color: '#c9d6e2', radial: 0, rise: [0.68, 0.75], fall: [0.78, 0.86], sweep: true },
+    anchor: { cluster: 'c06', pos: [0.425, 0, -14.55] },
+    uiOutEnd: 0.3,
+    uiRelease: 0.86,
+    uiInFull: 0.96
+  }),
+
+  // 06 → 07 · DA INTEGRAÇÃO À GOVERNANÇA. Da 06.2, a câmera contorna a ponta da divisória de trás, entra no jardim e
+  // passa rente ao bambuzal; a luz cai para um crepúsculo quente e dele surge o pátio do portal (ancorado além do
+  // jardim, com a sala da 08 alinhada atrás do portão), avançando pelo eixo até a 07.1.
+  keyed({
+    id: '06-07',
+    from: 5,
+    to: 6,
+    duration: 3.4,
+    reverseDuration: 2.7,
+    keys: [
+      { pos: [2.6, 0, -3.6], target: [5.5, -0.1, -8], t: 0.18 },
+      { pos: [4.75, -0.05, -5.2], target: [4.2, -0.1, -11], t: 0.36 },
+      { pos: [4.3, -0.1, -8.6], target: [3.0, -0.15, -14], t: 0.55 },
+      { pos: [3.5, -0.12, -9.6], target: [3.2, -0.15, -16], t: 0.66 },
+      { pos: [3.3, -0.12, -10.55], target: [3.1, -0.15, -17], t: 0.76, swap: true },
+      { pos: [2.75, -0.3, -12.15], target: [2.4, -0.4, -20.15], t: 0.88 }
+    ],
+    overlay: { color: '#140f0b', radial: 0, rise: [0.6, 0.745], fall: [0.78, 0.9] },
+    anchor: { cluster: 'c07', pos: [2.4, -0.42, -20.15] },
+    uiOutEnd: 0.3,
+    uiRelease: 0.86,
+    uiInFull: 0.97
   })
 ];
 
@@ -234,7 +306,7 @@ export function transitionKind(from: number, to: number, reduced: boolean): Tran
   if (from === to) return 'none';
   if (findPlan(from, to)) return reduced ? 'veil' : 'flight';
   if (from === SCREEN_PLANS || to === SCREEN_PLANS) return 'veil';
-  // Fase 3: saltos não adjacentes que envolvem as telas com âncora do Grupo A (01–04) usam o véu
-  if (Math.abs(from - to) > 1 && (from <= 3 || to <= 3)) return 'veil';
+  // Fase 3: saltos não adjacentes que envolvem as telas com âncora dos Grupos A e B (01–07) usam o véu
+  if (Math.abs(from - to) > 1 && (from <= 6 || to <= 6)) return 'veil';
   return 'none';
 }

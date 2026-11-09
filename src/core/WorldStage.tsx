@@ -1247,14 +1247,17 @@ export const WorldStage: React.FC = () => {
     // Etapa 11 • Fase 3: grupos das telas 02, 03 e 04 para âncora/rebase genéricos (transformação rígida).
     // Na posição natural (repouso) a transformação é a identidade; os objetos mantêm as posições internas.
     // O globo NÃO entra em grupo nenhum: é compartilhado com a tela 12 e nunca se desloca.
-    const clusters = { c02: new THREE.Group(), c03: new THREE.Group(), c04: new THREE.Group() };
-    clusters.c02.name = 'cluster-02';
-    clusters.c03.name = 'cluster-03';
-    clusters.c04.name = 'cluster-04';
-    scene.add(clusters.c02, clusters.c03, clusters.c04);
+    const clusters = { c02: new THREE.Group(), c03: new THREE.Group(), c04: new THREE.Group(), c05: new THREE.Group(), c06: new THREE.Group(), c07: new THREE.Group() };
+    Object.entries(clusters).forEach(([k, g]) => (g.name = 'cluster-' + k.slice(1)));
+    scene.add(clusters.c02, clusters.c03, clusters.c04, clusters.c05, clusters.c06, clusters.c07);
     clusters.c02.add(atrium.root);
     clusters.c03.add(corridorEnv.root, corridorGroup, fusionGroup);
     clusters.c04.add(passage.root, threadWeaveGroup);
+    // Grupo B: escritório + trilho da demonstração; pavilhão + treliças; portal + sala da 08 (grupo-pai: a lógica
+    // própria da 07 ↔ 08 continua deslocando a sala dentro dele, relativa ao portal)
+    clusters.c05.add(workspace.root, taskPipelineGroup);
+    clusters.c06.add(ecosystem.root, adaptationMorphGroup);
+    clusters.c07.add(cluster07, cluster08);
     const anchorMatrix = (a: Anchor) =>
       new THREE.Matrix4().compose(new THREE.Vector3(...a.pos), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), a.yaw ?? 0), new THREE.Vector3(1, 1, 1));
     let anchoredPlan: FlightPlan | null = null;
@@ -1274,13 +1277,17 @@ export const WorldStage: React.FC = () => {
     };
     // camada de passagem (névoa atmosférica, sombra de oclusão, luz) desenhada sobre o mundo 3D, em tela cheia
     const passageMat = new THREE.ShaderMaterial({
-      uniforms: { uColor: { value: new THREE.Color() }, uOpacity: { value: 0 }, uRadial: { value: 0 } },
+      uniforms: { uColor: { value: new THREE.Color() }, uOpacity: { value: 0 }, uRadial: { value: 0 }, uSweep: { value: 0 }, uPos: { value: 0 } },
       vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
-      fragmentShader: `uniform vec3 uColor; uniform float uOpacity; uniform float uRadial; varying vec2 vUv;
+      fragmentShader: `uniform vec3 uColor; uniform float uOpacity; uniform float uRadial; uniform float uSweep; uniform float uPos; varying vec2 vUv;
         void main(){
           float d = length((vUv - 0.5) * vec2(1.6, 1.0));
           float shape = mix(1.0, 1.35 * smoothstep(1.05, 0.0, d), uRadial);
           float a = clamp(uOpacity * shape, 0.0, 1.0);
+          // reflexo em faixa diagonal (travessia de vidro)
+          float diag = vUv.x * 0.78 + (1.0 - vUv.y) * 0.62;
+          float band = smoothstep(0.32, 0.0, abs(diag - uPos));
+          a = mix(a, clamp(uOpacity * (0.3 + 0.95 * band), 0.0, 1.0), uSweep);
           a = mix(a, 1.0, smoothstep(0.86, 1.0, uOpacity));
           gl_FragColor = vec4(uColor, a);
           #include <colorspace_fragment>
@@ -1328,8 +1335,11 @@ export const WorldStage: React.FC = () => {
       warm([clusters.c02, atrium.root, passageQuad]);
       warm([clusters.c03, corridorEnv.root, corridorGroup, fusionGroup, passageQuad]);
       warm([clusters.c04, passage.root, threadWeaveGroup, passageQuad]);
+      warm([clusters.c05, workspace.root, taskPipelineGroup, passageQuad]);
+      warm([clusters.c06, ecosystem.root, adaptationMorphGroup, passageQuad]);
+      warm([clusters.c07, cluster07, cluster08, portalHall.root, gateGroup, modular.root, passageQuad]);
       scene.children.forEach((o, i) => (o.visible = saved[i]));
-      [atrium.root, corridorEnv.root, passage.root, planetarium.root].forEach((o) => (o.visible = false));
+      [atrium.root, corridorEnv.root, passage.root, planetarium.root, workspace.root, ecosystem.root, portalHall.root, modular.root].forEach((o) => (o.visible = false));
     }
     let frameCostMs = 0;
     let animId: number;
@@ -1605,6 +1615,8 @@ export const WorldStage: React.FC = () => {
         passageMat.uniforms.uColor.value.set(trOut.overlay.color);
         passageMat.uniforms.uOpacity.value = trOut.overlay.opacity;
         passageMat.uniforms.uRadial.value = trOut.overlay.radial;
+        passageMat.uniforms.uSweep.value = trOut.overlay.sweep >= 0 ? 1 : 0;
+        passageMat.uniforms.uPos.value = -0.35 + Math.max(0, trOut.overlay.sweep) * 1.75;
       } else passageQuad.visible = false;
 
       // Fase 3: quais cenários aparecem. Fora de transição: só o atual. Num voo com troca (swapAt), antes do
@@ -1742,8 +1754,10 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       // 6. Live Task Pipeline (Scene 06)
       // -----------------------------------------------------------------------
-      taskPipelineGroup.visible = sIdx === 5;
-      if (sIdx === 5) {
+      const c5 = vis(5);
+      taskPipelineGroup.visible = c5.on;
+      if (c5.on) {
+        const scIdx = c5.scene;
         const targetX = -1.4 + scIdx * 0.7;
         taskCapsule.position.x = THREE.MathUtils.lerp(taskCapsule.position.x, targetX, 0.08);
         taskCapsule.rotation.x += 0.05;
@@ -1782,8 +1796,10 @@ export const WorldStage: React.FC = () => {
       // -----------------------------------------------------------------------
       // 8. Adaptation Metamorphosis (Scene 08)
       // -----------------------------------------------------------------------
-      adaptationMorphGroup.visible = sIdx === 7;
-      if (sIdx === 7) {
+      const c7 = vis(7);
+      adaptationMorphGroup.visible = c7.on;
+      if (c7.on) {
+        const scIdx = c7.scene;
         // a luz acompanha a cena: a camada ativa acende, a outra recua (por tempo; mov. reduzido = mais curto)
         const k = 1 - Math.exp(-dt * (reducedMotion ? 7 : 2.4));
         const front = scIdx === 0;
@@ -1806,7 +1822,8 @@ export const WorldStage: React.FC = () => {
       // Etapa 11: durante a travessia rumo à 08, o portão continua visível e aberto (a câmera passa por ele)
       const flightActive = director.active?.kind === 'flight';
       const gateOpenBeyond = (sIdx === 6 || sIdx === 12) && flightActive;
-      gateGroup.visible = sIdx === 8 || gateOpenBeyond;
+      // Grupo B: na travessia 06 ↔ 07 o portal só aparece do lado em que está à mostra (troca sob o crepúsculo)
+      gateGroup.visible = (sIdx === 8 && showCurrent) || gateOpenBeyond || (showFrozen && frozen.stage === 8);
       if (sIdx === 8) {
         // em telas 4:3 o portal estreita um pouco para os montantes ficarem nos vãos entre as colunas
         gateGroup.scale.x = camera.aspect < 1.5 ? 0.86 : 1;
@@ -1936,12 +1953,12 @@ export const WorldStage: React.FC = () => {
       const onPassage = vis(4).on;
       passage.root.visible = onPassage;
       // Etapa 10 • Telas 05 e 06: escritório e pavilhão de vidro e aço, cenas estáticas
-      const onWorkspace = sIdx === 5;
+      const onWorkspace = vis(5).on;
       workspace.root.visible = onWorkspace;
-      const onEcosystem = sIdx === 7;
+      const onEcosystem = vis(7).on;
       ecosystem.root.visible = onEcosystem;
       // Etapa 10 • Telas 07 e 08: portal monumental e arquitetura modular (materiais sem névoa)
-      const onPortal = sIdx === 8;
+      const onPortal = vis(8).on;
       const onModular = sIdx === 6 || sIdx === 12;
       portalHall.root.visible = onPortal || (onModular && flightActive);
       // a sala existe atrás do paredão também na tela 07 (vista pela abertura); na 08 fica acesa
